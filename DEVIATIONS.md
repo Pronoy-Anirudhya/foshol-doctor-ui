@@ -203,3 +203,142 @@ harm — so a control that cannot keep its promise is worse than no control.
 **Unblock.** Either narrow `WEB-FR-231` to remedy *selection* plus the note, or add an
 edited-steps field to `PublishAdvisoryRequest` **and** a place for the backend to persist it
 (owner: A1 for the contract, A5 for `review`). Until one of those happens, this stays as built.
+
+---
+
+## D-13 · `app-config.ts` amended for the field-metrics bounds
+
+**What.** `APP_CONFIG.intake.metrics` was added after Wave 0 — `fieldAreaMin/Max/Step`,
+`cropQuantityMin/Max/Step` and `defaultFieldAreaUnit`. `app-config.ts` is otherwise frozen and a
+change to it is an amendment request rather than an edit.
+
+**Why.** The contract now makes `fieldArea` and `fieldAreaUnit` **required** multipart parts, so
+the capture screen has to render two number inputs. `WEB-NFR-009` forbids a numeric literal in a
+component, and `min`, `max` and `step` are numbers; they had nowhere else to live.
+
+**How we cope.** No server property backs any of these. They shape the control and nothing else:
+the client never rejects an area on them, and `WEB-NFR-010` still holds — the server's gate is
+the decision of record. `defaultFieldAreaUnit` is `DECIMAL` (শতক) because that is the unit a
+Bangladeshi smallholder measures a plot in.
+
+**Unblock.** If `foshol.intake.*` ever publishes these bounds, mirror them here and mark the
+constants fallback-only, the way `analysis.confidence*Fallback` already is.
+
+---
+
+## D-14 · The persisted draft now carries the field metrics
+
+**What.** `WEB-DATA-020` names `cropId` and `noteBn` as the only two persisted draft fields.
+`CaseDraftStore` now also persists `fieldArea`, `fieldAreaUnit`, `cropQuantity` and
+`cropQuantityUnit`.
+
+**Why.** `fieldArea` became a required part of every submission. A refresh that kept the crop and
+the note but silently dropped the one newly-required field would leave the farmer staring at a
+disabled submit button with no indication of what had gone.
+
+**How we cope.** All four are typed-in scalars, so `WEB-DATA-021` — the rule that actually
+matters, that image and audio **bytes** never reach web storage — is untouched. A metric is
+written only once it has a value, so a draft the farmer has not reached the field step of
+round-trips byte-identical to how earlier builds wrote it; and a draft persisted by an earlier
+build restores with the metrics simply unanswered rather than being discarded.
+
+**Unblock.** Widen `WEB-DATA-020` to "typed-in scalars" (owner: A1 for the requirement).
+
+---
+
+## D-15 · The vegetation override survives the server's hard non-crop reject
+
+**What.** The server gate now refuses a non-crop photograph outright — `422` with
+`rejectedImages[].reason = NOT_A_CROP`, nothing stored, and no override on that path. The
+**client-side** vegetation heuristic still offers "send anyway" (`WEB-FR-124`).
+
+**Why we kept it.** The client heuristic is a hue/saturation coverage guess with no model behind
+it, and `WEB-FR-124` exists precisely because it is weak: it must never permanently block a
+farmer whose valid photograph it misreads. Removing the override would let a client-side guess
+become terminal, which is the opposite of what the requirement asks for.
+
+**How we cope.** The override stops being an invitation. `farmer.capture.quality.help.NOT_CROP`
+now says the server makes the final call, and a warning line above the button
+(`farmer.capture.quality.sendAnywayWarning`) says the server will refuse a photograph with no
+crop in it and that nothing will be stored. The server's own `NOT_A_CROP` rejection renders as a
+named reason on the thumbnail with **no** override offered — the only forward move there is a new
+photograph.
+
+**Unblock.** If the client ever gets a real crop/not-crop model, revisit whether the local
+verdict should become terminal (owner: A1 for `WEB-FR-124`).
+
+---
+
+## D-16 · A resubmission starts with the field area blank
+
+**What.** `RejectionPanel` calls `CaseDraftStore.discard()` before navigating back to capture, so
+a resubmission after a rejection begins with no field area, and the farmer re-enters it.
+
+**Why.** `discard()` is the one cleanup path that revokes preview object URLs and clears the
+persisted draft (`WEB-DATA-022`); carving the metrics out of it would mean two cleanup paths that
+have to stay in agreement. And a resubmission is not necessarily the same plot — a farmer told
+their photo was of the wrong crop may well be photographing a different field.
+
+**Unblock.** If the demo shows this as friction, carry the metrics across the resubmit hop
+explicitly rather than by exempting them from `discard()` (owner: C-farmer-view, C-capture).
+
+---
+
+## D-17 · `src/styles.css` and `app-config.ts` amended for the UI overhaul
+
+**What.** Both files are integrator-only per `OWNERS.md` ("frozen after Wave 0"). The premium
+overhaul amends both: `styles.css` gains an enriched paddy ramp, a teal accent, a sage neutral,
+three slate steps, `focus-invert`, sixteen semantic aliases and six radius tokens;
+`app-config.ts` gains `notifications` and `admin` blocks.
+
+**Why.** The frozen-after-Wave-0 rule exists so parallel agents cannot collide on shared files
+mid-wave, not to make the design system permanent. A palette with holes in every ramp, no radius
+tokens and no semantic layer is exactly the thing an overhaul has to change, and `WEB-NFR-009`
+forbids the alternative of scattering the new constants through components.
+
+**How we cope.** The change is additive: **no token was removed and no name changed**, so every
+existing `var(--color-*)` reference and every Tailwind utility still resolves. The semantic layer
+is new surface area rather than a rename, so components migrate to it as they are touched instead
+of in one flag day.
+
+**Unblock.** None needed — this is the amendment, applied by the integrator between waves, which
+is what `OWNERS.md` prescribes.
+
+---
+
+## D-18 · The contrast gate now resolves token aliases
+
+**What.** `scripts/check-contrast.mjs` used to scrape `--color-x: #rrggbb;` with a regex. It now
+follows a chain of `var(--color-*)` aliases to the hex it ends at, fails on a dangling or circular
+alias, and says which of the two problems an unresolvable pair has.
+
+**Why.** With a two-layer token system, `--color-primary: var(--color-paddy-600)` is not a hex.
+The old scrape would have gated the ramp nobody writes and silently skipped the alias every
+component writes — the precise drift the script exists to prevent, and a skipped pair looks
+identical to a passing one in the report.
+
+**How we cope.** `PAIRS` now names the semantic token wherever components write one. The gate
+grew from 24 rows to 49, closing gaps that were live but ungated: `paddy-800` on `paddy-50` in
+the success toast, `dawn-300` on `slate-900` in the SSE indicator, and the three chip borders.
+
+**Unblock.** None. One judgement recorded: `dawn-300` on `dawn-100` is **1.49:1** and is gated at
+1.4 as a "decorative floor", consistent with the existing `surface-3`/`surface-0` row at 1.2. The
+toast border carries no meaning alone — the glyph, the tone and the text all say it first.
+
+---
+
+## D-19 · `--color-focus` is unusable on the console chrome
+
+**What.** The focus ring `#0b63c5` clears 3:1 against every light surface but is only **2.69:1**
+on `slate-800`. A new `--color-focus-invert` (7.6:1 on slate-800, 8.5:1 on slate-900) is swapped in
+by a single base-layer rule keyed off `[data-chrome='console']`, which `AppShell` sets when the
+signed-in role is OFFICER or ADMIN.
+
+**Why.** This was a real `WEB-UX-041` / `WEB-UX-043` hole, not a new requirement. It had not bitten
+only because nothing focusable had yet been placed inside a dark panel — and the rebuilt admin
+dashboard puts widgets there.
+
+**How we cope.** One rule, applied from the shell, so a widget author cannot forget it. Both
+inverted pairs are gated in `check-contrast.mjs`.
+
+**Unblock.** None.

@@ -1,7 +1,7 @@
 # Backend blockers found while building this frontend
 
-**Status: B1, B3 (partially) and the SSE gap are FIXED as of 2026-09-08.** What remains open is
-B2 and the audio-analysis race. Each item below now records what was found, and what happened.
+**Status: B1, B2, B3 (partially) and the SSE gap are FIXED as of 2026-09-08.** What remains open
+is the audio-analysis race. Each item below now records what was found, and what happened.
 
 Everything here is in `foshol-doctor` backend modules, not in this repo. Each was reproduced
 against the running stack; none is worked around in the client, because a frontend that
@@ -55,8 +55,20 @@ single case is enough to break it**.
 Fix: `rs.getBigDecimal(...)`, or map through `Number`, for `approval_rate`, `median_minutes` and
 `agreement_rate`. Owner: A5 (`review`).
 
-The admin page is built and correct; until this lands it can only demonstrate its `WEB-FR-305`
-stale-and-error path.
+**FIXED — re-probed 2026-09-08 during the UI overhaul.** With `admin`/`password` against the
+running stack the endpoint now returns **200 with non-null rates**, which is precisely the case
+that used to throw:
+
+```json
+{"casesToday":14,"approvalRate":0,"medianReviewMinutes":255.48561141666664,
+ "agreementRate":1,"agreementSampleSize":7,"confidenceHigh":0.75,"confidenceLow":0.45}
+```
+
+So the admin page can demonstrate its real values, not only the `WEB-FR-305` stale-and-error path.
+The new dashboard widgets are nonetheless sourced from `GET /review/queue` rather than from here —
+not out of distrust, but because `/admin/stats` returns six scalars and the queue returns the
+distribution the widgets actually need. Two independent reads also mean neither endpoint failing
+can blank the whole page.
 
 ---
 
