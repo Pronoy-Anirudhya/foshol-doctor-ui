@@ -4,6 +4,8 @@ import { CaseDraftStore } from './case-draft-store';
 import { CaseReviewStore } from './case-review-store';
 import { CaseStatusStore } from './case-status-store';
 import { LiveAnnouncer } from './live-announcer';
+import { NotificationStore } from './notification-store';
+import { QueueSampleStore } from './queue-sample-store';
 import { QueueStore } from './queue-store';
 import { StatsStore } from './stats-store';
 import { ToastStore } from './toast-store';
@@ -27,9 +29,11 @@ export class StoreTeardown {
     inject(CaseStatusStore),
     inject(CaseDraftStore),
     inject(QueueStore),
+    inject(QueueSampleStore),
     inject(CaseReviewStore),
     inject(StatsStore),
     inject(ToastStore),
+    inject(NotificationStore),
     inject(LiveAnnouncer),
     // Presigned URLs are time-limited by design (COMMON-SEC-016); leaving a cache of live
     // ones behind after sign-out would defeat the limit on a shared demo laptop.
