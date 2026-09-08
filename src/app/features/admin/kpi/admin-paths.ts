@@ -8,6 +8,8 @@
  */
 export const ADMIN_PATHS = {
   stats: '/admin/stats',
+  /** The district's cases — filterable, with the one write on the admin surface (bulk reject). */
+  cases: '/admin/cases',
   /** The KPI dashboard: two district totals plus the per-officer resolution breakdown. */
   kpis: '/admin/kpis',
   /** The drill-down. `kind` and `officerId` are query parameters, never a district. */

@@ -7,12 +7,12 @@ import type { AdminStats } from '../../generated/models/admin-stats';
  *  See DEVIATIONS.md **D-06** and LIVE-API-NOTES.md "Divergence 2".
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * The frozen schema types `AdminStats` as
- *   `{casesToday, approvalRate, medianReviewSeconds, modelOfficerAgreementRate,
- *     advisoriesPublished, casesRejected, pathCounts, thresholds:{high,low}}`
- * while the running server sends
- *   `{casesToday, approvalRate, medianReviewMinutes, agreementRate, agreementSampleSize,
- *     confidenceHigh, confidenceLow}`.
+ * The frozen schema still lists a handful of names the live server never sends
+ *   (`medianReviewSeconds`, `modelOfficerAgreementRate`, `advisoriesPublished`, `casesRejected`,
+ *   `pathCounts`, `thresholds:{high,low}`), while the running server's `AdminStatsView` sends
+ *   exactly `{casesToday, casesThisMonth, casesThisYear, casesLifetime, approvalRate,
+ *   medianReviewMinutes, agreementRate, agreementSampleSize, rejectionRate, confidenceHigh,
+ *   confidenceLow}` (11 fields, frontend-demo-api.md §9). This adapter binds to that wire shape.
  *
  * Three differences matter and are handled here rather than in the page:
  *   1. **`medianReviewMinutes` is a different UNIT from `medianReviewSeconds`.** Reading the
@@ -44,7 +44,12 @@ export interface AdminThresholdsView {
 
 export interface AdminStatsView {
   readonly casesToday: number | null;
+  readonly casesThisMonth: number | null;
+  readonly casesThisYear: number | null;
+  readonly casesLifetime: number | null;
   readonly approvalRate: number | null;
+  /** Share of terminal review tasks in the district whose state is REJECTED. */
+  readonly rejectionRate: number | null;
   /** Minutes, whichever unit the server used to say it. */
   readonly medianReviewMinutes: number | null;
   readonly agreementRate: number | null;
@@ -60,7 +65,11 @@ export interface AdminStatsView {
 /** The live body, named as the server actually names it. */
 interface LiveAdminStatsBody {
   readonly casesToday?: unknown;
+  readonly casesThisMonth?: unknown;
+  readonly casesThisYear?: unknown;
+  readonly casesLifetime?: unknown;
   readonly approvalRate?: unknown;
+  readonly rejectionRate?: unknown;
   readonly medianReviewMinutes?: unknown;
   readonly medianReviewSeconds?: unknown;
   readonly agreementRate?: unknown;
@@ -105,7 +114,11 @@ export function toAdminStatsView(stats: AdminStats): AdminStatsView {
   const body = stats as unknown as LiveAdminStatsBody;
   return {
     casesToday: num(body.casesToday),
+    casesThisMonth: num(body.casesThisMonth),
+    casesThisYear: num(body.casesThisYear),
+    casesLifetime: num(body.casesLifetime),
     approvalRate: num(body.approvalRate),
+    rejectionRate: num(body.rejectionRate),
     medianReviewMinutes: medianMinutesOf(body),
     agreementRate: num(body.agreementRate) ?? num(body.modelOfficerAgreementRate),
     agreementSampleSize: num(body.agreementSampleSize),

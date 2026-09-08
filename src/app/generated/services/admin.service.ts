@@ -15,9 +15,12 @@ import { getAdminKpis } from '../fn/admin/get-admin-kpis';
 import { GetAdminKpis$Params } from '../fn/admin/get-admin-kpis';
 import { getAdminStats } from '../fn/admin/get-admin-stats';
 import { GetAdminStats$Params } from '../fn/admin/get-admin-stats';
+import { listAdminCases } from '../fn/admin/list-admin-cases';
+import { ListAdminCases$Params } from '../fn/admin/list-admin-cases';
 import { listAdminKpiBreaches } from '../fn/admin/list-admin-kpi-breaches';
 import { ListAdminKpiBreaches$Params } from '../fn/admin/list-admin-kpi-breaches';
 import { PageOfKpiBreach } from '../models/page-of-kpi-breach';
+import { PageOfOfficerQueueRow } from '../models/page-of-officer-queue-row';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService extends BaseService {
@@ -122,6 +125,39 @@ export class AdminService extends BaseService {
   listAdminKpiBreaches(params?: ListAdminKpiBreaches$Params, context?: HttpContext): Promise<PageOfKpiBreach> {
     const resp = this.listAdminKpiBreaches$Response(params, context);
     return resp.then((r: StrictHttpResponse<PageOfKpiBreach>): PageOfKpiBreach => r.body);
+  }
+
+  /** Path part for operation `listAdminCases()` */
+  static readonly ListAdminCasesPath = '/api/v1/admin/cases';
+
+  /**
+   * District case list for ADMIN, newest first.
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `listAdminCases()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listAdminCases$Response(params?: ListAdminCases$Params, context?: HttpContext): Promise<StrictHttpResponse<PageOfOfficerQueueRow>> {
+    const obs = listAdminCases(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * District case list for ADMIN, newest first.
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `listAdminCases$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listAdminCases(params?: ListAdminCases$Params, context?: HttpContext): Promise<PageOfOfficerQueueRow> {
+    const resp = this.listAdminCases$Response(params, context);
+    return resp.then((r: StrictHttpResponse<PageOfOfficerQueueRow>): PageOfOfficerQueueRow => r.body);
   }
 
 }
