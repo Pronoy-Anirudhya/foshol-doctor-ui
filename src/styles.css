@@ -141,15 +141,40 @@
   --color-ink-faint: #5b6a62; /* 5.5:1 on surface-0, 4.5:1 on surface-2 — body-text floor */
   --color-ink-invert: #fbfaf7;
 
-  /* ── Paddy green: the primary action colour ─────────────────────────────── */
-  --color-paddy-50: #f0f9f4;
-  --color-paddy-100: #dcefe4;
-  --color-paddy-200: #b6dcc7;
-  --color-paddy-300: #7fc2a1;
-  --color-paddy-500: #2a8a63;
-  --color-paddy-600: #1e6f4e; /* white on this = 5.2:1 */
-  --color-paddy-700: #14523a;
-  --color-paddy-800: #0e3b2a;
+  /* ── Paddy green: the primary action colour ─────────────────────────────────
+     Deepened to a jewel emerald. `paddy-600` gains contrast in the process —
+     ink-invert on it goes 5.2:1 → 6.15:1 — so the primary button is more
+     legible, not merely richer. `400` and `900` fill holes the widget suite
+     needs: 400 is the histogram bar on a dark panel, 900 the far stop of its
+     gradient. */
+  --color-paddy-50: #eef8f2;
+  --color-paddy-100: #d5eddf;
+  --color-paddy-200: #a9dcc0;
+  --color-paddy-300: #6fc39c;
+  --color-paddy-400: #35a878;
+  --color-paddy-500: #1c8a5f;
+  --color-paddy-600: #146c4a; /* ink-invert on this = 6.15:1 */
+  --color-paddy-700: #0e5138;
+  --color-paddy-800: #093727;
+  --color-paddy-900: #05231a;
+
+  /* ── Teal: the accent ───────────────────────────────────────────────────────
+     One vivid hue held back for emphasis the primary must not spend itself on —
+     a sparkline stroke, a peak call-out, an accent chip. Deliberately NOT used
+     for anything the primary already means. */
+  --color-teal-100: #d3f2f2;
+  --color-teal-300: #63d2d5; /* 9.8:1 on slate-900 — a mark on the dark panel */
+  --color-teal-500: #0e979c;
+  --color-teal-600: #08757b; /* 5.2:1 on surface-0 */
+  --color-teal-700: #075a60;
+
+  /* ── Sage: the muted neutral ────────────────────────────────────────────────
+     `sage-600` exists to be a FOURTH categorical fill. Without it the queue's
+     PENDING state has to borrow one of the three decision-path hues, which
+     would say something about routing that is not true. */
+  --color-sage-100: #e9ede7;
+  --color-sage-400: #7d8c78;
+  --color-sage-600: #59684f;
 
   /* ── Dawn amber: warning, mid-confidence, SLA pressure ──────────────────── */
   --color-dawn-100: #fdf0d9;
@@ -163,14 +188,72 @@
   --color-clay-600: #a32f26; /* white = 6.4:1 */
   --color-clay-700: #82251e;
 
-  /* ── Slate: officer console chrome only ─────────────────────────────────── */
+  /* ── Slate: officer console chrome ──────────────────────────────────────────
+     200/300/500 are new. They fix a small existing crime: warm-stone
+     `surface-3` text currently sits on cool slate panels, which reads as a
+     mismatch even where it passes contrast. */
+  --color-slate-200: #c2cbd6;
+  --color-slate-300: #94a2b3;
+  --color-slate-500: #4e5d70;
   --color-slate-600: #3a4757;
   --color-slate-700: #26313e;
   --color-slate-800: #1b2430;
   --color-slate-900: #121924;
 
-  /* ── Focus ring: 3:1+ against every surface above ───────────────────────── */
+  /* ── Focus ring ─────────────────────────────────────────────────────────────
+     `focus` clears 3:1 against every light surface, but it is only 2.69:1 on
+     slate-800 — below the UI floor. That has not bitten yet because nothing
+     focusable sat inside a dark panel; the console widgets change that, so the
+     inverted ring exists for them. */
   --color-focus: #0b63c5;
+  --color-focus-invert: #7ab8ff; /* 7.6:1 on slate-800, 8.5:1 on slate-900 */
+
+  /* ── Semantic aliases ───────────────────────────────────────────────────────
+     Layer two. Components reference these, not the ramps, so re-theming is a
+     change to this block rather than a hunt through seventeen stylesheets. The
+     two-layer shape (primitives → semantics) is what Material 3, Radix,
+     shadcn/ui and the W3C Design Tokens WG all converge on; a flat
+     --primary/--secondary pair cannot express hover, pressed, tinted-ground and
+     border states without components hard-coding shades again.
+
+     Surfaces and ink get NO alias on purpose: `surface-0` and `ink-muted` are
+     already role names, and a second name for one thing is a synonym, not a
+     layer. `scripts/check-contrast.mjs` resolves these to their hex, so the
+     gate checks the names components actually write. */
+  --color-primary: var(--color-paddy-600);
+  --color-primary-hover: var(--color-paddy-700);
+  --color-on-primary: var(--color-ink-invert);
+
+  --color-accent: var(--color-teal-600);
+  --color-accent-soft: var(--color-teal-100);
+  --color-on-accent: var(--color-ink-invert);
+
+  --color-warning: var(--color-dawn-600);
+  --color-on-warning: var(--color-ink-invert);
+
+  --color-danger: var(--color-clay-600);
+  --color-on-danger: var(--color-ink-invert);
+
+  --color-console: var(--color-slate-800);
+  --color-console-deep: var(--color-slate-900);
+  --color-on-console: var(--color-ink-invert);
+  --color-on-console-muted: var(--color-slate-300);
+
+  --color-ring: var(--color-focus);
+  --color-ring-invert: var(--color-focus-invert);
+
+  /* ── Radius ─────────────────────────────────────────────────────────────────
+     Named for the thing, not the size, so a control and a card can be retuned
+     independently. `control` and `card` happen to equal Tailwind's built-in
+     --radius-xl / --radius-2xl; the point is the name. `pill` earns its place
+     because `rounded-full` is a static utility with no variable behind it, and
+     component CSS needs something to write. */
+  --radius-hair: 1px;
+  --radius-control: 0.75rem;
+  --radius-chip: 0.875rem;
+  --radius-card: 1rem;
+  --radius-panel: 1.25rem;
+  --radius-pill: 999px;
 
   /* ── Typography ─────────────────────────────────────────────────────────────
      Bangla is the language of record (COMMON-NFR-037), so both stacks lead with
@@ -198,8 +281,16 @@
   --duration-3: 420ms; /* surface enter */
 
   /* ── Elevation ──────────────────────────────────────────────────────────── */
-  --shadow-card: 0 1px 2px rgb(20 33 27 / 0.06), 0 4px 16px -4px rgb(20 33 27 / 0.1);
-  --shadow-lift: 0 2px 4px rgb(20 33 27 / 0.08), 0 12px 32px -8px rgb(20 33 27 / 0.16);
+  /* Three layers rather than one: a hairline that reads as a contact edge, a short shadow that
+     grounds the card, and a long soft one that gives it height. A single blurred shadow at this
+     opacity reads as a grey smudge; the contact edge is what makes it read as a raised surface.
+     Tinted with ink, never neutral black — a black shadow on a warm ground looks like dirt. */
+  --shadow-card:
+    0 0 0 1px rgb(20 33 27 / 0.03), 0 1px 2px rgb(20 33 27 / 0.05),
+    0 6px 20px -6px rgb(20 33 27 / 0.1);
+  --shadow-lift:
+    0 0 0 1px rgb(20 33 27 / 0.04), 0 2px 4px rgb(20 33 27 / 0.07),
+    0 16px 40px -12px rgb(20 33 27 / 0.18);
   --shadow-stamp: 0 1px 1px rgb(20 33 27 / 0.18);
 }
 
@@ -247,9 +338,16 @@
   /* WEB-UX-041 — a visible focus indicator on every focusable element, never
      removed without replacement. */
   :focus-visible {
-    outline: 3px solid var(--color-focus);
+    outline: 3px solid var(--color-ring);
     outline-offset: 2px;
     border-radius: 4px;
+  }
+
+  /* The default ring is only 2.69:1 on slate-800 — below the 3:1 UI floor. Any focusable thing
+     inside the console chrome gets the inverted ring instead, from one rule, so a widget author
+     cannot forget. Scoped by a data attribute rather than a class so it survives a restyle. */
+  [data-chrome='console'] :focus-visible {
+    outline-color: var(--color-ring-invert);
   }
 
   /* A required field that failed validation gets a red border everywhere in the app, from one
@@ -261,11 +359,18 @@
      `.field { border-color: ... }` is unlayered CSS, which beats anything in `@layer base` on
      cascade order alone, regardless of specificity — the same reason `[hidden]` needs it. */
   :is(input, select, textarea)[aria-invalid='true'] {
-    border-color: var(--color-clay-600) !important;
+    border-color: var(--color-danger) !important;
   }
 
   :is(input, select, textarea)[aria-invalid='true']:focus-visible {
-    outline-color: var(--color-clay-600);
+    outline-color: var(--color-danger);
+  }
+
+  /* The browser's default selection blue fights a warm green palette everywhere it appears.
+     `paddy-100` is light enough that `ink` on it stays far above the text floor. */
+  ::selection {
+    background-color: var(--color-paddy-100);
+    color: var(--color-ink);
   }
 
   /* Numbers must not jitter as they tick. */
@@ -333,7 +438,7 @@
 @utility card {
   background-color: var(--color-surface-0);
   border: 1px solid var(--color-surface-3);
-  border-radius: 1rem;
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
 
