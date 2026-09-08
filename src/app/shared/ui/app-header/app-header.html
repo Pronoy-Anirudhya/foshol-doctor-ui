@@ -50,6 +50,8 @@
     <div class="ms-auto flex items-center gap-2 md:gap-3">
       @if (authenticated()) {
         <foshol-sse-indicator [tone]="tone()" />
+        <!-- The stream's state, then what the stream delivered. -->
+        <foshol-notification-bell [tone]="tone()" />
       }
 
       <foshol-lang-toggle [tone]="tone()" />

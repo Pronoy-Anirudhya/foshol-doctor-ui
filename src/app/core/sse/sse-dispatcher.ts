@@ -1,6 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { CaseStatusStore } from '../stores/case-status-store';
 import { LiveAnnouncer } from '../stores/live-announcer';
+import {
+  NotificationStore,
+  NOTIFY_ADVISORY,
+  NOTIFY_REJECTION,
+  NOTIFY_REVISION,
+  NOTIFY_STATUS,
+  type NotificationKind,
+} from '../stores/notification-store';
 import { QueueStore } from '../stores/queue-store';
 import {
   ToastStore,
@@ -28,6 +36,13 @@ const KEY_ADVISORY_REVISED = 'live.advisory.revised';
 const KEY_CASE_REJECTED = 'live.case.rejected';
 const KEY_QUEUE_UPDATED = 'live.queue.updated';
 const KEY_RESYNCED = 'live.stream.resynced';
+/**
+ * A status notification's detail line is the status label the badges already use, looked up by
+ * the value the server sent. Reusing that catalogue rather than authoring a second set of status
+ * words is what stops the bell and the stepper from ever disagreeing about what `IN_REVIEW`
+ * is called.
+ */
+const KEY_STATUS_LABEL_PREFIX = 'badge.status.';
 
 /**
  * Fan-out from one stream to the stores that care.
@@ -46,6 +61,12 @@ export class SseDispatcher {
   private readonly caseStatus = inject(CaseStatusStore);
   private readonly queue = inject(QueueStore);
   private readonly toasts = inject(ToastStore);
+  /**
+   * The notification centre is a RECORDER hung off this same choke point, not a replacement for
+   * the toast: a toast is the interruption, the bell is the record of it. Appending to an array
+   * issues no request, so the "nothing here fetches" rule above still holds.
+   */
+  private readonly notifications = inject(NotificationStore);
   private readonly announcer = inject(LiveAnnouncer);
   private readonly sse = inject(SseStore);
 
@@ -92,6 +113,13 @@ export class SseDispatcher {
     if (event === null) return;
     // WEB-FR-353 — the whole update, with no request behind it.
     this.caseStatus.applyServerStatus(event.caseId, event.toStatus, event.fromStatus ?? null);
+    this.notifications.record({
+      kind: NOTIFY_STATUS,
+      titleKey: KEY_STATUS_CHANGED,
+      bodyKey: `${KEY_STATUS_LABEL_PREFIX}${event.toStatus}`,
+      caseId: event.caseId,
+      notificationId: event.notificationId,
+    });
     this.announcer.announce(KEY_STATUS_CHANGED);
   }
 
@@ -102,7 +130,7 @@ export class SseDispatcher {
     // WEB-FR-354 — toast now, and mark the case so its view re-reads when it next renders.
     this.caseStatus.markNeedsRefresh(event.caseId);
 
-    const { key, kind } = describe(event);
+    const { key, kind, notificationKind } = describe(event);
     this.toasts.show({
       kind,
       titleKey: event.titleBn === null || event.titleBn === undefined ? key : undefined,
@@ -111,6 +139,16 @@ export class SseDispatcher {
       title: event.titleBn ?? undefined,
       body: event.bodyBn ?? undefined,
       caseId: event.caseId,
+    });
+    // Same fields, kept rather than expired: a farmer who was looking at the camera when the
+    // toast came and went still finds the advisory in the bell.
+    this.notifications.record({
+      kind: notificationKind,
+      titleKey: event.titleBn === null || event.titleBn === undefined ? key : undefined,
+      title: event.titleBn ?? undefined,
+      body: event.bodyBn ?? undefined,
+      caseId: event.caseId,
+      notificationId: event.notificationId,
     });
     this.announcer.announce(key);
   }
@@ -126,15 +164,23 @@ export class SseDispatcher {
   }
 }
 
-function describe(event: AdvisoryEventData): { key: string; kind: ToastKind } {
+function describe(event: AdvisoryEventData): {
+  key: string;
+  kind: ToastKind;
+  notificationKind: NotificationKind;
+} {
   switch (event.type) {
     case ADVISORY_PUBLISHED:
-      return { key: KEY_ADVISORY_PUBLISHED, kind: TOAST_SUCCESS };
+      return {
+        key: KEY_ADVISORY_PUBLISHED,
+        kind: TOAST_SUCCESS,
+        notificationKind: NOTIFY_ADVISORY,
+      };
     case ADVISORY_REVISED:
-      return { key: KEY_ADVISORY_REVISED, kind: TOAST_INFO };
+      return { key: KEY_ADVISORY_REVISED, kind: TOAST_INFO, notificationKind: NOTIFY_REVISION };
     case CASE_REJECTED:
-      return { key: KEY_CASE_REJECTED, kind: TOAST_WARNING };
+      return { key: KEY_CASE_REJECTED, kind: TOAST_WARNING, notificationKind: NOTIFY_REJECTION };
     default:
-      return { key: KEY_ADVISORY_PUBLISHED, kind: TOAST_INFO };
+      return { key: KEY_ADVISORY_PUBLISHED, kind: TOAST_INFO, notificationKind: NOTIFY_ADVISORY };
   }
 }

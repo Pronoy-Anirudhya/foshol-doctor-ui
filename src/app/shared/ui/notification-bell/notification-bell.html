@@ -1,0 +1,134 @@
+<button
+  type="button"
+  class="touch-target relative inline-flex items-center justify-center rounded-pill px-2 transition-colors duration-1 ease-settle"
+  [class]="buttonClass()"
+  [attr.aria-label]="ariaKey() | translate: ariaParams()"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="panelId"
+  (click)="toggle()"
+>
+  <foshol-icon name="bell" size="md" />
+
+  @if (hasUnread()) {
+    <!-- aria-hidden: the count is already in the button's own accessible name, and a digit
+         read on its own says nothing. -->
+    <span
+      class="nb-badge absolute top-1 end-0.5 inline-flex min-h-4 min-w-4 items-center justify-center rounded-pill px-1 text-[0.625rem] leading-none font-bold"
+      [class]="badgeClass()"
+      [attr.data-arrival]="arrivalPhase()"
+      aria-hidden="true"
+      >{{ unreadCount() }}</span
+    >
+  }
+</button>
+
+@if (open()) {
+  <!-- Stacking: the header is z-40 and sticky, which makes it a stacking context, so everything
+       drawn in here is confined beneath the toast host's z-50 whatever number this is given —
+       which is the order we want, because a toast is the interruption and this is the archive.
+       z-10 is therefore only about the header's own in-flow children, and is deliberately the
+       smallest value that clears them rather than a number chosen to win a fight. -->
+  <div
+    [id]="panelId"
+    class="nb-panel fixed inset-x-3 top-20 z-10 flex max-h-[min(28rem,70vh)] flex-col overflow-hidden rounded-panel border border-surface-3 bg-surface-0 text-ink shadow-lift md:absolute md:inset-x-auto md:end-0 md:top-full md:mt-2 md:w-[22rem]"
+  >
+    <div class="flex items-center gap-2 border-b border-surface-3 px-4 py-2.5">
+      <h2 class="min-w-0 flex-1 truncate text-sm font-bold">
+        {{ 'shared.notifications.title' | translate }}
+      </h2>
+
+      @if (hasUnread()) {
+        <button
+          type="button"
+          class="touch-target inline-flex items-center rounded-control px-2 text-xs font-semibold text-ink-muted transition-colors duration-1 ease-settle hover:text-ink"
+          (click)="markAllRead()"
+        >
+          {{ 'shared.notifications.markAllRead' | translate }}
+        </button>
+      }
+
+      <button
+        type="button"
+        class="touch-target inline-flex shrink-0 items-center justify-center rounded-control text-ink-muted transition-colors duration-1 ease-settle hover:text-ink"
+        [attr.aria-label]="'shared.notifications.close' | translate"
+        (click)="close()"
+      >
+        <foshol-icon name="close" size="sm" />
+      </button>
+    </div>
+
+    @if (isEmpty()) {
+      <div class="flex flex-col items-center gap-2 px-6 py-8 text-center">
+        <foshol-icon name="inbox" size="lg" class="text-ink-faint" />
+        <p class="text-sm font-semibold">{{ 'shared.notifications.empty' | translate }}</p>
+        <p class="text-xs text-ink-muted">{{ 'shared.notifications.emptyHint' | translate }}</p>
+      </div>
+    } @else {
+      <ul class="min-h-0 flex-1 list-none overflow-y-auto">
+        @for (item of items(); track item.id) {
+          <li class="border-b border-surface-2 last:border-b-0">
+            <div class="flex items-start gap-2.5 px-3 py-2.5" [class.bg-surface-1]="!item.read">
+              <foshol-icon [name]="glyph(item)" size="sm" [class]="glyphClass(item)" />
+
+              <div class="min-w-0 flex-1">
+                <p class="flex flex-wrap items-baseline gap-x-2 text-xs text-ink-muted">
+                  <span class="font-semibold">{{ kindKey(item) | translate }}</span>
+                  @if (!item.read) {
+                    <!-- The word, not just the tint: colour is never the only cue (WEB-UX-044). -->
+                    <span class="rounded-chip bg-accent-soft px-1.5 font-bold text-teal-700">
+                      {{ 'shared.notifications.unreadMark' | translate }}
+                    </span>
+                  }
+                  <time
+                    class="ms-auto font-latin"
+                    [attr.datetime]="timeIso(item)"
+                    [attr.aria-label]="
+                      'shared.notifications.receivedAt' | translate: { time: timeText(item) }
+                    "
+                    >{{ timeText(item) }}</time
+                  >
+                </p>
+
+                <p class="mt-0.5 text-sm font-semibold break-words">
+                  @if (item.titleKey) {
+                    {{ item.titleKey | translate }}
+                  } @else {
+                    {{ item.title }}
+                  }
+                </p>
+
+                @if (item.bodyKey) {
+                  <p class="mt-0.5 text-sm break-words text-ink-muted">
+                    {{ item.bodyKey | translate }}
+                  </p>
+                } @else if (item.body) {
+                  <p class="mt-0.5 text-sm break-words text-ink-muted">{{ item.body }}</p>
+                }
+
+                @if (casePath(item); as path) {
+                  <a
+                    [routerLink]="path"
+                    class="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                    (click)="close()"
+                  >
+                    {{ 'shared.notifications.openCase' | translate }}
+                    <foshol-icon name="arrow-right" size="xs" />
+                  </a>
+                }
+              </div>
+
+              <button
+                type="button"
+                class="touch-target -m-1 inline-flex shrink-0 items-center justify-center rounded-control text-ink-faint transition-colors duration-1 ease-settle hover:text-ink"
+                [attr.aria-label]="'shared.notifications.dismiss' | translate"
+                (click)="dismiss(item.id)"
+              >
+                <foshol-icon name="close" size="xs" />
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}

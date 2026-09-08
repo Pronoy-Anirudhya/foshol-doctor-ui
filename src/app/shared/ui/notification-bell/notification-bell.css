@@ -1,0 +1,85 @@
+/* ── The arrival cue ────────────────────────────────────────────────────────
+   Two rules, two keyframe names, one shape. `NotificationStore.arrivalPhase`
+   alternates 'a'/'b' on every recorded notification, so each arrival makes the
+   OTHER rule newly match — and a rule that newly matches starts its animation
+   from the beginning and runs it exactly once. That is the pattern
+   `status-stepper.css` uses for the flowing connector: no timer to cancel, no
+   signal bookkeeping, and nothing anyone has to remember to reset.
+
+   The two keyframe names are the load-bearing part. If both rules named one
+   animation, the computed `animation-name` would not change when the attribute
+   flipped and the browser would have nothing to restart.
+
+   Duration comes from `APP_CONFIG.notifications.arrivalHighlightMs`, bound to
+   `--nb-arrival` on the host, so the number stays in the config file
+   (WEB-NFR-009); the `var()` fallback keeps the cue working if it is ever
+   rendered without one. The global prefers-reduced-motion block in styles.css
+   disables all of this — no component writes its own media query. */
+
+.nb-badge {
+  --nb-halo: color-mix(in srgb, var(--color-danger) 45%, transparent);
+  --nb-halo-out: color-mix(in srgb, var(--color-danger) 0%, transparent);
+}
+
+@keyframes nb-arrive-a {
+  0% {
+    transform: scale(0.5);
+    box-shadow: 0 0 0 0 var(--nb-halo);
+  }
+  10% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 0.2rem var(--nb-halo);
+  }
+  24% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0.55rem var(--nb-halo-out);
+  }
+}
+
+@keyframes nb-arrive-b {
+  0% {
+    transform: scale(0.5);
+    box-shadow: 0 0 0 0 var(--nb-halo);
+  }
+  10% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 0.2rem var(--nb-halo);
+  }
+  24% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0.55rem var(--nb-halo-out);
+  }
+}
+
+.nb-badge[data-arrival='a'] {
+  animation: nb-arrive-a var(--nb-arrival, var(--duration-3)) var(--ease-settle) both;
+}
+
+.nb-badge[data-arrival='b'] {
+  animation: nb-arrive-b var(--nb-arrival, var(--duration-3)) var(--ease-settle) both;
+}
+
+/* ── The panel ──────────────────────────────────────────────────────────────
+   Motion that settles: a short rise into place, no overshoot, no bounce. */
+
+@keyframes nb-open {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.nb-panel {
+  animation: nb-open var(--duration-2) var(--ease-settle) both;
+  transform-origin: top right;
+}

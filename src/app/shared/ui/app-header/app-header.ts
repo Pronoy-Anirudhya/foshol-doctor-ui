@@ -6,6 +6,7 @@ import { homePathForRole } from '../../../core/auth/auth.guard';
 import { SessionStore } from '../../../core/auth/session-store';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { LangToggle } from '../lang-toggle/lang-toggle';
+import { NotificationBell } from '../notification-bell/notification-bell';
 import { SseIndicator } from '../sse-indicator/sse-indicator';
 
 /**
@@ -27,7 +28,7 @@ import { SseIndicator } from '../sse-indicator/sse-indicator';
 @Component({
   selector: 'foshol-app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, LangToggle, SseIndicator, RouterLink],
+  imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, RouterLink],
   templateUrl: './app-header.html',
   host: { class: 'block' },
 })

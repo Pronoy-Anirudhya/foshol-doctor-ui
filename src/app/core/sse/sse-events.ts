@@ -88,7 +88,15 @@ export function toCaseStatusEvent(data: string): CaseStatusEventData | null {
   const caseId = str(raw['caseId']);
   const toStatus = status(raw['toStatus']);
   if (caseId === null || toStatus === null) return null;
-  return { caseId, toStatus, fromStatus: status(raw['fromStatus']), correlationId: str(raw['correlationId']) ?? undefined };
+  return {
+    caseId,
+    toStatus,
+    fromStatus: status(raw['fromStatus']),
+    // The server's id for this notification. Absent on older frames, so it stays optional; the
+    // notification centre dedupes on it when it is there (WEB-FR-358 replays on resync).
+    notificationId: str(raw['notificationId']) ?? undefined,
+    correlationId: str(raw['correlationId']) ?? undefined,
+  };
 }
 
 export function toAdvisoryEvent(data: string): AdvisoryEventData | null {
@@ -103,6 +111,8 @@ export function toAdvisoryEvent(data: string): AdvisoryEventData | null {
     advisoryId: str(raw['advisoryId']),
     titleBn: str(raw['titleBn']),
     bodyBn: str(raw['bodyBn']),
+    /** See `toCaseStatusEvent` — the dedupe key for the notification centre. */
+    notificationId: str(raw['notificationId']) ?? undefined,
     correlationId: str(raw['correlationId']) ?? undefined,
   };
 }
