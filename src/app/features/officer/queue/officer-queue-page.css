@@ -19,7 +19,7 @@
 
 .order-note-lead {
   font-weight: 700;
-  color: var(--color-slate-800);
+  color: var(--color-console);
 }
 
 .order-note-detail {
@@ -36,37 +36,34 @@
   gap: 0.75rem;
 }
 
-.stale {
+/* Two amber pills differing only in loudness, so the shared half is written once. */
+.stale,
+.resub {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-dawn-300);
   background: var(--color-dawn-100);
+  color: var(--color-dawn-700);
+  white-space: nowrap;
+}
+
+.stale {
+  gap: 0.4rem;
   padding: 0.3rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-dawn-700);
 }
 
-/* ── Cards, below md (WEB-UX-032) ───────────────────────────────────────────────────────── */
+/* ── Cards, below md (WEB-UX-032) ─────────────────────────────────── */
 
-/* `display`, spacing and `list-style` for `.cards` live as Tailwind utilities on the `<ul>`
-   itself (`flex flex-col gap-3 list-none p-0 md:hidden`), not here. A component-scoped
-   `.cards { display: flex }` compiles under Angular's emulated encapsulation to
-   `.cards[_ngcontent-x] { display: flex }` — specificity (0,2,0) — which beats the plain
-   Tailwind utility `.md\:hidden { display: none }` (0,1,0) inside its own media query,
-   regardless of viewport width. The desktop table then never got the chance to show: the
-   mobile card list rendered permanently, at every width. Keeping `display` and the
-   breakpoint entirely in the template, where WEB-UX-034 already requires every breakpoint to
-   live, is what makes this class of bug structurally impossible rather than merely fixed once. */
-
-/* `relative`/`cursor-pointer`/the hover lift live as Tailwind utilities on the elements
-   themselves (`.queue-card` in the template, `<tr data-testid="queue-row">`), for the same
-   per-component style-budget reason the cards/table split above does. Only the ::after overlay
-   below has no utility equivalent: it stretches the one real link inside each row/card over
-   the whole surface, so the whole thing is the click target while staying a single, real,
-   keyboard-focusable anchor — no second, non-semantic click handler. */
+/* `display`, every breakpoint, `cursor-pointer` and the hover lift are Tailwind utilities on
+   the elements themselves, never rules here. A scoped `.cards { display: flex }` compiles to
+   `.cards[_ngcontent-x]` — (0,2,0) — which beats `.md\:hidden` (0,1,0) at every width, so the
+   desktop table never got to show. Keeping them in the template (WEB-UX-034) makes that bug
+   structurally impossible and keeps this file inside its budget. Only the ::after overlay has
+   no utility equivalent: it stretches each row's one real link over the whole surface, so the
+   row is the click target while staying a single, keyboard-focusable anchor. */
 .queue-card {
   padding: 0.9rem 1rem;
   display: flex;
@@ -81,26 +78,23 @@
   inset: 0;
 }
 
-/* State-keyed accent — WEB-UX-044, alongside .state's text, not instead of it. --wa is set on
-   the card or row and read by the cell/card border below, so each state names its colour once
-   rather than once per surface. */
-.queue-card[data-state='PENDING'],
-.queue-table tr[data-state='PENDING'] {
+/* State-keyed accent — WEB-UX-044, alongside .state's text, not instead of it. The bare
+   attribute selector is deliberate: emulated encapsulation already scopes it to this template,
+   where a card, a row and a state chip all carry data-state, so each state names its colour
+   once rather than once per surface. --wa is read by the border below. */
+[data-state='PENDING'] {
   --wa: var(--color-dawn-600);
 }
 
-.queue-card[data-state='CLAIMED'],
-.queue-table tr[data-state='CLAIMED'] {
+[data-state='CLAIMED'] {
   --wa: var(--color-paddy-600);
 }
 
-.queue-card[data-state='DONE'],
-.queue-table tr[data-state='DONE'] {
+[data-state='DONE'] {
   --wa: var(--color-paddy-700);
 }
 
-.queue-card[data-state='REJECTED'],
-.queue-table tr[data-state='REJECTED'] {
+[data-state='REJECTED'] {
   --wa: var(--color-clay-600);
 }
 
@@ -145,7 +139,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--color-slate-800);
+  color: var(--color-console);
 }
 
 .card-badges {
@@ -172,7 +166,7 @@
   font-weight: 600;
 }
 
-/* ── Table, md and above (WEB-UX-032) ───────────────────────────────────────────────────── */
+/* ── Table, md and above (WEB-UX-032) ─────────────────────────────── */
 
 /* WEB-UX-031 — the wide thing scrolls inside its own box; the page never scrolls sideways. */
 .table-wrap {
@@ -191,7 +185,7 @@
 }
 
 .queue-table thead {
-  background: var(--color-slate-800);
+  background: var(--color-console);
 }
 
 /* WEB-FR-200 — a header cell, and nothing more. There is no control here to make interactive:
@@ -203,7 +197,7 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--color-ink-invert);
+  color: var(--color-on-console);
   white-space: nowrap;
   cursor: default;
 }
@@ -232,12 +226,8 @@
 .queue-table td.num {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--color-slate-800);
+  color: var(--color-console);
 }
-
-/* The reduced column set at md and the full set at xl (WEB-UX-030) are expressed as
-   `hidden xl:table-cell` on the cells themselves. WEB-UX-034 forbids an ad-hoc media query
-   here, and Tailwind's own breakpoint is the only breakpoint this file is allowed to use. */
 
 .media {
   display: block;
@@ -245,24 +235,17 @@
 }
 
 .resub {
-  display: inline-flex;
-  align-items: center;
   gap: 0.25rem;
   margin-inline-start: 0.4rem;
-  border-radius: 999px;
-  border: 1px solid var(--color-dawn-300);
-  background: var(--color-dawn-100);
   padding: 0.1rem 0.5rem;
   font-size: 0.6875rem;
   font-weight: 700;
-  color: var(--color-dawn-700);
-  white-space: nowrap;
 }
 
 .state {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-surface-3);
   background: var(--color-surface-1);
   padding: 0.15rem 0.6rem;
@@ -284,9 +267,36 @@
   color: var(--color-clay-700);
 }
 
+/* ── Live arrival (WEB-FR-204) ──────────────────────────────────────
+   An SSE `queue` frame gives the row a `liveStatus`, which puts `data-live` on it for the
+   first time; a rule that NEWLY matches runs its animation exactly once — status-stepper.css's
+   pattern, so no signal bookkeeping and nothing to reset. Both keyframes are `from`-only, so
+   each settles back into the row's own zebra stripe or hover rather than pinning a value.
+   WEB-UX-044 — the wash is not the message; the status text arriving with it is. The wash runs
+   for twice surface-enter, because a single 420 ms flash is missable on a glance away. */
+.queue-card[data-live],
+.queue-table tr[data-live] {
+  animation: q-arrive calc(var(--duration-3) * 2) var(--ease-settle) 1;
+}
+
 .live-status {
   display: block;
   margin-block-start: 0.2rem;
   font-size: 0.6875rem;
-  color: var(--color-ink-faint);
+  font-weight: 700;
+  color: var(--color-teal-700);
+  animation: q-arrive-text var(--duration-3) var(--ease-settle) 1;
+}
+
+@keyframes q-arrive {
+  from {
+    background-color: var(--color-teal-100);
+  }
+}
+
+@keyframes q-arrive-text {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
 }

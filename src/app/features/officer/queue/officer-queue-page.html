@@ -29,15 +29,7 @@
         [disabled]="facade.queue.loading()"
         (click)="refresh()"
       >
-        <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
-          <path
-            d="M13.5 8a5.5 5.5 0 1 1-1.7-3.97M13.5 2.5V5H11"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <foshol-icon class="shrink-0" name="refresh" size="sm" />
         {{
           (facade.queue.loading() ? 'officer.queue.refreshing' : 'officer.queue.refresh')
             | translate
@@ -46,7 +38,7 @@
 
       @if (facade.queue.needsReload()) {
         <p class="stale" data-testid="queue-stale">
-          <span aria-hidden="true">↻</span>
+          <foshol-icon name="refresh" size="xs" />
           {{ 'officer.queue.stale' | translate }}
         </p>
       }
@@ -133,6 +125,7 @@
             data-testid="queue-card"
             [attr.data-case-id]="view.row.caseId"
             [attr.data-state]="view.row.state"
+            [attr.data-live]="view.liveStatus ? '' : null"
           >
             <div class="card-top">
               <a
@@ -153,7 +146,7 @@
               {{ view.row.cropNameBn }}
               @if (view.row.isResubmission) {
                 <span class="resub" [title]="'officer.queue.resubmissionHint' | translate">
-                  <span aria-hidden="true">↩</span>
+                  <foshol-icon name="resubmit" size="xs" />
                   {{ 'officer.queue.resubmission' | translate }}
                 </span>
               }
@@ -199,7 +192,7 @@
               @if (view.liveStatus) {
                 <div>
                   <dt>{{ 'officer.queue.liveStatus' | translate }}</dt>
-                  <dd>{{ statusKey(view) | translate }}</dd>
+                  <dd class="live-status">{{ statusKey(view) | translate }}</dd>
                 </div>
               }
             </dl>
@@ -244,6 +237,7 @@
                 data-testid="queue-row"
                 [attr.data-case-id]="view.row.caseId"
                 [attr.data-state]="view.row.state"
+                [attr.data-live]="view.liveStatus ? '' : null"
               >
                 <td>
                   <a
@@ -257,7 +251,7 @@
                   </a>
                   @if (view.row.isResubmission) {
                     <span class="resub" [title]="'officer.queue.resubmissionHint' | translate">
-                      <span aria-hidden="true">↩</span>
+                      <foshol-icon name="resubmit" size="xs" />
                       {{ 'officer.queue.resubmission' | translate }}
                     </span>
                   }
