@@ -30,7 +30,11 @@
           [attr.aria-label]="(playing() ? 'media.audio.pause' : 'media.audio.play') | translate"
           (click)="toggle()"
         >
-          <span aria-hidden="true">{{ playing() ? '❚❚' : '▶' }}</span>
+          @if (playing()) {
+            <foshol-icon name="pause" />
+          } @else {
+            <foshol-icon name="play" />
+          }
         </button>
 
         <!-- A range input is keyboard-operable for free: arrows step, Home and End jump

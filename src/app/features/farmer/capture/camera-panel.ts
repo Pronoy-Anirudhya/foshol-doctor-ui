@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { CAMERA_READY, PhotoCamera } from './photo-camera';
 
 /**
@@ -27,7 +28,7 @@ const KEY = 'farmer.capture.camera.';
   selector: 'foshol-camera-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [PhotoCamera],
-  imports: [TranslatePipe],
+  imports: [Icon, TranslatePipe],
   host: { class: 'block' },
   template: `
     @if (camera.available()) {
@@ -81,7 +82,7 @@ const KEY = 'farmer.capture.camera.';
           [disabled]="disabled() || camera.starting()"
           (click)="startCamera()"
         >
-          <span aria-hidden="true">📷</span>
+          <foshol-icon class="shrink-0" name="camera" />
           {{ (camera.starting() ? KEY + 'opening' : KEY + 'trigger') | translate }}
         </button>
 
@@ -104,7 +105,7 @@ const KEY = 'farmer.capture.camera.';
           [disabled]="disabled()"
           (change)="fileChosen($event)"
         />
-        <span aria-hidden="true">📷</span>
+        <foshol-icon class="shrink-0" name="camera" />
         {{ 'farmer.capture.images.takePhoto' | translate }}
       </label>
     }

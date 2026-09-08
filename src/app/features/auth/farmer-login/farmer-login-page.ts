@@ -17,6 +17,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { AuthShell } from '../shared/auth-shell';
 import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
 import { ProblemNotice } from '../shared/problem-notice';
@@ -47,7 +48,15 @@ const DEV_FIXED = 'DEV_FIXED';
 @Component({
   selector: 'foshol-farmer-login-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AuthShell, DemoHint, ProblemNotice, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [
+    AuthShell,
+    DemoHint,
+    Icon,
+    ProblemNotice,
+    ReactiveFormsModule,
+    RouterLink,
+    TranslatePipe,
+  ],
   template: `
     <foshol-auth-shell variant="farmer">
       <div class="card p-6 sm:p-8">
@@ -108,7 +117,7 @@ const DEV_FIXED = 'DEV_FIXED';
 
             @if (cooldown.active()) {
               <p class="wait" role="status">
-                <span aria-hidden="true">⏳</span>
+                <foshol-icon class="shrink-0" name="hourglass" size="sm" />
                 {{ 'auth.farmer.rateLimited' | translate: { time: cooldown.display() } }}
               </p>
             }
@@ -174,7 +183,7 @@ const DEV_FIXED = 'DEV_FIXED';
 
             @if (cooldown.active()) {
               <p class="wait" role="status">
-                <span aria-hidden="true">⏳</span>
+                <foshol-icon class="shrink-0" name="hourglass" size="sm" />
                 {{ 'auth.farmer.rateLimited' | translate: { time: cooldown.display() } }}
               </p>
             }
@@ -319,6 +328,7 @@ const DEV_FIXED = 'DEV_FIXED';
     /* WEB-UX-044 — the hourglass and the wording carry the meaning, not the amber alone. */
     .wait {
       display: flex;
+      align-items: flex-start;
       gap: 0.5rem;
       padding: 0.6rem 0.8rem;
       border: 1px solid var(--color-dawn-300);
@@ -327,6 +337,11 @@ const DEV_FIXED = 'DEV_FIXED';
       color: var(--color-dawn-700);
       font-size: 0.875rem;
       font-weight: 600;
+    }
+
+    /* Optically centres the 16 px glyph on the first line of 14 px/1.5 text. */
+    .wait foshol-icon {
+      margin-block-start: 0.15rem;
     }
 
     .notice-soft {

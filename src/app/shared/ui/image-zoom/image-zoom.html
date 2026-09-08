@@ -8,7 +8,7 @@
     [attr.aria-label]="'media.zoom.out' | translate"
     (click)="zoomOut()"
   >
-    <span aria-hidden="true">−</span>
+    <foshol-icon name="minus" />
   </button>
 
   <!-- WEB-UX-044 — the magnification is readable as a number, not inferred from how big the
@@ -25,7 +25,7 @@
     [attr.aria-label]="'media.zoom.in' | translate"
     (click)="zoomIn()"
   >
-    <span aria-hidden="true">+</span>
+    <foshol-icon name="plus" />
   </button>
 
   <button type="button" class="control reset touch-target" [disabled]="!zoomed()" (click)="reset()">

@@ -7,6 +7,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Icon } from '../icon/icon';
 
 /**
  * WEB-FR-210 — a zoom control over projected content, operable by POINTER **and** by KEYBOARD.
@@ -52,7 +53,7 @@ const RESET_KEYS: readonly string[] = ['0'];
 @Component({
   selector: 'foshol-image-zoom',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [Icon, TranslatePipe],
   templateUrl: './image-zoom.html',
   styleUrl: './image-zoom.css',
 })

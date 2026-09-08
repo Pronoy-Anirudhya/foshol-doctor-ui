@@ -4,6 +4,7 @@ import { APP_CONFIG } from '../../../core/config/app-config';
 import { CaseReviewStore, CLAIM_EXPIRED } from '../../../core/stores/case-review-store';
 import { toPercentString } from '../../../core/util/percent';
 import { CountdownPipe } from '../../../shared/pipes/countdown.pipe';
+import { Icon } from '../../../shared/ui/icon/icon';
 
 /**
  * `WEB-FR-241` — the claim countdown, as a ring.
@@ -19,7 +20,7 @@ import { CountdownPipe } from '../../../shared/pipes/countdown.pipe';
  *
  * `WEB-UX-044` — colour is never the sole carrier. The ring turns dawn-amber under
  * `claimWarnMs` and clay under `claimCriticalMs`, **and** the label underneath changes its
- * words, **and** a `⚠` glyph appears. Any one of the three carries the meaning alone.
+ * words, **and** a warning glyph appears. Any one of the three carries the meaning alone.
  */
 type ClaimTone = 'normal' | 'warn' | 'critical' | 'expired';
 
@@ -33,7 +34,7 @@ const NO_TIME_LEFT = 0;
 @Component({
   selector: 'foshol-claim-timer-ring',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CountdownPipe, TranslatePipe],
+  imports: [CountdownPipe, Icon, TranslatePipe],
   host: { class: 'flex items-center gap-3' },
   template: `
     <div
@@ -51,7 +52,12 @@ const NO_TIME_LEFT = 0;
 
     <p class="tone" [attr.data-tone]="tone()" data-testid="claim-tone">
       @if (warned()) {
-        <span class="glyph" [attr.aria-label]="'officer.claim.warnGlyph' | translate">⚠</span>
+        <foshol-icon
+          class="glyph"
+          name="warning"
+          size="sm"
+          [label]="'officer.claim.warnGlyph' | translate"
+        />
       }
       <span class="tone-text">{{ toneKey() | translate }}</span>
       <span class="remaining tabular">
@@ -121,18 +127,14 @@ const NO_TIME_LEFT = 0;
       color: var(--color-ink);
     }
 
-    .tone[data-tone='warn'] .tone-text {
+    /* The glyph takes the tone's colour with the words, so the two never disagree. */
+    .tone[data-tone='warn'] :is(.glyph, .tone-text) {
       color: var(--color-dawn-700);
     }
 
-    .tone[data-tone='critical'] .tone-text,
-    .tone[data-tone='expired'] .tone-text {
+    .tone[data-tone='critical'] :is(.glyph, .tone-text),
+    .tone[data-tone='expired'] :is(.glyph, .tone-text) {
       color: var(--color-clay-700);
-    }
-
-    .glyph {
-      font-size: 0.9rem;
-      line-height: 1;
     }
 
     .remaining {

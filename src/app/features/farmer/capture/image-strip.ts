@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import type { DraftImage } from '../../../core/stores/case-draft-store';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 
 /**
@@ -37,7 +38,7 @@ const FIRST = 0;
 @Component({
   selector: 'foshol-image-strip',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Spinner, TranslatePipe],
+  imports: [Icon, Spinner, TranslatePipe],
   host: { class: 'block' },
   template: `
     <ol
@@ -85,7 +86,7 @@ const FIRST = 0;
               "
               (click)="moved.emit({ id: tile.id, delta: -one })"
             >
-              <span aria-hidden="true">←</span>
+              <foshol-icon name="arrow-left" />
             </button>
             <button
               type="button"
@@ -96,7 +97,7 @@ const FIRST = 0;
               "
               (click)="removed.emit(tile.id)"
             >
-              <span aria-hidden="true">✕</span>
+              <foshol-icon name="close" />
             </button>
             <button
               type="button"
@@ -108,7 +109,7 @@ const FIRST = 0;
               "
               (click)="moved.emit({ id: tile.id, delta: one })"
             >
-              <span aria-hidden="true">→</span>
+              <foshol-icon name="arrow-right" />
             </button>
           </div>
         </li>

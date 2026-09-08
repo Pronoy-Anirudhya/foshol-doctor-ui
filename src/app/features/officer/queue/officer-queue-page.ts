@@ -17,6 +17,7 @@ import { AnalysisModeBadge } from '../../../shared/ui/analysis-mode-badge/analys
 import { DecisionPathBadge } from '../../../shared/ui/decision-path-badge/decision-path-badge';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
@@ -63,6 +64,7 @@ const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
     DhakaTimePipe,
     EmptyState,
     ErrorPanel,
+    Icon,
     PageHeading,
     Paginator,
     Percent1Pipe,

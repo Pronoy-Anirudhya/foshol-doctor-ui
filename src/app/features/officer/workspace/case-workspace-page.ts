@@ -25,6 +25,7 @@ import { AudioPlayer } from '../../../shared/ui/audio-player/audio-player';
 import { DecisionPathBadge } from '../../../shared/ui/decision-path-badge/decision-path-badge';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { GradcamView } from '../../../shared/ui/gradcam-view/gradcam-view';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { ImageZoom } from '../../../shared/ui/image-zoom/image-zoom';
 import { MatcherChip } from '../../../shared/ui/matcher-chip/matcher-chip';
 import { SecureImage } from '../../../shared/ui/secure-image/secure-image';
@@ -92,6 +93,7 @@ const BUTTON_BASE =
     DhakaDateTimePipe,
     ErrorPanel,
     GradcamView,
+    Icon,
     ImageZoom,
     MatcherChip,
     Percent1Pipe,
