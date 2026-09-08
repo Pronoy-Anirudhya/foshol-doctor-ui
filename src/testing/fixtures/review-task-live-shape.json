@@ -81,6 +81,17 @@
         "[step 3]"
       ],
       "dosageBn": "[dosageBn]",
+      "rateAmount": 2.5,
+      "rateUnit": "ML",
+      "rateBasis": "PER_DECIMAL",
+      "rateNotesBn": null,
+      "computedDose": {
+        "amount": 5,
+        "unit": "ML",
+        "basis": "PER_DECIMAL",
+        "fromArea": 2,
+        "fromAreaUnit": "DECIMAL"
+      },
       "phiDays": null,
       "sourceRef": "[sourceRef]"
     },

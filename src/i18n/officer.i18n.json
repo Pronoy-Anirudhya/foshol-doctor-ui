@@ -171,6 +171,30 @@
     "bn": "কেস আইডি",
     "en": "Case id"
   },
+  "officer.case.metrics.fieldArea": {
+    "bn": "জমির পরিমাণ",
+    "en": "Field area"
+  },
+  "officer.case.metrics.cropQuantity": {
+    "bn": "ফসলের পরিমাণ",
+    "en": "Crop quantity"
+  },
+  "officer.case.metrics.source": {
+    "bn": "মাপ এসেছে",
+    "en": "Metrics from"
+  },
+  "officer.case.metrics.source.FORM": {
+    "bn": "কৃষক লিখেছেন",
+    "en": "Typed by the farmer"
+  },
+  "officer.case.metrics.source.SPEECH": {
+    "bn": "কৃষকের কথা থেকে",
+    "en": "From the farmer's speech"
+  },
+  "officer.case.metrics.source.FORM_AND_SPEECH": {
+    "bn": "লেখা ও কথা — দুটো থেকেই",
+    "en": "From both the form and the speech"
+  },
   "officer.case.note": {
     "bn": "কৃষকের লেখা",
     "en": "Farmer's note"
@@ -222,6 +246,14 @@
   "officer.case.candidatesEmpty": {
     "bn": "মডেল কোনো সম্ভাব্য রোগ দিতে পারেনি।",
     "en": "The model returned no candidates."
+  },
+  "officer.case.candidateTop": {
+    "bn": "প্রস্তাবের ভিত্তি",
+    "en": "Suggestion built on this"
+  },
+  "officer.case.candidateContext": {
+    "bn": "বিবেচনার জন্য",
+    "en": "For your consideration"
   },
   "officer.case.thresholdCaption": {
     "bn": "দুটি খাড়া রেখা দুটি রাউটিং সীমা — প্রতিটি প্রার্থীর উপর একই জায়গায়, সার্ভারের পাঠানো মান অনুযায়ী।",
@@ -410,6 +442,14 @@
   "officer.remedy.dosage": {
     "bn": "মাত্রা",
     "en": "Dosage"
+  },
+  "officer.remedy.dose": {
+    "bn": "এই জমির জন্য হিসাব করা পরিমাণ",
+    "en": "Amount computed for this field"
+  },
+  "officer.remedy.doseFrom": {
+    "bn": "হিসাব করা হয়েছে {{area}}",
+    "en": "Reckoned from {{area}}"
   },
   "officer.remedy.phi": {
     "bn": "ফসল তোলার আগে অপেক্ষা",

@@ -7,6 +7,7 @@ import { LiveAnnouncer } from '../../core/stores/live-announcer';
 import { QueueStore } from '../../core/stores/queue-store';
 import { TOAST_SUCCESS, ToastStore } from '../../core/stores/toast-store';
 import type { CaseDetail } from '../../generated/models/case-detail';
+import type { ComputedDose } from '../../generated/models/computed-dose';
 import type { Disease } from '../../generated/models/disease';
 import type { OfficerQueueRow } from '../../generated/models/officer-queue-row';
 import type { PublishAdvisoryRequest } from '../../generated/models/publish-advisory-request';
@@ -43,6 +44,9 @@ import { adaptReviewTask, remedyId, type ReviewTaskSummary } from './review-task
  * for the officer, because a silent retry of "publish this advisory" is a second advisory.
  */
 const FIRST_PAGE = 0;
+
+/** Shared empty result, so a case with no computed dose does not churn a new Map each read. */
+const EMPTY_DOSES: ReadonlyMap<string, ComputedDose> = new Map();
 
 export type PublishAction = PublishAdvisoryRequest['action'];
 
@@ -119,6 +123,33 @@ export class OfficerFacade {
   readonly isResubmission = computed(
     () => this.openRow()?.isResubmission ?? this._summary()?.isResubmission ?? false,
   );
+
+  /**
+   * The server's own dose arithmetic, keyed by remedy id.
+   *
+   * `computedDose` rides only on the review task's `suggestedRemedies`, which the server computes
+   * for the **rank-1** disease from the case's `fieldArea`. The editor renders the knowledge
+   * catalogue instead (`listRemedies`), and by contract that response never carries a dose — so
+   * the two are joined here rather than in the template.
+   *
+   * The join is gated on the officer still having the rank-1 disease selected. Once they replace
+   * it, the dose belongs to a diagnosis that is no longer on screen, and a dose shown against the
+   * wrong disease is not a stale number, it is a wrong instruction (`COMMON-CON-003`). Nothing
+   * here recomputes anything: `WEB-NFR-001` — area x rate is the server's sum, not ours.
+   */
+  readonly computedDoseById = computed<ReadonlyMap<string, ComputedDose>>(() => {
+    const summary = this._summary();
+    const selected = this.workspace.remedyDraft().diseaseId;
+    if (summary === null || selected === null || selected !== summary.topDiseaseId) {
+      return EMPTY_DOSES;
+    }
+    const doses = new Map<string, ComputedDose>();
+    for (const remedy of summary.suggestedRemedies) {
+      if (remedy.computedDose === undefined || remedy.computedDose === null) continue;
+      doses.set(remedyId(remedy), remedy.computedDose);
+    }
+    return doses;
+  });
 
   // ── Queue ────────────────────────────────────────────────────────────────────────────────
 
