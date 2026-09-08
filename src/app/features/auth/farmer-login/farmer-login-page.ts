@@ -12,12 +12,12 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { AuthShell } from '../shared/auth-shell';
-import { DemoHint, demoValue, type DemoAccount } from '../shared/demo-hint';
+import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
 import { ProblemNotice } from '../shared/problem-notice';
 import { Countdown } from './otp-countdown';
 
@@ -203,9 +203,11 @@ const DEV_FIXED = 'DEV_FIXED';
           </form>
         }
 
-        <div class="mt-6">
-          <foshol-demo-hint variant="farmer" (use)="fillDemo($event)" />
-        </div>
+        @if (showDemoHints) {
+          <div class="mt-6">
+            <foshol-demo-hint variant="farmer" (use)="fillDemo($event)" />
+          </div>
+        }
 
         <p class="mt-5 border-t border-surface-2 pt-4 text-sm">
           <a class="link" [routerLink]="officerLoginPath">
@@ -332,8 +334,10 @@ const DEV_FIXED = 'DEV_FIXED';
 })
 export class FarmerLoginPage {
   protected readonly facade = inject(AuthFacade);
-  private readonly translate = inject(TranslateService);
   private readonly injector = inject(Injector);
+
+  /** Hackathon-only — `false` in production; see `APP_CONFIG.demo`. */
+  protected readonly showDemoHints = APP_CONFIG.demo.showLoginHints;
 
   protected readonly otpLength = APP_CONFIG.auth.otpLength;
   protected readonly positions = Array.from({ length: APP_CONFIG.auth.otpLength }, (_, i) => i);
@@ -500,10 +504,10 @@ export class FarmerLoginPage {
     if (account !== 'farmer') return;
 
     if (this.onCodeStep()) {
-      this.writeDigits(overlay(emptyDigits(this.otpLength), 0, demoOtp(this.translate)));
+      this.writeDigits(overlay(emptyDigits(this.otpLength), 0, DEMO_ACCOUNTS.farmer.otp));
       return;
     }
-    this.phoneForm.controls.phone.setValue(demoPhone(this.translate));
+    this.phoneForm.controls.phone.setValue(DEMO_ACCOUNTS.farmer.phone);
   }
 
   /**
@@ -553,10 +557,3 @@ function overlay(digits: readonly string[], position: number, incoming: string):
   });
 }
 
-function demoPhone(translate: TranslateService): string {
-  return demoValue(translate, 'auth.demo.farmerPhone');
-}
-
-function demoOtp(translate: TranslateService): string {
-  return demoValue(translate, 'auth.demo.farmerOtp');
-}

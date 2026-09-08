@@ -1,19 +1,28 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /** Which seeded account a "fill in" button refers to (handover §2). */
 export type DemoAccount = 'farmer' | 'officer' | 'admin';
 
 /**
- * The seeded demo credentials, on screen, dismissible.
+ * The seeded demo credentials — a phone number, an OTP, two username/password pairs. These are
+ * fixed VALUES, not language-dependent text, so unlike every label around them they do not
+ * belong in the translation catalogue (`WEB-UX-013` governs user-visible prose; a phone number
+ * is not prose in either language). Seeded by migration `V100` on the `local`/`demo` profiles,
+ * documented in `docs/handover/frontend-demo-api.md` §2.
+ */
+export const DEMO_ACCOUNTS = {
+  farmer: { phone: '+8801711111111', otp: '123456' },
+  officer: { username: 'officer', password: 'password' },
+  admin: { username: 'admin', password: 'password' },
+} as const;
+
+/**
+ * The seeded-credential card, on screen, dismissible.
  *
- * This is a demo build for a room with a presenter and a clock; the credentials are seeded by
- * migration `V100` on the `local` and `demo` profiles and are documented in
- * `docs/handover/frontend-demo-api.md` §2. Putting them here saves a fumble, and dismissing
- * the card is one click when a judge wants the screen clean.
- *
- * They are ordinary user-visible strings, so they live in the catalogue like everything else
- * (`WEB-UX-013`) rather than as literals in this file.
+ * This exists for a room with a presenter and a clock, so the caller gates it behind
+ * `APP_CONFIG.demo.showLoginHints` (`false` in production) rather than mounting it
+ * unconditionally — a production login screen has no business publishing its own credentials.
  */
 @Component({
   selector: 'foshol-demo-hint',
@@ -35,9 +44,7 @@ export type DemoAccount = 'farmer' | 'officer' | 'admin';
           @if (!isConsole()) {
             <div class="row">
               <dt>{{ 'auth.demo.farmerLabel' | translate }}</dt>
-              <dd class="font-latin">
-                {{ 'auth.demo.farmerPhone' | translate }} · {{ 'auth.demo.farmerOtp' | translate }}
-              </dd>
+              <dd class="font-latin">{{ accounts.farmer.phone }} · {{ accounts.farmer.otp }}</dd>
               <button type="button" class="fill" (click)="use.emit('farmer')">
                 {{ 'auth.demo.use' | translate }}
               </button>
@@ -46,8 +53,7 @@ export type DemoAccount = 'farmer' | 'officer' | 'admin';
             <div class="row">
               <dt>{{ 'auth.demo.officerLabel' | translate }}</dt>
               <dd class="font-latin">
-                {{ 'auth.demo.officerUsername' | translate }} ·
-                {{ 'auth.demo.officerPassword' | translate }}
+                {{ accounts.officer.username }} · {{ accounts.officer.password }}
               </dd>
               <button type="button" class="fill" (click)="use.emit('officer')">
                 {{ 'auth.demo.use' | translate }}
@@ -55,10 +61,7 @@ export type DemoAccount = 'farmer' | 'officer' | 'admin';
             </div>
             <div class="row">
               <dt>{{ 'auth.demo.adminLabel' | translate }}</dt>
-              <dd class="font-latin">
-                {{ 'auth.demo.adminUsername' | translate }} ·
-                {{ 'auth.demo.adminPassword' | translate }}
-              </dd>
+              <dd class="font-latin">{{ accounts.admin.username }} · {{ accounts.admin.password }}</dd>
               <button type="button" class="fill" (click)="use.emit('admin')">
                 {{ 'auth.demo.use' | translate }}
               </button>
@@ -135,16 +138,7 @@ export class DemoHint {
   readonly variant = input<'farmer' | 'console'>('farmer');
   readonly use = output<DemoAccount>();
 
+  protected readonly accounts = DEMO_ACCOUNTS;
   protected readonly dismissed = signal(false);
   protected readonly isConsole = computed(() => this.variant() === 'console');
-}
-
-/**
- * Reads a demo credential out of the active catalogue so a prefill button and the card it sits
- * on can never disagree. `instant` widens to `StrictTranslation`, so anything but a plain
- * string becomes an empty field rather than `[object Object]` in an input.
- */
-export function demoValue(translate: TranslateService, key: string): string {
-  const value: unknown = translate.instant(key);
-  return typeof value === 'string' ? value : '';
 }

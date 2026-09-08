@@ -163,6 +163,16 @@ export const APP_CONFIG = {
     msPerSecond: 1_000,
     secondsPerMinute: 60,
   },
+
+  /**
+   * Hackathon-only affordances, all `false` by default so the shipped UI reads as production
+   * software rather than a rehearsal. No server property backs any of these — flip a value
+   * locally for a live scored demo session and flip it back afterward; never commit `true`.
+   */
+  demo: {
+    /** The seeded-credential card on both login screens (`demo-hint.ts`). */
+    showLoginHints: false,
+  },
 } as const;
 
 export type AppConfig = typeof APP_CONFIG;

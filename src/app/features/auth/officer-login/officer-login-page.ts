@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
+import { APP_CONFIG } from '../../../core/config/app-config';
 import { AuthShell } from '../shared/auth-shell';
-import { DemoHint, demoValue, type DemoAccount } from '../shared/demo-hint';
+import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
 import { ProblemNotice } from '../shared/problem-notice';
 
 /**
@@ -92,9 +93,11 @@ import { ProblemNotice } from '../shared/problem-notice';
           </button>
         </form>
 
-        <div class="mt-6">
-          <foshol-demo-hint variant="console" (use)="fillDemo($event)" />
-        </div>
+        @if (showDemoHints) {
+          <div class="mt-6">
+            <foshol-demo-hint variant="console" (use)="fillDemo($event)" />
+          </div>
+        }
 
         <p class="mt-5 border-t border-surface-2 pt-4 text-sm">
           <a class="link" [routerLink]="farmerLoginPath">
@@ -187,9 +190,10 @@ import { ProblemNotice } from '../shared/problem-notice';
 })
 export class OfficerLoginPage {
   protected readonly facade = inject(AuthFacade);
-  private readonly translate = inject(TranslateService);
 
   protected readonly farmerLoginPath = AUTH_SURFACES.farmerLogin;
+  /** Hackathon-only — `false` in production; see `APP_CONFIG.demo`. */
+  protected readonly showDemoHints = APP_CONFIG.demo.showLoginHints;
   protected readonly passwordVisible = signal(false);
 
   protected readonly form = new FormGroup({
@@ -217,17 +221,8 @@ export class OfficerLoginPage {
   protected fillDemo(account: DemoAccount): void {
     if (account === 'farmer') return;
 
-    const isAdmin = account === 'admin';
-    this.form.setValue({
-      username: demoValue(
-        this.translate,
-        isAdmin ? 'auth.demo.adminUsername' : 'auth.demo.officerUsername',
-      ),
-      password: demoValue(
-        this.translate,
-        isAdmin ? 'auth.demo.adminPassword' : 'auth.demo.officerPassword',
-      ),
-    });
+    const seeded = account === 'admin' ? DEMO_ACCOUNTS.admin : DEMO_ACCOUNTS.officer;
+    this.form.setValue(seeded);
     this.submitted.set(false);
   }
 }
