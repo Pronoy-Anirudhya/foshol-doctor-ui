@@ -390,6 +390,36 @@ paths:
               schema: { $ref: '#/components/schemas/PageOfOfficerQueueRow' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  /api/v1/review/officers:
+    get:
+      tags: [review]
+      operationId: listDistrictOfficers
+      summary: Active field officers in the caller's district, excluding the caller
+      responses:
+        '200':
+          description: Colleague list for transfer
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ColleagueOfficer' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/review/kpi-warnings:
+    get:
+      tags: [review]
+      operationId: listKpiWarnings
+      summary: Open resolution KPI warnings for the caller (resync recovery)
+      responses:
+        '200':
+          description: Warnings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/KpiWarning' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   /api/v1/review/tasks/{taskId}:
     get:
       tags: [review]
@@ -433,6 +463,87 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/review/tasks/{taskId}/transfer:
+    post:
+      tags: [review]
+      operationId: transferReviewTask
+      summary: Move a live claim to another officer in the same district
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetOfficerId]
+              properties:
+                targetOfficerId: { type: string, format: uuid }
+                expectedVersion: { type: integer }
+      responses:
+        '200':
+          description: Transferred
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReviewTask' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/review/tasks/bulk-transfer:
+    post:
+      tags: [review]
+      operationId: bulkTransferReviewTasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkTransferRequest' }
+      responses:
+        '200':
+          description: Per-item results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BulkOperationResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/review/tasks/bulk-approve:
+    post:
+      tags: [review]
+      operationId: bulkApproveReviewTasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkApproveRequest' }
+      responses:
+        '200':
+          description: Per-item results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BulkOperationResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/review/tasks/bulk-reject:
+    post:
+      tags: [review]
+      operationId: bulkRejectReviewTasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkRejectRequest' }
+      responses:
+        '200':
+          description: Per-item results
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BulkOperationResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /api/v1/review/tasks/{taskId}/symptoms:
     post:
@@ -544,6 +655,41 @@ paths:
               schema: { $ref: '#/components/schemas/AdminStats' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  /api/v1/admin/kpis:
+    get:
+      tags: [admin]
+      operationId: getAdminKpis
+      summary: District KPI failure summary (role ADMIN)
+      responses:
+        '200':
+          description: Assignment and resolution KPI counts plus per-officer resolution failures
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminKpiSummary' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/admin/kpis/breaches:
+    get:
+      tags: [admin]
+      operationId: listAdminKpiBreaches
+      summary: Paginated KPI breaches for the caller's district
+      parameters:
+        - name: kind
+          in: query
+          schema: { type: string, enum: [ASSIGNMENT, RESOLUTION] }
+        - name: officerId
+          in: query
+          schema: { type: string, format: uuid }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Size' }
+      responses:
+        '200':
+          description: Page of breaches
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PageOfKpiBreach' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   # ── stream ────────────────────────────────────────────────────────────────
   /api/v1/stream:
     get:
@@ -551,9 +697,9 @@ paths:
       operationId: openEventStream
       summary: Server-sent events for the authenticated principal
       description: >
-        Farmers receive events for their own cases only; officers receive queue events.
-        Event names are CASE_STATUS_CHANGED, ADVISORY_PUBLISHED, ADVISORY_REVISED,
-        CASE_REJECTED and QUEUE_CHANGED.
+        Farmers receive events for their own cases only; officers receive queue events and
+        assigned-officer KPI warnings. Event names on the wire are `case-status`, `advisory`,
+        `queue`, `kpi`, `resync` and `reconnect`.
       parameters:
         - name: Last-Event-ID
           in: header
@@ -963,6 +1109,8 @@ components:
         isResubmission:    { type: boolean }
         submittedAt:       { type: string, format: date-time }
         slaDueAt:          { type: string, format: date-time }
+        assignmentDueAt:   { type: string, format: date-time, nullable: true }
+        resolutionDueAt:  { type: string, format: date-time, nullable: true }
 
     ReviewTask:
       type: object
@@ -976,6 +1124,8 @@ components:
         claimedAt:    { type: string, format: date-time, nullable: true }
         claimExpiresAt: { type: string, format: date-time, nullable: true }
         slaDueAt:     { type: string, format: date-time }
+        assignmentDueAt: { type: string, format: date-time, nullable: true }
+        resolutionDueAt: { type: string, format: date-time, nullable: true }
         requeueCount: { type: integer }
         version:      { type: integer, description: Optimistic lock; echo it back on write }
 
@@ -1089,3 +1239,117 @@ components:
           required: [content]
           properties:
             content: { type: array, items: { $ref: '#/components/schemas/OfficerQueueRow' } }
+
+    ColleagueOfficer:
+      type: object
+      required: [officerId, name, districtCode]
+      properties:
+        officerId:     { type: string, format: uuid }
+        name:          { type: string }
+        districtCode: { type: string }
+
+    KpiWarning:
+      type: object
+      required: [caseId, reviewTaskId, dueAt]
+      properties:
+        caseId:        { type: string, format: uuid }
+        reviewTaskId: { type: string, format: uuid }
+        dueAt:         { type: string, format: date-time }
+        warnAt:        { type: string, format: date-time }
+
+    AdminKpiSummary:
+      type: object
+      required: [assignmentFailures, resolutionFailures, officers]
+      properties:
+        assignmentFailures: { type: integer, format: int64 }
+        resolutionFailures: { type: integer, format: int64 }
+        officers:
+          type: array
+          items:
+            type: object
+            required: [officerId, resolutionFailures]
+            properties:
+              officerId: { type: string, format: uuid }
+              officerName: { type: string }
+              resolutionFailures: { type: integer, format: int64 }
+
+    KpiBreach:
+      type: object
+      properties:
+        id:            { type: string, format: uuid }
+        reviewTaskId: { type: string, format: uuid }
+        caseId:        { type: string, format: uuid }
+        kind:          { type: string, enum: [ASSIGNMENT, RESOLUTION] }
+        officerId:     { type: string, format: uuid, nullable: true }
+        officerName:   { type: string, nullable: true }
+        farmerName:    { type: string }
+        cropCode:      { type: string }
+        cropNameBn:   { type: string }
+        dueAt:         { type: string, format: date-time }
+        breachedAt:    { type: string, format: date-time }
+
+    PageOfKpiBreach:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content: { type: array, items: { $ref: '#/components/schemas/KpiBreach' } }
+
+    BulkTaskItem:
+      type: object
+      required: [taskId]
+      properties:
+        taskId: { type: string, format: uuid }
+        expectedVersion: { type: integer }
+
+    BulkTransferRequest:
+      type: object
+      required: [targetOfficerId, items]
+      properties:
+        targetOfficerId: { type: string, format: uuid }
+        items: { type: array, items: { $ref: '#/components/schemas/BulkTaskItem' } }
+
+    BulkApproveRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            allOf:
+              - { $ref: '#/components/schemas/PublishAdvisoryRequest' }
+              - type: object
+                required: [taskId]
+                properties:
+                  taskId: { type: string, format: uuid }
+
+    BulkRejectRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            allOf:
+              - { $ref: '#/components/schemas/RejectCaseRequest' }
+              - type: object
+                required: [taskId]
+                properties:
+                  taskId: { type: string, format: uuid }
+
+    BulkOperationResult:
+      type: object
+      required: [succeeded, failed, results]
+      properties:
+        succeeded: { type: integer }
+        failed: { type: integer }
+        results:
+          type: array
+          items:
+            type: object
+            required: [taskId, status]
+            properties:
+              taskId: { type: string, format: uuid }
+              status: { type: string, enum: [OK, FAILED] }
+              errorCode: { type: string, nullable: true }

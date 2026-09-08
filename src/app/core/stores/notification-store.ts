@@ -10,8 +10,9 @@ import { newUuid } from '../util/uuid';
  * every advisory and every case transition the stream already delivered, kept in arrival order
  * so the bell can show what was missed.
  *
- * It is a RECORDER, not a fetcher. Every entry arrives from a frame `SseDispatcher` has already
- * parsed, so nothing here issues a request and nothing here polls (WEB-FR-356).
+ * It is a RECORDER, not a fetcher. Every entry is handed to it — by `SseDispatcher` from a frame
+ * it has already parsed, or by `KpiWarningSeeder` from the one recovery read — so nothing here
+ * issues a request and nothing here polls (WEB-FR-356).
  *
  * Deliberately memory-only. `APP_CONFIG.storageKeys` names the only two localStorage keys this
  * application may write (WEB-DATA-020) and a farmer's case notifications are not one of them;
@@ -24,12 +25,17 @@ import { newUuid } from '../util/uuid';
  * transition has no server prose at all — its detail line is the status label from our own
  * catalogue.
  */
-export type NotificationKind = 'STATUS' | 'ADVISORY' | 'REVISION' | 'REJECTION';
+export type NotificationKind = 'STATUS' | 'ADVISORY' | 'REVISION' | 'REJECTION' | 'KPI_WARNING';
 
 export const NOTIFY_STATUS: NotificationKind = 'STATUS';
 export const NOTIFY_ADVISORY: NotificationKind = 'ADVISORY';
 export const NOTIFY_REVISION: NotificationKind = 'REVISION';
 export const NOTIFY_REJECTION: NotificationKind = 'REJECTION';
+/**
+ * The officer's resolution-KPI warning. The only kind addressed by `reviewTaskId` rather than
+ * by `caseId`, because the console's workspace route is addressed by task.
+ */
+export const NOTIFY_KPI_WARNING: NotificationKind = 'KPI_WARNING';
 
 /** Which half of the arrival animation is armed. See `arrivalPhase` below. */
 export type ArrivalPhase = 'a' | 'b';
@@ -45,6 +51,17 @@ export interface AppNotification {
   readonly body?: string;
   /** Lets a row offer "open the case" without the view guessing (WEB-FR-354). */
   readonly caseId?: string;
+  /**
+   * The console's deep-link target. Present only on an officer-addressed entry; the farmer
+   * surface has no route a task id can address and never receives one of these frames.
+   */
+  readonly reviewTaskId?: string;
+  /**
+   * The frozen server instant this task is due to be resolved by. Displayed, never recomputed
+   * (WEB-NFR-001), and — with `reviewTaskId` — the dedupe key for an entry that carries no
+   * `notificationId`.
+   */
+  readonly dueAt?: string;
   /**
    * The server's own id for this notification, when the frame carried one. It is the dedupe
    * key: a resync replays frames that were already delivered, and a duplicated row is a lie
@@ -84,10 +101,7 @@ export class NotificationStore {
    * `receivedAtMs` is a parameter so a test can pin the clock without faking timers.
    */
   record(input: NotificationInput, receivedAtMs = Date.now()): string | null {
-    const serverId = input.notificationId;
-    if (serverId !== undefined && this._items().some((item) => item.notificationId === serverId)) {
-      return null;
-    }
+    if (this.#isReplay(input)) return null;
 
     const entry: AppNotification = { ...input, id: newUuid(), receivedAtMs, read: false };
     this._items.update((current) => {
@@ -99,6 +113,25 @@ export class NotificationStore {
     });
     this._arrivalPhase.update((phase) => (phase === 'a' ? 'b' : 'a'));
     return entry.id;
+  }
+
+  /**
+   * Two identities, because the two families of entry have two different ones.
+   *
+   * A farmer-addressed frame carries the server's `notificationId`, which is authoritative. A
+   * KPI warning has no such id at all — officer events are not persisted server-side — so it is
+   * identified by WHAT it warns about: this task, due at this instant. That is what stops the
+   * seeding fetch after a resync from doubling every warning already delivered live, and it
+   * still lets a re-warning at a NEW due instant through as the new thing it is.
+   */
+  #isReplay(input: NotificationInput): boolean {
+    const serverId = input.notificationId;
+    if (serverId !== undefined) {
+      return this._items().some((item) => item.notificationId === serverId);
+    }
+    const key = identityOf(input);
+    if (key === null) return false;
+    return this._items().some((item) => identityOf(item) === key);
   }
 
   markAllRead(): void {
@@ -115,4 +148,11 @@ export class NotificationStore {
   clearSession(): void {
     this._items.set([]);
   }
+}
+
+/** `null` for any entry that is not identified by task + due instant. */
+function identityOf(input: Pick<AppNotification, 'reviewTaskId' | 'dueAt'>): string | null {
+  const { reviewTaskId, dueAt } = input;
+  if (reviewTaskId === undefined || dueAt === undefined) return null;
+  return `${reviewTaskId} ${dueAt}`;
 }

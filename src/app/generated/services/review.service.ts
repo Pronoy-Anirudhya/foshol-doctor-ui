@@ -10,8 +10,16 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
 import { Advisory } from '../models/advisory';
+import { bulkApproveReviewTasks } from '../fn/review/bulk-approve-review-tasks';
+import { BulkApproveReviewTasks$Params } from '../fn/review/bulk-approve-review-tasks';
+import { BulkOperationResult } from '../models/bulk-operation-result';
+import { bulkRejectReviewTasks } from '../fn/review/bulk-reject-review-tasks';
+import { BulkRejectReviewTasks$Params } from '../fn/review/bulk-reject-review-tasks';
+import { bulkTransferReviewTasks } from '../fn/review/bulk-transfer-review-tasks';
+import { BulkTransferReviewTasks$Params } from '../fn/review/bulk-transfer-review-tasks';
 import { claimReviewTask } from '../fn/review/claim-review-task';
 import { ClaimReviewTask$Params } from '../fn/review/claim-review-task';
+import { ColleagueOfficer } from '../models/colleague-officer';
 import { getAdvisoryHistory } from '../fn/review/get-advisory-history';
 import { GetAdvisoryHistory$Params } from '../fn/review/get-advisory-history';
 import { getCaseAdvisory } from '../fn/review/get-case-advisory';
@@ -20,6 +28,11 @@ import { getReviewQueue } from '../fn/review/get-review-queue';
 import { GetReviewQueue$Params } from '../fn/review/get-review-queue';
 import { getReviewTask } from '../fn/review/get-review-task';
 import { GetReviewTask$Params } from '../fn/review/get-review-task';
+import { KpiWarning } from '../models/kpi-warning';
+import { listDistrictOfficers } from '../fn/review/list-district-officers';
+import { ListDistrictOfficers$Params } from '../fn/review/list-district-officers';
+import { listKpiWarnings } from '../fn/review/list-kpi-warnings';
+import { ListKpiWarnings$Params } from '../fn/review/list-kpi-warnings';
 import { PageOfOfficerQueueRow } from '../models/page-of-officer-queue-row';
 import { publishAdvisory } from '../fn/review/publish-advisory';
 import { PublishAdvisory$Params } from '../fn/review/publish-advisory';
@@ -34,6 +47,8 @@ import { ReviewCaseDetail } from '../models/review-case-detail';
 import { ReviewTask } from '../models/review-task';
 import { reviseAdvisory } from '../fn/review/revise-advisory';
 import { ReviseAdvisory$Params } from '../fn/review/revise-advisory';
+import { transferReviewTask } from '../fn/review/transfer-review-task';
+import { TransferReviewTask$Params } from '../fn/review/transfer-review-task';
 
 @Injectable({ providedIn: 'root' })
 export class ReviewService extends BaseService {
@@ -128,6 +143,72 @@ export class ReviewService extends BaseService {
     return resp.then((r: StrictHttpResponse<PageOfOfficerQueueRow>): PageOfOfficerQueueRow => r.body);
   }
 
+  /** Path part for operation `listDistrictOfficers()` */
+  static readonly ListDistrictOfficersPath = '/api/v1/review/officers';
+
+  /**
+   * Active field officers in the caller's district, excluding the caller.
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `listDistrictOfficers()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listDistrictOfficers$Response(params?: ListDistrictOfficers$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<ColleagueOfficer>>> {
+    const obs = listDistrictOfficers(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * Active field officers in the caller's district, excluding the caller.
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `listDistrictOfficers$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listDistrictOfficers(params?: ListDistrictOfficers$Params, context?: HttpContext): Promise<Array<ColleagueOfficer>> {
+    const resp = this.listDistrictOfficers$Response(params, context);
+    return resp.then((r: StrictHttpResponse<Array<ColleagueOfficer>>): Array<ColleagueOfficer> => r.body);
+  }
+
+  /** Path part for operation `listKpiWarnings()` */
+  static readonly ListKpiWarningsPath = '/api/v1/review/kpi-warnings';
+
+  /**
+   * Open resolution KPI warnings for the caller (resync recovery).
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `listKpiWarnings()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listKpiWarnings$Response(params?: ListKpiWarnings$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<KpiWarning>>> {
+    const obs = listKpiWarnings(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * Open resolution KPI warnings for the caller (resync recovery).
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `listKpiWarnings$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listKpiWarnings(params?: ListKpiWarnings$Params, context?: HttpContext): Promise<Array<KpiWarning>> {
+    const resp = this.listKpiWarnings$Response(params, context);
+    return resp.then((r: StrictHttpResponse<Array<KpiWarning>>): Array<KpiWarning> => r.body);
+  }
+
   /** Path part for operation `getReviewTask()` */
   static readonly GetReviewTaskPath = '/api/v1/review/tasks/{taskId}';
 
@@ -201,6 +282,114 @@ export class ReviewService extends BaseService {
   releaseReviewTask(params: ReleaseReviewTask$Params, context?: HttpContext): Promise<ReviewTask> {
     const resp = this.releaseReviewTask$Response(params, context);
     return resp.then((r: StrictHttpResponse<ReviewTask>): ReviewTask => r.body);
+  }
+
+  /** Path part for operation `transferReviewTask()` */
+  static readonly TransferReviewTaskPath = '/api/v1/review/tasks/{taskId}/transfer';
+
+  /**
+   * Move a live claim to another officer in the same district.
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `transferReviewTask()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  transferReviewTask$Response(params: TransferReviewTask$Params, context?: HttpContext): Promise<StrictHttpResponse<ReviewTask>> {
+    const obs = transferReviewTask(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * Move a live claim to another officer in the same district.
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `transferReviewTask$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  transferReviewTask(params: TransferReviewTask$Params, context?: HttpContext): Promise<ReviewTask> {
+    const resp = this.transferReviewTask$Response(params, context);
+    return resp.then((r: StrictHttpResponse<ReviewTask>): ReviewTask => r.body);
+  }
+
+  /** Path part for operation `bulkTransferReviewTasks()` */
+  static readonly BulkTransferReviewTasksPath = '/api/v1/review/tasks/bulk-transfer';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `bulkTransferReviewTasks()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  bulkTransferReviewTasks$Response(params: BulkTransferReviewTasks$Params, context?: HttpContext): Promise<StrictHttpResponse<BulkOperationResult>> {
+    const obs = bulkTransferReviewTasks(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `bulkTransferReviewTasks$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  bulkTransferReviewTasks(params: BulkTransferReviewTasks$Params, context?: HttpContext): Promise<BulkOperationResult> {
+    const resp = this.bulkTransferReviewTasks$Response(params, context);
+    return resp.then((r: StrictHttpResponse<BulkOperationResult>): BulkOperationResult => r.body);
+  }
+
+  /** Path part for operation `bulkApproveReviewTasks()` */
+  static readonly BulkApproveReviewTasksPath = '/api/v1/review/tasks/bulk-approve';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `bulkApproveReviewTasks()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  bulkApproveReviewTasks$Response(params: BulkApproveReviewTasks$Params, context?: HttpContext): Promise<StrictHttpResponse<BulkOperationResult>> {
+    const obs = bulkApproveReviewTasks(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `bulkApproveReviewTasks$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  bulkApproveReviewTasks(params: BulkApproveReviewTasks$Params, context?: HttpContext): Promise<BulkOperationResult> {
+    const resp = this.bulkApproveReviewTasks$Response(params, context);
+    return resp.then((r: StrictHttpResponse<BulkOperationResult>): BulkOperationResult => r.body);
+  }
+
+  /** Path part for operation `bulkRejectReviewTasks()` */
+  static readonly BulkRejectReviewTasksPath = '/api/v1/review/tasks/bulk-reject';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `bulkRejectReviewTasks()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  bulkRejectReviewTasks$Response(params: BulkRejectReviewTasks$Params, context?: HttpContext): Promise<StrictHttpResponse<BulkOperationResult>> {
+    const obs = bulkRejectReviewTasks(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `bulkRejectReviewTasks$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  bulkRejectReviewTasks(params: BulkRejectReviewTasks$Params, context?: HttpContext): Promise<BulkOperationResult> {
+    const resp = this.bulkRejectReviewTasks$Response(params, context);
+    return resp.then((r: StrictHttpResponse<BulkOperationResult>): BulkOperationResult => r.body);
   }
 
   /** Path part for operation `recordOfficerSymptoms()` */

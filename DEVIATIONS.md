@@ -342,3 +342,54 @@ dashboard puts widgets there.
 inverted pairs are gated in `check-contrast.mjs`.
 
 **Unblock.** None.
+
+---
+
+## D-20 · Bulk approve and reject still claim each task first
+
+**What.** `POST /review/tasks/bulk-approve` and `bulk-reject` are one request, but the console
+still sends **N claims before the one bulk write**. Bulk *transfer* claims nothing.
+
+**Why.** Each item in those two payloads carries an `expectedVersion`, and the only trustworthy
+version is the one `claim` returns. The flat review-task body's `version` is not it — D-05 records
+that it reported `2` where `claim` reported `0` on the same task — and there is no bulk-claim
+endpoint. Sending `UNKNOWN_TASK_VERSION` would be putting a value in the lock field that we know
+to be wrong, which is worse than the extra round trips: it would look like optimistic locking
+while doing nothing.
+
+**How we cope.** N claims + 1 write, down from the 2N of the sequential loop this replaced. A task
+that cannot be claimed never enters the request and is reported as a `FAILED` item carrying the
+server's own code; claims held by items that then fail are released quietly. Bulk transfer needs
+none of this because it only ever acts on claims the caller already holds, and `expectedVersion`
+is optional on `BulkTaskItem`.
+
+**Unblock.** Either a bulk-claim endpoint, or make `expectedVersion` optional on the approve and
+reject items so the server resolves the version it just read. Owner: A5 (`review`). Worth pairing
+with **B7** — `expectedVersion` is currently accepted and ignored, so today these versions are
+ceremony either way.
+
+---
+
+## D-21 · The KPI seed pulls `ReviewService` into the initial bundle
+
+**What.** `core/sse/kpi-warning-seeder.ts` is instantiated eagerly by `provideSse()` and imports
+the generated `ReviewService`. It is the only new eager import of a generated service — `core/` and
+`shared/` otherwise reach for just `AuthService` (needed at login) and `AnalysisService`
+(`core/media`). The production build now warns: **initial 513.40 kB against a 500 kB budget**
+(the error threshold is 1 MB, so this is a warning, not a failure).
+
+**Why it matters more than the number suggests.** Everything officer-shaped was lazy before this:
+the whole review client arrived only when an officer opened the console. A farmer on a rural
+connection now downloads the queue, claim, transfer, bulk and approve wrappers they will never
+call, and farmers are most of this product's users.
+
+**How we cope — for now, honestly rather than quietly.** The budget has deliberately **not** been
+raised, because raising it would hide the regression rather than answer it. The likely fix is a
+dynamic `import()` of `ReviewService` inside the seeder's fetch, so it resolves from the same lazy
+chunk the officer routes already pull; the seeder only ever runs for an OFFICER or ADMIN, so
+nothing a farmer does would load it.
+
+**Unblock.** Make that change and measure it. It is unmeasured here because
+`ng build --configuration production` aborts with SIGABRT in this environment — see the note in
+`README.md` — so the fix could not be verified at the time of writing, and an unverified bundle
+optimisation is a guess.

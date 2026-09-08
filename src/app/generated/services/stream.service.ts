@@ -24,7 +24,7 @@ export class StreamService extends BaseService {
   /**
    * Server-sent events for the authenticated principal.
    *
-   * Farmers receive events for their own cases only; officers receive queue events. Event names are CASE_STATUS_CHANGED, ADVISORY_PUBLISHED, ADVISORY_REVISED, CASE_REJECTED and QUEUE_CHANGED.
+   * Farmers receive events for their own cases only; officers receive queue events and assigned-officer KPI warnings. Event names on the wire are `case-status`, `advisory`, `queue`, `kpi`, `resync` and `reconnect`.
    *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `openEventStream()` instead.
@@ -39,7 +39,7 @@ export class StreamService extends BaseService {
   /**
    * Server-sent events for the authenticated principal.
    *
-   * Farmers receive events for their own cases only; officers receive queue events. Event names are CASE_STATUS_CHANGED, ADVISORY_PUBLISHED, ADVISORY_REVISED, CASE_REJECTED and QUEUE_CHANGED.
+   * Farmers receive events for their own cases only; officers receive queue events and assigned-officer KPI warnings. Event names on the wire are `case-status`, `advisory`, `queue`, `kpi`, `resync` and `reconnect`.
    *
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `openEventStream$Response()` instead.

@@ -234,4 +234,68 @@ describe('OfficerQueuePage (WEB-FR-200…205)', () => {
 
     expect(el().querySelector('[data-testid="queue-stale"]')).not.toBeNull();
   });
+
+  /**
+   * `REVIEW-FR-090` / `REVIEW-FR-091` — the running server predates both operational clocks and
+   * sends neither, which is exactly the shape of this fixture. Absent must render as ABSENT.
+   */
+  it('renders no KPI clock at all where the server sent no due instant', () => {
+    expect(el().querySelector('[data-testid="kpi-clock"]')).toBeNull();
+    expect(el().textContent ?? '').not.toContain('Invalid');
+  });
+
+  /**
+   * `REVIEW-FR-098` — the write is ONE request to the real bulk endpoint, and a `200` carrying a
+   * failed item is a partial result rather than a failed run. The claim stays per task because
+   * there is no bulk-claim endpoint and each item must carry the version its claim returned.
+   */
+  it('bulk approves through the bulk endpoint and reports each item separately', async () => {
+    const row = page.content[0];
+
+    el().querySelector<HTMLInputElement>('[data-testid="queue-row-select"]')!.click();
+    await settle();
+    el().querySelector<HTMLButtonElement>('[data-testid="queue-bulk-approve"]')!.click();
+    await settle();
+
+    // The approval is read first, so nothing is published that was not on screen.
+    http
+      .expectOne((r) => r.url.endsWith(`/review/tasks/${row.reviewTaskId}`))
+      .flush({ topDiseaseId: 'disease-1', suggestedRemedies: [{ remedyId: 'remedy-1' }] });
+    // The bulk read goes through Promise.all over the per-task cache, which is two microtask
+    // hops further than the single-row panel's; one settle is not enough to see it land.
+    await settle();
+    await settle();
+
+    el().querySelector<HTMLButtonElement>('[data-testid="queue-bulk-confirm"]')!.click();
+    await settle();
+
+    http
+      .expectOne((r) => r.url.endsWith(`/review/tasks/${row.reviewTaskId}/claim`))
+      .flush({ ...row, taskId: row.reviewTaskId, version: 7 });
+    await settle();
+
+    const bulk = http.expectOne((r) => r.url.endsWith('/review/tasks/bulk-approve'));
+    expect(bulk.request.method).toBe('POST');
+    expect(bulk.request.body.items).toEqual([
+      {
+        taskId: row.reviewTaskId,
+        action: 'APPROVED',
+        diseaseId: 'disease-1',
+        remedyIds: ['remedy-1'],
+        expectedVersion: 7,
+      },
+    ]);
+    bulk.flush({
+      succeeded: 1,
+      failed: 0,
+      results: [{ taskId: row.reviewTaskId, status: 'OK' }],
+    });
+    await settle();
+
+    http.expectOne((r) => r.url === QUEUE_URL).flush(page);
+    await settle();
+
+    const report = el().querySelector('[data-testid="queue-bulk-report"]');
+    expect(report?.querySelector('[data-status="OK"]')).not.toBeNull();
+  });
 });

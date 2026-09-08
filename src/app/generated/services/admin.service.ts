@@ -9,9 +9,15 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
+import { AdminKpiSummary } from '../models/admin-kpi-summary';
 import { AdminStats } from '../models/admin-stats';
+import { getAdminKpis } from '../fn/admin/get-admin-kpis';
+import { GetAdminKpis$Params } from '../fn/admin/get-admin-kpis';
 import { getAdminStats } from '../fn/admin/get-admin-stats';
 import { GetAdminStats$Params } from '../fn/admin/get-admin-stats';
+import { listAdminKpiBreaches } from '../fn/admin/list-admin-kpi-breaches';
+import { ListAdminKpiBreaches$Params } from '../fn/admin/list-admin-kpi-breaches';
+import { PageOfKpiBreach } from '../models/page-of-kpi-breach';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService extends BaseService {
@@ -50,6 +56,72 @@ export class AdminService extends BaseService {
   getAdminStats(params?: GetAdminStats$Params, context?: HttpContext): Promise<AdminStats> {
     const resp = this.getAdminStats$Response(params, context);
     return resp.then((r: StrictHttpResponse<AdminStats>): AdminStats => r.body);
+  }
+
+  /** Path part for operation `getAdminKpis()` */
+  static readonly GetAdminKpisPath = '/api/v1/admin/kpis';
+
+  /**
+   * District KPI failure summary (role ADMIN).
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getAdminKpis()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAdminKpis$Response(params?: GetAdminKpis$Params, context?: HttpContext): Promise<StrictHttpResponse<AdminKpiSummary>> {
+    const obs = getAdminKpis(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * District KPI failure summary (role ADMIN).
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getAdminKpis$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAdminKpis(params?: GetAdminKpis$Params, context?: HttpContext): Promise<AdminKpiSummary> {
+    const resp = this.getAdminKpis$Response(params, context);
+    return resp.then((r: StrictHttpResponse<AdminKpiSummary>): AdminKpiSummary => r.body);
+  }
+
+  /** Path part for operation `listAdminKpiBreaches()` */
+  static readonly ListAdminKpiBreachesPath = '/api/v1/admin/kpis/breaches';
+
+  /**
+   * Paginated KPI breaches for the caller's district.
+   *
+   *
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `listAdminKpiBreaches()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listAdminKpiBreaches$Response(params?: ListAdminKpiBreaches$Params, context?: HttpContext): Promise<StrictHttpResponse<PageOfKpiBreach>> {
+    const obs = listAdminKpiBreaches(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * Paginated KPI breaches for the caller's district.
+   *
+   *
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `listAdminKpiBreaches$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listAdminKpiBreaches(params?: ListAdminKpiBreaches$Params, context?: HttpContext): Promise<PageOfKpiBreach> {
+    const resp = this.listAdminKpiBreaches$Response(params, context);
+    return resp.then((r: StrictHttpResponse<PageOfKpiBreach>): PageOfKpiBreach => r.body);
   }
 
 }

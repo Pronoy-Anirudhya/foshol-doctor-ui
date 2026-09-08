@@ -1,9 +1,11 @@
 import { inject, Injectable } from '@angular/core';
+import { SessionStore } from '../auth/session-store';
 import { CaseStatusStore } from '../stores/case-status-store';
 import { LiveAnnouncer } from '../stores/live-announcer';
 import {
   NotificationStore,
   NOTIFY_ADVISORY,
+  NOTIFY_KPI_WARNING,
   NOTIFY_REJECTION,
   NOTIFY_REVISION,
   NOTIFY_STATUS,
@@ -24,6 +26,7 @@ import {
   SSE_EVENT,
   toAdvisoryEvent,
   toCaseStatusEvent,
+  toKpiEvent,
   toQueueEvent,
   type AdvisoryEventData,
 } from './sse-events';
@@ -36,6 +39,15 @@ const KEY_ADVISORY_REVISED = 'live.advisory.revised';
 const KEY_CASE_REJECTED = 'live.case.rejected';
 const KEY_QUEUE_UPDATED = 'live.queue.updated';
 const KEY_RESYNCED = 'live.stream.resynced';
+/**
+ * The KPI warning's words are ours alone: the frame carries no prose, and nothing about a
+ * deadline is agronomic content. It sits in the `shared.notifications.*` namespace rather than
+ * `live.*` only because `src/i18n/live.i18n.json` is another agent's fragment.
+ */
+const KEY_KPI_RESOLUTION_WARN = 'shared.notifications.kpi.resolutionWarning';
+
+/** Farmers receive `advisory` / `case-status`; officers receive `queue` / `kpi`. */
+const ROLE_FARMER = 'FARMER';
 /**
  * A status notification's detail line is the status label the badges already use, looked up by
  * the value the server sent. Reusing that catalogue rather than authoring a second set of status
@@ -69,6 +81,8 @@ export class SseDispatcher {
   private readonly notifications = inject(NotificationStore);
   private readonly announcer = inject(LiveAnnouncer);
   private readonly sse = inject(SseStore);
+  /** Read only to decide who a frame is FOR. Nothing here authorises anything. */
+  private readonly session = inject(SessionStore);
 
   dispatch(event: string, data: string): void {
     switch (event) {
@@ -80,6 +94,9 @@ export class SseDispatcher {
         return;
       case SSE_EVENT.queue:
         this.#onQueue(data);
+        return;
+      case SSE_EVENT.kpi:
+        this.#onKpi(data);
         return;
       case SSE_EVENT.resync:
         this.requestResync();
@@ -151,6 +168,30 @@ export class SseDispatcher {
       notificationId: event.notificationId,
     });
     this.announcer.announce(key);
+  }
+
+  /**
+   * A task this officer holds is approaching its resolution KPI.
+   *
+   * Recorded and announced, and that is all: no toast, because a deadline that is still
+   * fifteen minutes away is not worth seizing the screen for mid-review, and no request,
+   * because the frame already carries every field the row shows. The row deep-links by
+   * `reviewTaskId` — the console is addressed by task, not by case.
+   */
+  #onKpi(data: string): void {
+    // A farmer has no console, no task and no KPI. If one ever reaches this client the frame
+    // is dropped in silence — dropped, not counted as unknown, because the name IS known.
+    if (this.session.role() === ROLE_FARMER) return;
+    const event = toKpiEvent(data);
+    if (event === null) return;
+    this.notifications.record({
+      kind: NOTIFY_KPI_WARNING,
+      titleKey: KEY_KPI_RESOLUTION_WARN,
+      caseId: event.caseId,
+      reviewTaskId: event.reviewTaskId,
+      dueAt: event.dueAt,
+    });
+    this.announcer.announce(KEY_KPI_RESOLUTION_WARN);
   }
 
   #onQueue(data: string): void {

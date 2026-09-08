@@ -1,0 +1,75 @@
+<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+  <h2 class="text-base font-semibold text-ink">{{ 'admin.kpi.officers.title' | translate }}</h2>
+  @if (stale()) {
+    <span class="ofc-stale" data-testid="officers-stale-marker">{{
+      'admin.stats.stale.marker' | translate
+    }}</span>
+  }
+</div>
+
+<!-- The one sentence that keeps this section honest: these are resolution breaches, on cases
+     the officer had claimed. Assignment breaches are not here and never will be. -->
+<p class="mt-1 max-w-prose text-sm text-ink-muted">
+  {{ 'admin.kpi.officers.subtitle' | translate }}
+</p>
+
+@if (hasRows()) {
+  <p class="sr-only">{{ ariaLabel() }}</p>
+
+  <ul class="ofc-list">
+    @for (row of rows(); track row.officerId) {
+      <li class="ofc-row" data-testid="officer-row">
+        <div class="ofc-head">
+          <!-- Server content: the officer's name exactly as sent, never translated. When the
+               server named nobody the id stands in — ugly, but true (cf. RegionChip). -->
+          <span class="ofc-name" [class.font-latin]="!row.named" data-testid="officer-name">{{
+            row.label
+          }}</span>
+          @if (!row.named) {
+            <span class="ofc-unnamed">{{ 'admin.kpi.officers.unnamed' | translate }}</span>
+          }
+          <span class="ofc-count" data-testid="officer-count">{{ row.resolutionFailures }}</span>
+        </div>
+
+        <div
+          class="ofc-track"
+          role="img"
+          [attr.aria-label]="
+            'admin.kpi.officers.barAria'
+              | translate: { officer: row.label, count: row.resolutionFailures }
+          "
+        >
+          @if (row.resolutionFailures > 0) {
+            <div class="ofc-fill" [style.width]="row.width"></div>
+          }
+        </div>
+
+        <a
+          class="ofc-link touch-target"
+          [routerLink]="breachesPath"
+          [queryParams]="{ kind: 'RESOLUTION', officerId: row.officerId }"
+          data-testid="officer-drilldown"
+        >
+          {{ 'admin.kpi.officers.drillDown' | translate }}
+        </a>
+      </li>
+    }
+  </ul>
+
+  @if (unattributed() > 0) {
+    <!-- Not a bar. The server did not say whose these were, so nobody's row absorbs them. -->
+    <p class="ofc-residual" data-testid="officer-unattributed">
+      {{ 'admin.kpi.officers.unattributed' | translate: { count: unattributed() } }}
+    </p>
+  }
+} @else if (counted()) {
+  <!-- A counted zero: the server answered, and the answer was "nobody". Distinct from the
+       page's never-loaded state, which says so in its own words. -->
+  <p class="ofc-empty" data-testid="officers-none">
+    {{ 'admin.kpi.officers.none' | translate }}
+  </p>
+} @else {
+  <p class="ofc-empty" data-testid="officers-unknown">
+    {{ 'admin.kpi.officers.notLoaded' | translate }}
+  </p>
+}

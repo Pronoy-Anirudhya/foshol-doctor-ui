@@ -127,6 +127,8 @@ const PAIRS = [
   ['sage-600', 'surface-0', 4.5, 'neutral queue-state fill'],
   ['on-primary', 'sage-600', 4.5, 'count on the neutral queue-state segment'],
   ['sage-400', 'surface-0', 3.0, 'neutral divider'],
+  ['clay-700', 'surface-0', 4.5, 'KPI failure scope label'],
+  ['danger', 'surface-2', 3.0, 'officer failure bar on its track'],
   ['clay-300', 'console', 3.0, 'unread-count badge on the dark header'],
   ['ink', 'clay-300', 4.5, 'the unread count itself'],
   ['slate-600', 'surface-0', 4.5, 'volume-tile glyph and accent'],
@@ -146,6 +148,7 @@ const PAIRS = [
   // Borders that carry no meaning on their own: the shape, glyph and text all say it first.
   // Gated anyway, so a later edit cannot quietly drop one to invisible.
   ['surface-3', 'surface-0', 1.2, 'card border (decorative floor)'],
+  ['surface-3', 'surface-1', 1.2, 'chip border on the page ground (decorative floor)'],
   ['paddy-300', 'paddy-50', 1.4, 'success toast border (decorative floor)'],
   ['dawn-300', 'dawn-100', 1.4, 'warning toast border (decorative floor)'],
   ['clay-300', 'clay-100', 1.4, 'rejection toast border (decorative floor)'],

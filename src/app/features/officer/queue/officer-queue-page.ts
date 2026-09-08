@@ -10,6 +10,8 @@ import {
 import { RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SessionStore } from '../../../core/auth/session-store';
+import { APP_CONFIG } from '../../../core/config/app-config';
+import { LiveAnnouncer } from '../../../core/stores/live-announcer';
 import { SseStore } from '../../../core/sse/sse-store';
 import type { QueueRowView } from '../../../core/stores/queue-store';
 import type { OfficerQueueRow } from '../../../generated/models/officer-queue-row';
@@ -24,7 +26,8 @@ import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
-import { OfficerFacade } from '../officer-facade';
+import { KpiClock } from '../kpi-clock';
+import { KPI_ASSIGNMENT_KEY, KPI_RESOLUTION_KEY, OfficerFacade } from '../officer-facade';
 import { QueueActionPanel } from './queue-action-panel';
 import { QueueBulkBar } from './queue-bulk-bar';
 import { QueueRowActions, type QueuePopoverKind } from './queue-row-actions';
@@ -64,15 +67,20 @@ const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
 /** The two review-task states from which nothing can be actioned — the case is already decided. */
 const TERMINAL_STATES: readonly OfficerQueueRow['state'][] = ['DONE', 'REJECTED'];
 const CLAIMED: OfficerQueueRow['state'] = 'CLAIMED';
+const PENDING: OfficerQueueRow['state'] = 'PENDING';
+
+/** `REVIEW-FR-098` — mirrors `foshol.review.bulk.max-size`; the server refuses more. */
+const BULK_MAX = APP_CONFIG.review.bulkMaxSize;
 
 /** The bulk bar's panels ride the same one-open-at-a-time channel as the rows' own. */
 const BULK_ANCHOR = 'bulk';
 
 /**
  * `<th>` count in the table below — select, farmer, crop, candidate, confidence, path, media,
- * submitted, SLA, state, actions. Only the confirm row's `colspan` reads it.
+ * submitted, farmer-wait SLA, officer KPI, state, actions. Only the confirm row's `colspan`
+ * reads it.
  */
-const COLUMN_COUNT = 11;
+const COLUMN_COUNT = 12;
 
 interface OpenPanel {
   /** A `reviewTaskId`, or `BULK_ANCHOR` for the bulk bar. */
@@ -90,6 +98,7 @@ interface OpenPanel {
     EmptyState,
     ErrorPanel,
     Icon,
+    KpiClock,
     PageHeading,
     RegionChip,
     Paginator,
@@ -115,6 +124,34 @@ export class OfficerQueuePage {
   protected readonly facade = inject(OfficerFacade);
   private readonly sse = inject(SseStore);
   private readonly session = inject(SessionStore);
+  private readonly announcer = inject(LiveAnnouncer);
+
+  /**
+   * The instant every KPI clock on this screen is judged against.
+   *
+   * `WEB-FR-356` — deliberately NOT a ticking clock. `QueueStore.loadedAt` moves whenever the
+   * page is (re)loaded — the manual refresh, an SSE-driven refetch, a finished bulk run — which
+   * is exactly when the rows themselves change, and a second-by-second timer here would be a
+   * poll of nothing wearing a countdown's clothes. The workspace, where the officer is actually
+   * working a single case, has the claim timer's tick and gets a live one.
+   */
+  protected readonly now = computed(() => this.facade.queue.loadedAt() ?? Date.now());
+
+  /**
+   * `REVIEW-FR-090` / `REVIEW-FR-091` — which of the two operational clocks this row is on.
+   * `PENDING` counts down to `assignmentDueAt`, `CLAIMED` to `resolutionDueAt`, and a decided
+   * row counts down to nothing. Both fields are nullable and the running server omits them, so
+   * `null` is the ordinary answer and renders no clock at all.
+   */
+  protected kpiDueAt(view: QueueRowView): string | null {
+    if (view.row.state === PENDING) return view.row.assignmentDueAt ?? null;
+    if (view.row.state === CLAIMED) return view.row.resolutionDueAt ?? null;
+    return null;
+  }
+
+  protected kpiLabelKey(view: QueueRowView): string {
+    return view.row.state === CLAIMED ? KPI_RESOLUTION_KEY : KPI_ASSIGNMENT_KEY;
+  }
 
   /**
    * Set from the outlet's own `activate` / `deactivate` outputs rather than by reading the
@@ -196,13 +233,33 @@ export class OfficerQueuePage {
     this.actionableRows().filter((view) => this.selectedIds().has(view.row.reviewTaskId)),
   );
 
+  /**
+   * `REVIEW-FR-096` — bulk transfer moves LIVE claims, so the batch is exactly the selected
+   * rows this officer already holds. A `PENDING` row is in the shared pool and is not something
+   * to hand anybody; a row somebody else holds is not ours to move.
+   */
+  protected readonly transferableRows = computed(() =>
+    this.selectedRows().filter(
+      (view) =>
+        view.row.state === CLAIMED && (view.row.officerId ?? null) === this.session.subjectId(),
+    ),
+  );
+
+  /**
+   * `REVIEW-FR-098` — the server refuses a batch over `foshol.review.bulk.max-size` with
+   * `400 ERR_BULK_TOO_LARGE`, so the selection stops there and says why, rather than letting an
+   * officer tick fifty-one boxes and then composing a request we know will be thrown away.
+   */
+  protected readonly bulkMax = BULK_MAX;
+  protected readonly atBulkCap = computed(() => this.selectedRows().length >= BULK_MAX);
+
   protected readonly noneActionable = computed(() => this.actionableRows().length === NONE);
   protected readonly anySelected = computed(() => this.selectedRows().length > NONE);
-  protected readonly allSelected = computed(
-    () =>
-      this.actionableRows().length > NONE &&
-      this.selectedRows().length === this.actionableRows().length,
-  );
+  /** "All" means every row one request may carry, which is the cap when the page holds more. */
+  protected readonly allSelected = computed(() => {
+    const selectable = Math.min(this.actionableRows().length, BULK_MAX);
+    return selectable > NONE && this.selectedRows().length === selectable;
+  });
   protected readonly someSelected = computed(() => this.anySelected() && !this.allSelected());
 
   /** The bar survives the selection being cleared, so a finished run's report can be read. */
@@ -248,6 +305,11 @@ export class OfficerQueuePage {
 
   protected toggleRow(view: QueueRowView): void {
     const taskId = view.row.reviewTaskId;
+    if (!this.isSelected(view) && this.atBulkCap()) {
+      // The box stays unticked, so the announcement is the only thing that explains why.
+      this.announcer.announce('officer.queue.bulk.capReached', { max: BULK_MAX });
+      return;
+    }
     this.selectedIds.update((current) => {
       const next = new Set(current);
       if (!next.delete(taskId)) next.add(taskId);
@@ -255,13 +317,20 @@ export class OfficerQueuePage {
     });
   }
 
-  /** `WEB-FR-201` — the loaded page only. Never the rows the server has not sent. */
+  /** `WEB-FR-201` — the loaded page only. Never the rows the server has not sent, and never
+      more of them than one bulk request may carry (`REVIEW-FR-098`). */
   protected toggleAll(): void {
     if (this.allSelected()) {
       this.clearSelection();
       return;
     }
-    this.selectedIds.set(new Set(this.actionableRows().map((view) => view.row.reviewTaskId)));
+    const rows = this.actionableRows();
+    // `slice` preserves the server's order; it is a cap on how many, never on which
+    // (`WEB-FR-200` — nothing here compares two rows).
+    this.selectedIds.set(new Set(rows.slice(NONE, BULK_MAX).map((view) => view.row.reviewTaskId)));
+    if (rows.length > BULK_MAX) {
+      this.announcer.announce('officer.queue.bulk.capReached', { max: BULK_MAX });
+    }
   }
 
   protected clearSelection(): void {

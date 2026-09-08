@@ -5,6 +5,7 @@ import { AnalysisMode } from '../models/analysis-mode';
 import { DecisionPath } from '../models/decision-path';
 export interface OfficerQueueRow {
   analysisMode?: AnalysisMode;
+  assignmentDueAt?: string | null;
   caseId: string;
   cropCode?: string;
   cropNameBn?: string;
@@ -15,6 +16,7 @@ export interface OfficerQueueRow {
   imageCount?: number;
   isResubmission?: boolean;
   officerId?: string | null;
+  resolutionDueAt?: string | null;
   reviewTaskId: string;
   slaDueAt: string;
   state: 'PENDING' | 'CLAIMED' | 'DONE' | 'REJECTED';

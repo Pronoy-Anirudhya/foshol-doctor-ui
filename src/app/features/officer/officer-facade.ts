@@ -6,7 +6,9 @@ import { CaseReviewStore } from '../../core/stores/case-review-store';
 import { LiveAnnouncer } from '../../core/stores/live-announcer';
 import { QueueStore } from '../../core/stores/queue-store';
 import { TOAST_SUCCESS, ToastStore } from '../../core/stores/toast-store';
+import type { BulkOperationResult } from '../../generated/models/bulk-operation-result';
 import type { CaseDetail } from '../../generated/models/case-detail';
+import type { ColleagueOfficer } from '../../generated/models/colleague-officer';
 import type { ComputedDose } from '../../generated/models/computed-dose';
 import type { Disease } from '../../generated/models/disease';
 import type { OfficerQueueRow } from '../../generated/models/officer-queue-row';
@@ -19,7 +21,12 @@ import { CasesService } from '../../generated/services/cases.service';
 import { KnowledgeService } from '../../generated/services/knowledge.service';
 import { ReviewService } from '../../generated/services/review.service';
 import { OFFICER_PATHS } from './officer-paths';
-import { adaptReviewTask, remedyId, type ReviewTaskSummary } from './review-task.adapter';
+import {
+  adaptReviewTask,
+  remedyId,
+  UNKNOWN_TASK_VERSION,
+  type ReviewTaskSummary,
+} from './review-task.adapter';
 
 /**
  * Everything the officer console does to the network, in one place.
@@ -45,8 +52,22 @@ import { adaptReviewTask, remedyId, type ReviewTaskSummary } from './review-task
  */
 const FIRST_PAGE = 0;
 
+/** An empty batch is never sent, so this is both the floor and the slice origin. */
+const NO_ITEMS = 0;
+
 /** Shared empty result, so a case with no computed dose does not churn a new Map each read. */
 const EMPTY_DOSES: ReadonlyMap<string, ComputedDose> = new Map();
+
+/** Task states this class has to name. Taken from the generated union so they cannot drift. */
+const STATE_PENDING: OfficerQueueRow['state'] = 'PENDING';
+const STATE_CLAIMED: OfficerQueueRow['state'] = 'CLAIMED';
+
+/**
+ * `REVIEW-FR-090` / `REVIEW-FR-091` — one label per operational clock, so the words on screen
+ * always name the instant beneath them and neither can be read as the farmer's SLA.
+ */
+export const KPI_ASSIGNMENT_KEY = 'officer.kpi.assignment';
+export const KPI_RESOLUTION_KEY = 'officer.kpi.resolution';
 
 export type PublishAction = PublishAdvisoryRequest['action'];
 
@@ -68,24 +89,37 @@ export interface QueueApproval {
   readonly remedyIds: readonly string[];
 }
 
-/** One task's result inside a bulk run. `problem` is `null` exactly when `ok` is true. */
+/**
+ * One task's result inside a bulk run — the server's own per-item verdict
+ * (`BulkOperationResult.results`), or, for a task that never reached the request, the code of
+ * the failure that stopped it. `errorCode` is `null` on success and on a failure the server
+ * named nothing for.
+ */
 export interface BulkOutcome {
   readonly taskId: string;
   readonly ok: boolean;
-  readonly problem: ProblemView | null;
+  readonly errorCode: string | null;
 }
 
 /**
  * A bulk run, as the bar renders it. Counts are derived from `outcomes` rather than tallied
  * alongside it, so the number on screen and the list beneath it cannot disagree.
+ *
+ * `problem` is the WHOLE REQUEST failing — `400 ERR_BULK_TOO_LARGE`, a `403`, a dropped
+ * connection. A `200` with failed items is not that: `REVIEW-FR-098` makes partial success the
+ * normal outcome, so per-item failures live in `outcomes` and never light this up.
  */
 export interface BulkProgress {
   readonly running: boolean;
   readonly total: number;
   readonly outcomes: readonly BulkOutcome[];
+  readonly problem: ProblemView | null;
 }
 
-export const IDLE_BULK: BulkProgress = { running: false, total: 0, outcomes: [] };
+export const IDLE_BULK: BulkProgress = { running: false, total: 0, outcomes: [], problem: null };
+
+/** `BulkOperationResult.results[].status`, from the generated union so it cannot drift. */
+const BULK_OK: BulkOperationResult['results'][number]['status'] = 'OK';
 
 export const succeededIn = (bulk: BulkProgress): readonly BulkOutcome[] =>
   bulk.outcomes.filter((outcome) => outcome.ok);
@@ -126,6 +160,15 @@ export class OfficerFacade {
   private readonly _remediesLoading = signal(false);
   private readonly _claimPending = signal(false);
   private readonly _actionPending = signal(false);
+  private readonly _colleagues = signal<readonly ColleagueOfficer[]>([]);
+  private readonly _colleaguesLoading = signal(false);
+  private readonly _colleaguesProblem = signal<ProblemView | null>(null);
+  /**
+   * Transfer failures are held apart from `_actionProblem` on purpose: the transfer panel names
+   * this endpoint's own error codes in its own words, and sharing one signal would print the
+   * same failure twice — once there and once in the workspace's generic action-problem block.
+   */
+  private readonly _transferProblem = signal<ProblemView | null>(null);
 
   readonly queueProblem = this._queueProblem.asReadonly();
   readonly caseProblem = this._casePayload.asReadonly();
@@ -139,6 +182,11 @@ export class OfficerFacade {
   readonly remediesLoading = this._remediesLoading.asReadonly();
   readonly claimPending = this._claimPending.asReadonly();
   readonly actionPending = this._actionPending.asReadonly();
+  /** `REVIEW-FR-097` — active officers in the caller's district, self already excluded. */
+  readonly colleagues = this._colleagues.asReadonly();
+  readonly colleaguesLoading = this._colleaguesLoading.asReadonly();
+  readonly colleaguesProblem = this._colleaguesProblem.asReadonly();
+  readonly transferProblem = this._transferProblem.asReadonly();
 
   readonly conflicted = computed(() => this._actionProblem()?.status === HTTP_STATUS.conflict);
 
@@ -160,6 +208,32 @@ export class OfficerFacade {
   readonly isResubmission = computed(
     () => this.openRow()?.isResubmission ?? this._summary()?.isResubmission ?? false,
   );
+
+  /**
+   * The OPERATIONAL clock for the open case — the officer's own deadline, never the farmer's
+   * wait above.
+   *
+   * `REVIEW-FR-090` / `REVIEW-FR-091`: a `PENDING` task is counting down to `assignmentDueAt`,
+   * a `CLAIMED` one to `resolutionDueAt`, and a decided task is counting down to nothing at
+   * all. Both are frozen server instants and both are nullable — the running server omits them
+   * entirely — so `null` here means "render no clock", which is what `KpiClock` does with it.
+   *
+   * `WEB-NFR-001` — the instant is read, never derived. Nothing in this class knows the working
+   * calendar, and nothing in it ever adds an hour to `now`.
+   */
+  readonly kpiDueAt = computed<string | null>(() => {
+    const task = this.workspace.task();
+    const row = this.openRow();
+    const state = task?.state ?? row?.state ?? null;
+    if (state === STATE_CLAIMED) return task?.resolutionDueAt ?? row?.resolutionDueAt ?? null;
+    if (state === STATE_PENDING) return task?.assignmentDueAt ?? row?.assignmentDueAt ?? null;
+    return null;
+  });
+
+  readonly kpiLabelKey = computed(() => {
+    const state = this.workspace.task()?.state ?? this.openRow()?.state ?? null;
+    return state === STATE_CLAIMED ? KPI_RESOLUTION_KEY : KPI_ASSIGNMENT_KEY;
+  });
 
   /**
    * The server's own dose arithmetic, keyed by remedy id.
@@ -422,52 +496,195 @@ export class OfficerFacade {
     }
   }
 
-  // ── Bulk actions ─────────────────────────────────────────────────────────────────────────
+  // ── Bulk actions (REVIEW-FR-098) ─────────────────────────────────────────────────────────
 
-  async bulkApprove(approvals: readonly QueueApproval[]): Promise<void> {
-    const byTask = new Map(approvals.map((approval) => [approval.taskId, approval]));
-    await this.runBulk([...byTask.keys()], async (taskId) => {
-      const approval = byTask.get(taskId);
-      return approval === undefined ? null : this.approveOne(approval);
-    });
+  /**
+   * **These are the real bulk endpoints.** An earlier build of this console looped the
+   * single-task endpoints because no bulk endpoint existed; `POST /review/tasks/bulk-approve`,
+   * `bulk-reject` and `bulk-transfer` now do exist, and the write is one request.
+   *
+   * All three answer **`200` with per-item results**, not a single pass/fail: `REVIEW-FR-098`
+   * makes partial success the normal outcome, so one failed row must never read as a failed
+   * run. Everything below therefore records `succeeded`, `failed` and a verdict per task id,
+   * and reserves `BulkProgress.problem` for the request itself being refused.
+   *
+   * **The claim stays per task, and only for approve and reject.** There is no bulk-claim
+   * endpoint, and `BulkApproveRequest`/`BulkRejectRequest` items each require the
+   * `expectedVersion` the officer holds — which only `claim` returns (`review-task.adapter.ts`
+   * explains why the flat task body's `version` may never be used for this). So the shape is:
+   * claim each selected task, build one request from the versions those claims returned, send
+   * it once. Bulk TRANSFER needs no claim at all, because it operates only on tasks the caller
+   * already holds and `BulkTaskItem.expectedVersion` is optional.
+   */
+
+  /**
+   * `REVIEW-FR-096` — one target for the whole batch, and only tasks the caller already holds.
+   *
+   * No `expectedVersion` is sent: the caller's claim came from a queue row, and a queue row
+   * carries no task version this client is allowed to trust. The field is optional here for
+   * exactly that reason, and the server's own claim check is what makes the write safe.
+   */
+  async bulkTransfer(taskIds: readonly string[], targetOfficerId: string): Promise<void> {
+    const items = this.startBulk(taskIds);
+    if (items === null) return;
+    try {
+      this.applyBulkResult(
+        await this.reviewApi.bulkTransferReviewTasks({
+          body: { targetOfficerId, items: items.map((taskId) => ({ taskId })) },
+        }),
+      );
+    } catch (error) {
+      this.failBulk(items, error);
+    }
+    await this.settleBulk();
   }
 
+  /**
+   * `WEB-FR-240` — every item publishes exactly the approval the officer was shown, with the
+   * version the claim just returned. `COMMON-CON-003` — `diseaseId` and `remedyIds` come off
+   * `QueueApproval` verbatim and `officerNoteBn` is deliberately absent: a bulk run has no
+   * officer note, and this console never composes agronomic text of its own.
+   */
+  async bulkApprove(approvals: readonly QueueApproval[]): Promise<void> {
+    const byTask = new Map(approvals.map((approval) => [approval.taskId, approval]));
+    const taskIds = this.startBulk([...byTask.keys()]);
+    if (taskIds === null) return;
+
+    const versions = await this.claimEach(taskIds);
+    const items = [...versions].flatMap(([taskId, expectedVersion]) => {
+      const approval = byTask.get(taskId);
+      return approval === undefined
+        ? []
+        : [
+            {
+              taskId,
+              action: ACTION_APPROVED,
+              diseaseId: approval.diseaseId,
+              remedyIds: [...approval.remedyIds],
+              expectedVersion,
+            },
+          ];
+    });
+
+    if (items.length > NO_ITEMS) {
+      try {
+        this.applyBulkResult(await this.reviewApi.bulkApproveReviewTasks({ body: { items } }));
+      } catch (error) {
+        this.failBulk(
+          items.map((item) => item.taskId),
+          error,
+        );
+      }
+    }
+    await this.releaseFailedClaims(versions);
+    await this.settleBulk();
+  }
+
+  /** `WEB-FR-233` — the caller has already required a reason and a Bangla message the officer
+      typed. Nothing here writes Bangla. */
   async bulkReject(
     taskIds: readonly string[],
     reasonCode: RejectionReason,
     messageBn: string,
   ): Promise<void> {
-    await this.runBulk(taskIds, (taskId) => this.rejectOne(taskId, reasonCode, messageBn));
+    const started = this.startBulk(taskIds);
+    if (started === null) return;
+
+    const versions = await this.claimEach(started);
+    const items = [...versions].map(([taskId, expectedVersion]) => ({
+      taskId,
+      reasonCode,
+      messageBn,
+      expectedVersion,
+    }));
+
+    if (items.length > NO_ITEMS) {
+      try {
+        this.applyBulkResult(await this.reviewApi.bulkRejectReviewTasks({ body: { items } }));
+      } catch (error) {
+        this.failBulk(
+          items.map((item) => item.taskId),
+          error,
+        );
+      }
+    }
+    await this.releaseFailedClaims(versions);
+    await this.settleBulk();
   }
 
   /**
-   * **There is no bulk endpoint.** The frozen contract — and the running server — expose only
-   * `POST /review/tasks/{taskId}/approve` and `.../reject`, so a bulk action is this loop: one
-   * claim-and-write per task, in the order the officer sees them, with the outcome of each
-   * recorded rather than collapsed into a single pass/fail. A partial failure is the NORMAL
-   * case here (a `409` means another officer reached that one row first), so the officer is
-   * shown which rows landed and which did not.
+   * Opens a run, or refuses to. `null` means nothing was started — an empty selection is never
+   * sent, and a second run is never stacked on a running one.
    *
-   * **Swapping in a real bulk endpoint is a change to this method and nothing else.** Replace
-   * the `for` loop with the single generated call and map its per-task result into `outcomes`;
-   * `bulkApprove`, `bulkReject`, the progress signal, the bulk bar and its per-row report all
-   * keep working unchanged.
+   * The slice is the same cap the queue page enforces on the selection itself
+   * (`APP_CONFIG.review.bulkMaxSize`, mirroring `foshol.review.bulk.max-size`). Composing a
+   * request this client already knows would come back `400 ERR_BULK_TOO_LARGE` is a round trip
+   * spent to be told something we could say ourselves. De-duplication is the same argument for
+   * `ERR_BULK_DUPLICATE`.
    */
-  private async runBulk(
-    taskIds: readonly string[],
-    step: (taskId: string) => Promise<ProblemView | null>,
-  ): Promise<void> {
-    if (taskIds.length === 0 || this._bulk().running) return;
+  private startBulk(taskIds: readonly string[]): readonly string[] | null {
+    if (this._bulk().running) return null;
+    const unique = [...new Set(taskIds)].slice(NO_ITEMS, APP_CONFIG.review.bulkMaxSize);
+    if (unique.length === NO_ITEMS) return null;
+    this._bulk.set({ ...IDLE_BULK, running: true, total: unique.length });
+    return unique;
+  }
 
-    this._bulk.set({ ...IDLE_BULK, running: true, total: taskIds.length });
+  /**
+   * One claim per task, because there is no bulk-claim endpoint and every approve/reject item
+   * must carry the version its claim returned. A task that cannot be claimed never reaches the
+   * request and is reported with the server's own code — usually `ERR_TASK_CLAIMED`, meaning
+   * another officer got there first, which is a per-row fact and not a failed run.
+   */
+  private async claimEach(taskIds: readonly string[]): Promise<Map<string, number>> {
+    const versions = new Map<string, number>();
     for (const taskId of taskIds) {
-      const problem = await step(taskId);
-      this._bulk.update((now) => ({
-        ...now,
-        outcomes: [...now.outcomes, { taskId, ok: problem === null, problem }],
-      }));
+      try {
+        const task = await this.reviewApi.claimReviewTask({ taskId });
+        versions.set(taskId, task.version);
+      } catch (error) {
+        this.recordOutcomes([{ taskId, ok: false, errorCode: toProblemView(error).code }]);
+      }
     }
+    return versions;
+  }
 
+  /**
+   * A claim taken for a bulk item that then failed is handed straight back, for the same reason
+   * `releaseQuietly` exists on the single-row path: one failed item must not park a case behind
+   * a claim for the full TTL and punish every other officer for it.
+   */
+  private async releaseFailedClaims(versions: ReadonlyMap<string, number>): Promise<void> {
+    const failed = failedIn(this._bulk()).map((outcome) => outcome.taskId);
+    for (const taskId of failed) {
+      if (versions.has(taskId)) await this.releaseQuietly(taskId);
+    }
+  }
+
+  private applyBulkResult(result: BulkOperationResult): void {
+    this.recordOutcomes(
+      result.results.map((item) => ({
+        taskId: item.taskId,
+        ok: item.status === BULK_OK,
+        errorCode: item.errorCode ?? null,
+      })),
+    );
+  }
+
+  /** The request itself was refused, so every item it carried failed for that one reason. */
+  private failBulk(taskIds: readonly string[], error: unknown): void {
+    const problem = toProblemView(error);
+    this._bulk.update((now) => ({ ...now, problem }));
+    this.recordOutcomes(
+      taskIds.map((taskId) => ({ taskId, ok: false, errorCode: problem.code })),
+    );
+  }
+
+  private recordOutcomes(outcomes: readonly BulkOutcome[]): void {
+    this._bulk.update((now) => ({ ...now, outcomes: [...now.outcomes, ...outcomes] }));
+  }
+
+  private async settleBulk(): Promise<void> {
     const finished = this._bulk();
     this._bulk.set({ ...finished, running: false });
     this.announcer.announce('officer.queue.bulk.finished', {
@@ -628,6 +845,79 @@ export class OfficerFacade {
     } finally {
       this._claimPending.set(false);
     }
+  }
+
+  // ── Same-district transfer (REVIEW-FR-096 / REVIEW-FR-097) ───────────────────────────────
+
+  /**
+   * `REVIEW-FR-097` — who may receive a transfer, answered by the server.
+   *
+   * Cached for the session because a district's officer roster does not change while an officer
+   * works a queue, and re-reading it every time a panel opens would be a request per keystroke
+   * of hesitation. `force` is the retry control's way back in.
+   */
+  async loadColleagues(force = false): Promise<void> {
+    if (this._colleaguesLoading()) return;
+    if (!force && this._colleagues().length > NO_ITEMS) return;
+    this._colleaguesLoading.set(true);
+    this._colleaguesProblem.set(null);
+    try {
+      this._colleagues.set(await this.reviewApi.listDistrictOfficers());
+    } catch (error) {
+      this._colleagues.set([]);
+      this._colleaguesProblem.set(toProblemView(error));
+    } finally {
+      this._colleaguesLoading.set(false);
+    }
+  }
+
+  /**
+   * `REVIEW-FR-096` — move a LIVE claim to a colleague in the same district.
+   *
+   * The caller must be holding the claim; `workspace.canAct()` is that check, and it is the
+   * server's `state`/`officerId` being read rather than a rule re-implemented here
+   * (`WEB-NFR-001`). `PENDING` is a shared pool and is never assigned from this console, no
+   * cross-district target is ever offered, and a decided task offers no transfer control at all
+   * — the server still refuses each of those, and its `errorCode` is what the officer reads.
+   *
+   * `expectedVersion` is the version the held `ReviewTask` carries — the one `claim` returned.
+   * When this session never claimed (a reload while already holding the case) the adapter has
+   * only `UNKNOWN_TASK_VERSION` to offer, and the field is then omitted rather than filled with
+   * a number that would fail the lock for the wrong reason. It is optional for that case.
+   *
+   * `WEB-FR-234` — a successful transfer is a terminal act for this officer, so it ends the same
+   * way approve and reject do: back to the queue, reloaded.
+   */
+  async transfer(targetOfficerId: string): Promise<boolean> {
+    const task = this.workspace.task();
+    if (task === null || !this.workspace.canAct() || this._actionPending()) return false;
+
+    this._actionPending.set(true);
+    this._transferProblem.set(null);
+    try {
+      await this.reviewApi.transferReviewTask({
+        taskId: task.taskId,
+        body:
+          task.version === UNKNOWN_TASK_VERSION
+            ? { targetOfficerId }
+            : { targetOfficerId, expectedVersion: task.version },
+      });
+      await this.finish('officer.transfer.done', { case: task.caseId });
+      return true;
+    } catch (error) {
+      const problem = toProblemView(error);
+      this._transferProblem.set(problem);
+      // WEB-FR-235 — a 409 means the claim state moved under us; re-read rather than retry.
+      if (problem.status === HTTP_STATUS.conflict) await this.refreshCase();
+      return false;
+    } finally {
+      this._actionPending.set(false);
+    }
+  }
+
+  /** Closing the transfer panel puts its failure away with it. */
+  clearTransferProblem(): void {
+    this._transferProblem.set(null);
   }
 
   // ── The four terminal actions (WEB-FR-230) ───────────────────────────────────────────────
