@@ -68,6 +68,34 @@
   gap: 0.5rem;
 }
 
+/* State-keyed accent — WEB-UX-044, alongside .state's text, not instead of it. --wa is set on
+   the card or row and read by the cell/card border below, so each state names its colour once
+   rather than once per surface. */
+.queue-card[data-state='PENDING'],
+.queue-table tr[data-state='PENDING'] {
+  --wa: var(--color-dawn-600);
+}
+
+.queue-card[data-state='CLAIMED'],
+.queue-table tr[data-state='CLAIMED'] {
+  --wa: var(--color-paddy-600);
+}
+
+.queue-card[data-state='DONE'],
+.queue-table tr[data-state='DONE'] {
+  --wa: var(--color-paddy-700);
+}
+
+.queue-card[data-state='REJECTED'],
+.queue-table tr[data-state='REJECTED'] {
+  --wa: var(--color-clay-600);
+}
+
+.queue-card,
+.queue-table tr td:first-child {
+  border-inline-start: 3px solid var(--wa, transparent);
+}
+
 .card-top {
   display: flex;
   align-items: center;
@@ -179,8 +207,13 @@
   color: var(--color-ink);
 }
 
-.queue-table tbody tr:hover {
+/* Zebra striping — a plain reading aid, orthogonal to the state accent above. */
+.queue-table tr:nth-child(even) {
   background: var(--color-surface-1);
+}
+
+.queue-table tr:hover {
+  background: var(--color-surface-2);
 }
 
 .queue-table td.num {

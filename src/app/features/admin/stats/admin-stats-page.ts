@@ -61,6 +61,14 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
   ],
   host: { class: 'block' },
   template: `
+    <!-- A quiet echo of the slate console chrome below (the thresholds section), so the page
+         opens with one deliberate mark rather than heading straight into body text. Kept as a
+         thin accent rather than a full dark band behind the heading: PageHeading's own text
+         colours assume the light surface and are shared by every routed page, so recolouring
+         them for one dark wrapper here would mean forking the component for a purely
+         decorative touch. -->
+    <div class="mb-4 h-1.5 w-16 rounded-full bg-slate-800" aria-hidden="true"></div>
+
     <foshol-page-heading
       eyebrowKey="admin.stats.eyebrow"
       titleKey="admin.stats.title"
@@ -132,12 +140,14 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
         data-testid="stat-grid"
       >
         <foshol-stat-tile
+          kind="volume"
           labelKey="admin.stats.casesToday.label"
           hintKey="admin.stats.casesToday.hint"
           [stale]="store.stale()"
           [value]="stats.casesToday === null ? null : stats.casesToday.toString()"
         />
         <foshol-stat-tile
+          kind="rate"
           labelKey="admin.stats.approvalRate.label"
           hintKey="admin.stats.approvalRate.hint"
           [stale]="store.stale()"
@@ -148,6 +158,7 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
           "
         />
         <foshol-stat-tile
+          kind="time"
           labelKey="admin.stats.medianReview.label"
           hintKey="admin.stats.medianReview.hint"
           [stale]="store.stale()"
@@ -160,6 +171,7 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
         <!-- The sample size always travels with the agreement rate: a rate computed from two
              advisories is not a rate, and the count is the only honest way to say so. -->
         <foshol-stat-tile
+          kind="agreement"
           labelKey="admin.stats.agreement.label"
           hintKey="admin.stats.agreement.hint"
           [stale]="store.stale()"

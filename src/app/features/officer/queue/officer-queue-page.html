@@ -72,6 +72,7 @@
             class="card queue-card"
             data-testid="queue-card"
             [attr.data-case-id]="view.row.caseId"
+            [attr.data-state]="view.row.state"
           >
             <div class="card-top">
               <a
@@ -178,7 +179,11 @@
           </thead>
           <tbody>
             @for (view of rows(); track view.row.reviewTaskId) {
-              <tr data-testid="queue-row" [attr.data-case-id]="view.row.caseId">
+              <tr
+                data-testid="queue-row"
+                [attr.data-case-id]="view.row.caseId"
+                [attr.data-state]="view.row.state"
+              >
                 <td>
                   <a
                     class="row-link"
