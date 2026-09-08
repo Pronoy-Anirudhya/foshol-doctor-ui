@@ -1,0 +1,54 @@
+.am-avatar {
+  display: inline-grid;
+  place-items: center;
+  height: 1.75rem;
+  width: 1.75rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-paddy-600);
+  color: var(--color-ink-invert);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.am-avatar-lg {
+  height: 2.5rem;
+  width: 2.5rem;
+  font-size: 1rem;
+}
+
+.am-caret {
+  transition: transform var(--duration-1) var(--ease-settle);
+}
+
+.am-trigger[aria-expanded='true'] .am-caret {
+  transform: rotate(180deg);
+}
+
+.am-details {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.am-details dt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.am-details dd {
+  margin: 0.15rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.am-pin {
+  color: var(--color-ink-faint);
+}

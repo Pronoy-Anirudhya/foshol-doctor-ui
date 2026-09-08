@@ -1,0 +1,61 @@
+@if (items().length > 0) {
+  <ng-template #navLinks>
+    <ul class="sn-list">
+      @for (item of items(); track item.path) {
+        <li>
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="sn-active"
+            ariaCurrentWhenActive="page"
+            class="sn-link"
+            data-testid="side-nav-link"
+            (click)="onNavigate()"
+          >
+            <foshol-icon [name]="item.icon" size="md" />
+            <span class="sn-label">{{ labelKey(item) | translate }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </ng-template>
+
+  <!-- Desktop: a persistent column, sticky under the header, collapsible to an icon rail. -->
+  <nav
+    [class]="desktopClass()"
+    [attr.data-collapsed]="collapsed() || null"
+    [attr.aria-label]="'shared.nav.label' | translate"
+    data-testid="side-nav"
+  >
+    <ng-container [ngTemplateOutlet]="navLinks" />
+
+    <button
+      type="button"
+      class="sn-collapse-toggle"
+      data-testid="side-nav-collapse"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-label]="(collapsed() ? 'shared.nav.expand' : 'shared.nav.collapse') | translate"
+      (click)="toggleCollapsed()"
+    >
+      <foshol-icon [name]="collapsed() ? 'arrow-right' : 'arrow-left'" size="sm" />
+      <span class="sn-label">{{ (collapsed() ? 'shared.nav.expand' : 'shared.nav.collapse') | translate }}</span>
+    </button>
+  </nav>
+
+  @if (open()) {
+    <!-- Mobile: an off-canvas drawer over a backdrop — WEB-UX-030's "one column below xl" rule
+         applied to navigation chrome, not just page content. Always full-width labels; there is
+         no icon-rail state at this width. -->
+    <div
+      class="sn-backdrop fixed inset-0 z-[44] md:hidden"
+      data-testid="side-nav-backdrop"
+      (click)="closed.emit()"
+    ></div>
+    <nav
+      id="foshol-side-nav"
+      [class]="mobileClass()"
+      [attr.aria-label]="'shared.nav.label' | translate"
+    >
+      <ng-container [ngTemplateOutlet]="navLinks" />
+    </nav>
+  }
+}

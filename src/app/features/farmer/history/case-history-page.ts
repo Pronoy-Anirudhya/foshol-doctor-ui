@@ -23,7 +23,6 @@ import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { SecureImage } from '../../../shared/ui/secure-image/secure-image';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
-import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { FARMER_PATHS } from '../capture/farmer-paths';
 
 /**
@@ -73,7 +72,6 @@ const STATUS_FILTER_OPTIONS: readonly CaseStatus[] = [
     EmptyState,
     ErrorPanel,
     Paginator,
-    RegionChip,
     SecureImage,
     Skeleton,
   ],

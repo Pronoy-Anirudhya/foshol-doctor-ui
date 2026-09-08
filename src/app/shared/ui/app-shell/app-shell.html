@@ -7,17 +7,31 @@
   {{ 'shared.skipToContent' | translate }}
 </a>
 
-<foshol-app-header [tone]="headerTone()" />
+<foshol-app-header [tone]="headerTone()" [navOpen]="navOpen()" (menuToggle)="toggleNav()" />
 
 <!-- WEB-FR-402 — directly under the header so it is seen, above the content so it never
      covers a control. -->
 <foshol-offline-banner />
 
-<main id="main" tabindex="-1" class="flex-1" [attr.aria-label]="'shared.mainLandmark' | translate">
-  <div [class]="mainClass()">
-    <router-outlet />
-  </div>
-</main>
+<div class="flex flex-1 items-start">
+  <foshol-side-nav [tone]="headerTone()" [open]="navOpen()" (closed)="closeNav()" />
+
+  <!-- [container-type:inline-size] — establishes a container-query context sized to the true
+       available content width (viewport minus the nav), so a page that needs to escape the
+       shell's own width cap (`case-history-page.html`'s full-bleed trick) can measure against
+       THIS box with `cqw` instead of `vw`. Plain `vw` assumes `main` is centered in the raw
+       viewport, which stopped being true the moment a persistent nav became its sibling. -->
+  <main
+    id="main"
+    tabindex="-1"
+    class="min-w-0 flex-1 [container-type:inline-size]"
+    [attr.aria-label]="'shared.mainLandmark' | translate"
+  >
+    <div [class]="mainClass()">
+      <router-outlet />
+    </div>
+  </main>
+</div>
 
 <foshol-toast-host />
 <foshol-live-region />

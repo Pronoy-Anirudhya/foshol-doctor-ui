@@ -47,7 +47,12 @@ export type IconName =
   | 'pin'
   | 'view'
   | 'approve'
-  | 'reject';
+  | 'reject'
+  | 'menu'
+  | 'logout'
+  | 'user'
+  | 'home'
+  | 'list';
 
 @Component({
   selector: 'foshol-icon',
@@ -158,6 +163,28 @@ export type IconName =
         @case ('bell') {
           <path d="M18 9.4a6 6 0 1 0-12 0c0 4.3-1.4 5.8-2 6.6a.7.7 0 0 0 .6 1.1h14.8a.7.7 0 0 0 .6-1.1c-.6-.8-2-2.3-2-6.6Z" />
           <path d="M10.2 20.2a2.2 2.2 0 0 0 3.6 0" />
+        }
+        @case ('menu') {
+          <!-- Three bars: the nav is a list of destinations, drawn as one. -->
+          <path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" />
+        }
+        @case ('logout') {
+          <path d="M8 3.5H5.2A1.7 1.7 0 0 0 3.5 5.2v9.6A1.7 1.7 0 0 0 5.2 16.5H8" />
+          <path d="M12.5 13.5 16 10l-3.5-3.5M16 10H7.5" />
+        }
+        @case ('user') {
+          <!-- A head and shoulders: the account, not a role glyph. -->
+          <circle cx="12" cy="8.4" r="3.4" />
+          <path d="M4.6 20.2a7.4 7.4 0 0 1 14.8 0" />
+        }
+        @case ('home') {
+          <path d="M4 11.4 12 4.4l8 7" />
+          <path d="M6 10v8.6a1 1 0 0 0 1 1h3.4v-5.4h3.2v5.4H17a1 1 0 0 0 1-1V10" />
+        }
+        @case ('list') {
+          <!-- A row of cases: a short tick, then a line, repeated three times. -->
+          <path d="M3.6 6.5h1.6M3.6 12h1.6M3.6 17.5h1.6" stroke-width="2.4" />
+          <path d="M8.6 6.5h11.9M8.6 12h11.9M8.6 17.5h11.9" />
         }
         @default {
           <!-- inbox — a tray with the lid open, for the empty notification panel. -->

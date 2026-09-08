@@ -1,8 +1,10 @@
-<!-- "Full-bleed with a cap": below ~1600px viewport width this resolves to a plain
-     shell-relative box; above it, a viewport-centred 90rem (1440px) box that stops growing —
-     self-centering regardless of AppShell's own narrower cap, which this page deliberately
-     overrides so the case list can use the whole screen instead of a cramped single column. -->
-<div class="xl:w-[min(100vw,90rem)] xl:mx-[calc(50%-min(50vw,45rem))] xl:px-8">
+<!-- "Full-bleed with a cap": below ~1600px container width this resolves to a plain
+     shell-relative box; above it, a box centred on `<main>` (via `cqw`, not `vw` — the shell's
+     persistent nav is `main`'s sibling now, not part of it, so a viewport-relative centring
+     trick would centre on the wrong box) that stops growing at 90rem (1440px) — self-centering
+     regardless of AppShell's own narrower cap, which this page deliberately overrides so the
+     case list can use the whole main column instead of a cramped single column. -->
+<div class="xl:w-[min(100cqw,90rem)] xl:mx-[calc(50%-min(50cqw,45rem))] xl:px-8">
   <div class="mb-6 flex flex-wrap items-end justify-between gap-4" [class.hidden]="detailOpen()">
     <div class="min-w-0">
       <h1 id="ch-heading" class="m-0 text-2xl leading-tight text-ink">
@@ -11,9 +13,6 @@
       <p class="mt-1.5 mb-0 text-sm text-ink-muted">
         {{ 'farmer.history.subtitle' | translate }}
       </p>
-      <!-- The header's copy of this is hidden below md, and a farmer is on a phone. Read-only:
-           the server files a case under the farmer's own region, never one the app chose. -->
-      <foshol-region-chip class="mt-2 inline-flex md:hidden" />
     </div>
 
     <a
