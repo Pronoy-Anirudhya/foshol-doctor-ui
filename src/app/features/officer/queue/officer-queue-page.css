@@ -61,11 +61,24 @@
    breakpoint entirely in the template, where WEB-UX-034 already requires every breakpoint to
    live, is what makes this class of bug structurally impossible rather than merely fixed once. */
 
+/* `relative`/`cursor-pointer`/the hover lift live as Tailwind utilities on the elements
+   themselves (`.queue-card` in the template, `<tr data-testid="queue-row">`), for the same
+   per-component style-budget reason the cards/table split above does. Only the ::after overlay
+   below has no utility equivalent: it stretches the one real link inside each row/card over
+   the whole surface, so the whole thing is the click target while staying a single, real,
+   keyboard-focusable anchor — no second, non-semantic click handler. */
 .queue-card {
   padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.row-link::after,
+.card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
 /* State-keyed accent — WEB-UX-044, alongside .state's text, not instead of it. --wa is set on

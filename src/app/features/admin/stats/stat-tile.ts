@@ -26,7 +26,7 @@ export type StatTileKind = 'volume' | 'rate' | 'time' | 'agreement';
   host: { class: 'block' },
   template: `
     <div
-      class="card flex h-full flex-col gap-1 border-t-4 p-5"
+      class="card flex h-full flex-col gap-1 border-t-4 p-5 transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift"
       [class]="accentBorderClass()"
       [attr.data-stale]="stale() || null"
       data-testid="stat-tile"

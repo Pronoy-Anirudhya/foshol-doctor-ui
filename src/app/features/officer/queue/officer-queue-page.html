@@ -69,7 +69,7 @@
       <ul class="mt-4 flex flex-col gap-3 list-none p-0 md:hidden" data-testid="queue-cards">
         @for (view of rows(); track view.row.reviewTaskId) {
           <li
-            class="card queue-card"
+            class="card queue-card relative cursor-pointer transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift active:translate-y-0"
             data-testid="queue-card"
             [attr.data-case-id]="view.row.caseId"
             [attr.data-state]="view.row.state"
@@ -180,6 +180,7 @@
           <tbody>
             @for (view of rows(); track view.row.reviewTaskId) {
               <tr
+                class="relative cursor-pointer"
                 data-testid="queue-row"
                 [attr.data-case-id]="view.row.caseId"
                 [attr.data-state]="view.row.state"
@@ -250,6 +251,8 @@
   </section>
 
   <section class="min-w-0" [class.hidden]="!detailOpen()">
+    <!-- case-workspace-page.html carries its own "back to queue" link — WEB-UX-030's route
+         back below xl — so this pane doesn't duplicate it. -->
     <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
   </section>
 </div>
