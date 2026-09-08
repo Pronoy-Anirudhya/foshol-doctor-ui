@@ -70,6 +70,23 @@
   "shared.notifications.kind.ADVISORY": { "bn": "পরামর্শ", "en": "Advisory" },
   "shared.notifications.kind.REVISION": { "bn": "সংশোধিত পরামর্শ", "en": "Revised advisory" },
   "shared.notifications.kind.REJECTION": { "bn": "ফেরত পাঠানো হয়েছে", "en": "Returned" },
+  "shared.notifications.kind.KPI_WARNING": {
+    "bn": "সময়সীমার সতর্কতা",
+    "en": "Deadline warning"
+  },
+  "shared.notifications.openTask": { "bn": "কাজটি খুলুন", "en": "Open the review task" },
+  "shared.notifications.dueBy": {
+    "bn": "নিষ্পত্তির সময়সীমা {{time}}",
+    "en": "Due by {{time}}"
+  },
+  "shared.notifications.kpi.resolutionWarning": {
+    "bn": "এই কেসটি নিষ্পত্তির সময়সীমার কাছাকাছি চলে এসেছে",
+    "en": "This case is nearing its resolution deadline"
+  },
+  "shared.notifications.kpi.restored": {
+    "bn": "{{count}}টি সময়সীমার সতর্কতা আবার তালিকায় আনা হয়েছে",
+    "en": "Recovered {{count}} open deadline warnings"
+  },
 
   "shared.offline.title": { "bn": "আপনি এখন অফলাইন", "en": "You are offline" },
   "shared.offline.detail": {

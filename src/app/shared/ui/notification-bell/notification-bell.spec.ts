@@ -12,10 +12,12 @@ import { APP_CONFIG } from '../../../core/config/app-config';
 import {
   NotificationStore,
   NOTIFY_ADVISORY,
+  NOTIFY_KPI_WARNING,
   NOTIFY_STATUS,
 } from '../../../core/stores/notification-store';
 import { LiveAnnouncer } from '../../../core/stores/live-announcer';
 import type { Principal } from '../../../generated/models/principal';
+import { taskPath } from '../../../features/officer/officer-paths';
 import { NotificationBell } from './notification-bell';
 
 /**
@@ -32,6 +34,10 @@ const CATALOGUE: Readonly<Record<string, string>> = {
   'shared.notifications.openCase': 'কেসটি খুলুন',
   'shared.notifications.empty': 'এখনো কোনো বিজ্ঞপ্তি নেই',
   'shared.notifications.kind.ADVISORY': 'পরামর্শ',
+  'shared.notifications.kind.KPI_WARNING': 'সময়সীমার সতর্কতা',
+  'shared.notifications.openTask': 'কাজটি খুলুন',
+  'shared.notifications.dueBy': 'নিষ্পত্তির সময়সীমা {{time}}',
+  'shared.notifications.kpi.resolutionWarning': 'এই কেসটি নিষ্পত্তির সময়সীমার কাছাকাছি চলে এসেছে',
 };
 
 class LocalCatalogueLoader extends TranslateLoader {
@@ -207,6 +213,47 @@ describe('NotificationBell (WEB-FR-354, WEB-UX-044, WEB-UX-046)', () => {
 
     expect(host.querySelector('li a')).toBeNull();
     expect(host.textContent).toContain('পরামর্শ');
+  });
+
+  it('deep-links a KPI warning to the officer task route, not to the case', async () => {
+    const { fixture, host, store, session } = await render();
+    session.signIn(tokenFor('OFFICER'), { id: 'u-2', name: 'Officer', role: 'OFFICER' }, new Date());
+    store.record({
+      kind: NOTIFY_KPI_WARNING,
+      titleKey: 'shared.notifications.kpi.resolutionWarning',
+      caseId: 'c-1',
+      reviewTaskId: 't-9',
+      dueAt: '2026-09-08T11:30:00Z',
+    });
+    button(host).click();
+    await fixture.whenStable();
+
+    const link = host.querySelector('li a') as HTMLAnchorElement | null;
+    // Compared against the console's own path builder rather than a literal. `shared/` may not
+    // import `features/`, so the bell re-declares this route by hand, and a duplicated route is
+    // one that drifts — silently, since the bell would go on rendering a link that 404s. A spec
+    // may cross the boundary production code cannot, so the duplicate is pinned here.
+    expect(link?.getAttribute('href')).toBe(taskPath('t-9'));
+    expect(link?.textContent).toContain(CATALOGUE['shared.notifications.openTask']);
+    // WEB-UX-044 — the kind is stated in words beside the glyph, never carried by hue alone.
+    expect(host.textContent).toContain(CATALOGUE['shared.notifications.kind.KPI_WARNING']);
+    expect(host.textContent).toContain('নিষ্পত্তির সময়সীমা');
+  });
+
+  it('never offers a farmer a task link, even if a KPI entry somehow reached the store', async () => {
+    const { fixture, host, store, session } = await render();
+    session.signIn(tokenFor('FARMER'), { id: 'u-1', name: 'Demo', role: 'FARMER' }, new Date());
+    store.record({
+      kind: NOTIFY_KPI_WARNING,
+      titleKey: 'shared.notifications.kpi.resolutionWarning',
+      caseId: 'c-1',
+      reviewTaskId: 't-9',
+      dueAt: '2026-09-08T11:30:00Z',
+    });
+    button(host).click();
+    await fixture.whenStable();
+
+    expect(host.querySelector('li a')).toBeNull();
   });
 
   it('is a header control, never a blocking overlay', async () => {

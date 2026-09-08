@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import type { OfficerQueueRow } from '../../generated/models/officer-queue-row';
 import type { PageOfOfficerQueueRow } from '../../generated/models/page-of-officer-queue-row';
+import { SessionStore } from '../auth/session-store';
 import { CaseStatusStore } from '../stores/case-status-store';
 import { LiveAnnouncer } from '../stores/live-announcer';
 import { NotificationStore } from '../stores/notification-store';
@@ -180,6 +181,63 @@ describe('SseDispatcher', () => {
     expect(entry.titleKey).toBe('live.case.statusChanged');
     expect(entry.bodyKey).toBe('badge.status.IN_REVIEW');
     expect(entry.caseId).toBe('c-4');
+  });
+
+  it('records a KPI warning against the review task, with no toast and no request', () => {
+    dispatcher.dispatch(
+      'kpi',
+      '{"caseId":"c-9","reviewTaskId":"t-9","kind":"RESOLUTION_WARN","dueAt":"2026-09-08T11:30:00Z","correlationId":"r-1"}',
+    );
+
+    const entry = notifications.items()[0];
+    expect(entry.kind).toBe('KPI_WARNING');
+    expect(entry.reviewTaskId).toBe('t-9');
+    expect(entry.dueAt).toBe('2026-09-08T11:30:00Z');
+    expect(entry.caseId).toBe('c-9');
+    expect(entry.titleKey).toBe('shared.notifications.kpi.resolutionWarning');
+    expect(announcer.message()?.key).toBe('shared.notifications.kpi.resolutionWarning');
+    // A deadline fifteen minutes out is not worth seizing the screen for mid-review.
+    expect(toasts.toasts()).toHaveLength(0);
+    expect(queue.needsReload()).toBe(false);
+  });
+
+  it('drops a KPI frame for a farmer — officers receive queue/kpi, farmers advisory/case-status', () => {
+    const session = TestBed.inject(SessionStore);
+    const payload = btoa(JSON.stringify({ sub: 'u', role: 'FARMER', exp: 9_999_999_999 }));
+    session.signIn(`h.${payload}.s`, { id: 'u-1', name: 'Demo', role: 'FARMER' }, new Date());
+
+    dispatcher.dispatch(
+      'kpi',
+      '{"caseId":"c-9","reviewTaskId":"t-9","kind":"RESOLUTION_WARN","dueAt":"2026-09-08T11:30:00Z"}',
+    );
+
+    expect(notifications.items()).toHaveLength(0);
+    // Dropped, not counted: the event name IS known, it is simply not addressed to this role.
+    expect(sse.unknownEventCount()).toBe(0);
+  });
+
+  it('drops a KPI frame whose kind is not whitelisted, and one with no task id', () => {
+    dispatcher.dispatch(
+      'kpi',
+      '{"caseId":"c-9","reviewTaskId":"t-9","kind":"ASSIGNMENT_WARN","dueAt":"2026-09-08T11:30:00Z"}',
+    );
+    dispatcher.dispatch('kpi', '{"caseId":"c-9","kind":"RESOLUTION_WARN","dueAt":"2026-09-08T11:30:00Z"}');
+
+    expect(notifications.items()).toHaveLength(0);
+  });
+
+  it('does not double a KPI warning replayed for the same task and due instant', () => {
+    const frame =
+      '{"caseId":"c-9","reviewTaskId":"t-9","kind":"RESOLUTION_WARN","dueAt":"2026-09-08T11:30:00Z"}';
+    dispatcher.dispatch('kpi', frame);
+    dispatcher.dispatch('kpi', frame);
+    // A NEW due instant is a new warning, not a replay.
+    dispatcher.dispatch(
+      'kpi',
+      '{"caseId":"c-9","reviewTaskId":"t-9","kind":"RESOLUTION_WARN","dueAt":"2026-09-08T11:45:00Z"}',
+    );
+
+    expect(notifications.items()).toHaveLength(2);
   });
 
   it('counts an unknown event and leaves everything else alone (WEB-FR-352)', () => {

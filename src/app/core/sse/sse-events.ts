@@ -12,6 +12,11 @@ export const SSE_EVENT = {
   caseStatus: 'case-status',
   advisory: 'advisory',
   queue: 'queue',
+  /**
+   * The officer's resolution-KPI warning. Lowercase on the wire like every other name here —
+   * the OpenAPI prose's `RESOLUTION_KPI_WARNING` is not what lands in the `event:` field.
+   */
+  kpi: 'kpi',
   resync: 'resync',
   reconnect: 'reconnect',
 } as const;
@@ -43,9 +48,29 @@ export interface AdvisoryEventData {
   readonly bodyBn?: string | null;
 }
 
+/** The `kind` discriminator carried INSIDE a `kpi` frame's data. */
+export type KpiEventKind = 'RESOLUTION_WARN';
+
+export const RESOLUTION_WARN: KpiEventKind = 'RESOLUTION_WARN';
+
 export interface QueueEventData {
   readonly caseId: string;
   readonly toStatus: CaseStatus;
+  readonly correlationId?: string;
+}
+
+/**
+ * A resolution-KPI warning for a task this officer holds. It carries no prose at all — the
+ * backend sends no Bangla for KPI — so every word the bell shows for one is chrome from this
+ * application's own catalogue.
+ *
+ * `reviewTaskId` is the deep-link target: the console is addressed by task, not by case.
+ */
+export interface KpiEventData {
+  readonly caseId: string;
+  readonly reviewTaskId: string;
+  readonly kind: KpiEventKind;
+  readonly dueAt: string;
   readonly correlationId?: string;
 }
 
@@ -60,6 +85,8 @@ const CASE_STATUSES: readonly string[] = [
 ];
 
 const ADVISORY_TYPES: readonly string[] = [ADVISORY_PUBLISHED, ADVISORY_REVISED, CASE_REJECTED];
+
+const KPI_KINDS: readonly string[] = [RESOLUTION_WARN];
 
 /**
  * A frame's `data` is attacker-adjacent input as far as this client is concerned: it is
@@ -124,4 +151,25 @@ export function toQueueEvent(data: string): QueueEventData | null {
   const toStatus = status(raw['toStatus']);
   if (caseId === null || toStatus === null) return null;
   return { caseId, toStatus, correlationId: str(raw['correlationId']) ?? undefined };
+}
+
+export function toKpiEvent(data: string): KpiEventData | null {
+  const raw = parseJson(data);
+  if (raw === null) return null;
+  const caseId = str(raw['caseId']);
+  const reviewTaskId = str(raw['reviewTaskId']);
+  const dueAt = str(raw['dueAt']);
+  const kindValue = raw['kind'];
+  // Whitelisted like the advisory `type`: an unlisted kind is a frame this build does not
+  // understand, and an understood-looking frame with a missing task id would produce a bell
+  // row whose link resolves to nothing.
+  if (caseId === null || reviewTaskId === null || dueAt === null) return null;
+  if (typeof kindValue !== 'string' || !KPI_KINDS.includes(kindValue)) return null;
+  return {
+    caseId,
+    reviewTaskId,
+    dueAt,
+    kind: kindValue as KpiEventKind,
+    correlationId: str(raw['correlationId']) ?? undefined,
+  };
 }

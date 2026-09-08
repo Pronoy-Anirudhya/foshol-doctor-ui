@@ -105,13 +105,19 @@
                   <p class="mt-0.5 text-sm break-words text-ink-muted">{{ item.body }}</p>
                 }
 
-                @if (casePath(item); as path) {
+                @if (dueText(item); as due) {
+                  <p class="mt-0.5 text-sm break-words text-ink-muted">
+                    {{ 'shared.notifications.dueBy' | translate: { time: due } }}
+                  </p>
+                }
+
+                @if (linkPath(item); as path) {
                   <a
                     [routerLink]="path"
-                    class="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                    class="touch-target mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary underline-offset-2 hover:underline"
                     (click)="close()"
                   >
-                    {{ 'shared.notifications.openCase' | translate }}
+                    {{ linkKey(item) | translate }}
                     <foshol-icon name="arrow-right" size="xs" />
                   </a>
                 }

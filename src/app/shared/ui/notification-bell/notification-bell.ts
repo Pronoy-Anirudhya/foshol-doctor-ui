@@ -43,6 +43,9 @@ const GLYPHS: Readonly<Record<NotificationKind, IconName>> = {
   ADVISORY: 'bell',
   REVISION: 'refresh',
   REJECTION: 'warning',
+  // No clock glyph exists and `icon.ts` is another agent's file; the hourglass is the closer
+  // reading anyway — a KPI warning is time running out, not an error.
+  KPI_WARNING: 'hourglass',
 };
 
 /** Icon colour only; every row states its kind in words beside the glyph (WEB-UX-044). */
@@ -51,16 +54,24 @@ const GLYPH_TONES: Readonly<Record<NotificationKind, string>> = {
   ADVISORY: 'text-primary',
   REVISION: 'text-accent',
   REJECTION: 'text-danger',
+  KPI_WARNING: 'text-dawn-700',
 };
 
 /**
- * Only the farmer surface has a route addressed by a case id (`/farmer/cases/:caseId`). The
- * console's workspace is addressed by a `reviewTaskId`, which no notification frame carries, so
- * an officer's row is a record rather than a link that would resolve to nothing. Route paths are
- * not user-visible strings, so WEB-UX-013 does not apply to them (see `auth.guard.ts`).
+ * The two deep-link targets, one per addressing scheme.
+ *
+ * The farmer surface is addressed by case id (`/farmer/cases/:caseId`); the console's workspace
+ * is addressed by REVIEW TASK id, as a child of the queue (`/officer/queue/tasks/:taskId`), and
+ * a KPI warning is the one entry that carries one. Both are re-declared here rather than
+ * imported: `shared/` may not import from `features/`, so `features/officer/officer-paths.ts`
+ * is out of reach and this constant must be kept in step with it by hand. Route paths are not
+ * user-visible strings, so WEB-UX-013 does not apply to them (see `auth.guard.ts`).
  */
 const FARMER_CASE_PATH: readonly string[] = ['/farmer', 'cases'];
+const OFFICER_TASK_PATH: readonly string[] = ['/officer', 'queue', 'tasks'];
 const ROLE_FARMER = 'FARMER';
+const KEY_OPEN_CASE = 'shared.notifications.openCase';
+const KEY_OPEN_TASK = 'shared.notifications.openTask';
 
 @Component({
   selector: 'foshol-notification-bell',
@@ -172,9 +183,36 @@ export class NotificationBell {
     return new Date(item.receivedAtMs).toISOString();
   }
 
-  /** `null` where this role has no route that a case id alone can address — see above. */
-  protected casePath(item: AppNotification): string[] | null {
-    if (item.caseId === undefined || this.session.role() !== ROLE_FARMER) return null;
+  /**
+   * `null` where this role has no route that this entry's id can address — see above.
+   *
+   * A KPI warning is officer-addressed and deep-links by `reviewTaskId`; everything else is
+   * farmer-addressed and deep-links by `caseId`. The role check on each branch is belt and
+   * braces: the server sends `kpi` only to officers and `advisory` only to farmers, but a bell
+   * row whose link lands on a route the guard refuses is worse than no link.
+   */
+  protected linkPath(item: AppNotification): string[] | null {
+    const role = this.session.role();
+    if (item.reviewTaskId !== undefined) {
+      return role === null || role === ROLE_FARMER ? null : [...OFFICER_TASK_PATH, item.reviewTaskId];
+    }
+    if (item.caseId === undefined || role !== ROLE_FARMER) return null;
     return [...FARMER_CASE_PATH, item.caseId];
+  }
+
+  /** The link's own wording follows its target: a case opens, a review task opens. */
+  protected linkKey(item: AppNotification): string {
+    return item.reviewTaskId === undefined ? KEY_OPEN_CASE : KEY_OPEN_TASK;
+  }
+
+  /**
+   * The resolution deadline, in Asia/Dhaka like every other instant this application shows.
+   * The value is the server's frozen `resolutionDueAt`; nothing here recomputes it
+   * (WEB-NFR-001), and a value that does not parse simply renders no line.
+   */
+  protected dueText(item: AppNotification): string | null {
+    if (item.dueAt === undefined) return null;
+    const due = new Date(item.dueAt);
+    return Number.isNaN(due.getTime()) ? null : formatDhakaTime(due);
   }
 }

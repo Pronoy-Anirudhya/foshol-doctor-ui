@@ -3,6 +3,7 @@ import { APP_CONFIG } from '../config/app-config';
 import {
   NotificationStore,
   NOTIFY_ADVISORY,
+  NOTIFY_KPI_WARNING,
   NOTIFY_REJECTION,
   NOTIFY_STATUS,
 } from './notification-store';
@@ -138,6 +139,25 @@ describe('NotificationStore (WEB-FR-354)', () => {
     expect(notifications.items()).toHaveLength(0);
     expect(notifications.unreadCount()).toBe(0);
     expect(notifications.isEmpty()).toBe(true);
+  });
+
+  it('identifies a KPI warning by task and due instant, because it carries no server id', () => {
+    const notifications = store();
+    const entry = {
+      kind: NOTIFY_KPI_WARNING,
+      caseId: 'c-1',
+      reviewTaskId: 't-1',
+      dueAt: '2026-09-08T11:30:00Z',
+    };
+
+    const first = notifications.record(entry);
+    const replay = notifications.record(entry);
+    const later = notifications.record({ ...entry, dueAt: '2026-09-08T11:45:00Z' });
+
+    expect(first).not.toBeNull();
+    expect(replay).toBeNull();
+    expect(later).not.toBeNull();
+    expect(notifications.items()).toHaveLength(2);
   });
 
   it('stamps an arrival time it is given, so a view never has to guess one', () => {
