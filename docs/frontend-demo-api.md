@@ -160,6 +160,11 @@ Content-Type: application/json
     "name": "Demo Farmer",
     "role": "FARMER",
     "districtCode": "DHA",
+    "divisionCode": "DHK",
+    "districtNameBn": "ঢাকা",
+    "districtNameEn": "Dhaka",
+    "divisionNameBn": "ঢাকা",
+    "divisionNameEn": "Dhaka",
     "preferredLanguage": "bn"
   }
 }
@@ -181,7 +186,16 @@ distinguishes them.
 ### 5.4 Current principal
 
 `GET /api/v1/me` — bearer. **200** `Principal`. Use after restore-from-memory is not possible (refresh
-always re-logins). **401**.
+always re-logins). **401**. Prefill farmer region from `divisionCode` / `districtCode` (and names);
+do not collect region on submit.
+
+### 5.5 Geography catalogue
+
+`GET /api/v1/geo/divisions` — bearer, any role. **200** array of `{ code, nameEn, nameBn }` (8 rows).
+
+`GET /api/v1/geo/divisions/{divisionCode}/districts` — bearer. **200** districts; **404** unknown
+division. Codes such as `DHA` (Dhaka district) sit under division `DHK`. Do not send district on
+`POST /api/v1/cases` — intake copies the farmer's identity.
 
 ---
 
@@ -732,6 +746,8 @@ Without the sidecar, a UI case is `UNDETERMINED` and still reaches the officer q
 | POST | `/api/v1/auth/otp/verify` | login | — | — | yes |
 | POST | `/api/v1/auth/officer/login` | — | login | login | yes |
 | GET | `/api/v1/me` | yes | yes | yes | useful |
+| GET | `/api/v1/geo/divisions` | yes | yes | yes | labels |
+| GET | `/api/v1/geo/divisions/{code}/districts` | yes | yes | yes | labels |
 | GET | `/api/v1/crops` | pick crop | yes | yes | yes |
 | GET | `/api/v1/crops/{cropId}/diseases` | optional | editor | — | officer |
 | GET | `/api/v1/diseases/{diseaseId}` | advisory context | editor | — | officer |
