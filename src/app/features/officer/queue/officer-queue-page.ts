@@ -5,9 +5,11 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { SessionStore } from '../../../core/auth/session-store';
 import { SseStore } from '../../../core/sse/sse-store';
 import type { QueueRowView } from '../../../core/stores/queue-store';
 import type { OfficerQueueRow } from '../../../generated/models/officer-queue-row';
@@ -23,7 +25,9 @@ import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { OfficerFacade } from '../officer-facade';
-import { taskPath } from '../officer-paths';
+import { QueueActionPanel } from './queue-action-panel';
+import { QueueBulkBar } from './queue-bulk-bar';
+import { QueueRowActions, type QueuePopoverKind } from './queue-row-actions';
 
 /**
  * The officer queue — and, at `xl`, the left pane of the two-pane console.
@@ -47,6 +51,7 @@ import { taskPath } from '../officer-paths';
  * is unreadable, and this console is used on a phone in the field as well as at a desk.
  */
 const FIRST_PAGE = 0;
+const NONE = 0;
 
 /** `officer.queue.state.*` already carries a label per value; this is just the value set. */
 const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
@@ -55,6 +60,25 @@ const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
   'DONE',
   'REJECTED',
 ];
+
+/** The two review-task states from which nothing can be actioned — the case is already decided. */
+const TERMINAL_STATES: readonly OfficerQueueRow['state'][] = ['DONE', 'REJECTED'];
+const CLAIMED: OfficerQueueRow['state'] = 'CLAIMED';
+
+/** The bulk bar's panels ride the same one-open-at-a-time channel as the rows' own. */
+const BULK_ANCHOR = 'bulk';
+
+/**
+ * `<th>` count in the table below — select, farmer, crop, candidate, confidence, path, media,
+ * submitted, SLA, state, actions. Only the confirm row's `colspan` reads it.
+ */
+const COLUMN_COUNT = 11;
+
+interface OpenPanel {
+  /** A `reviewTaskId`, or `BULK_ANCHOR` for the bulk bar. */
+  readonly anchor: string;
+  readonly kind: QueuePopoverKind;
+}
 
 @Component({
   selector: 'foshol-officer-queue-page',
@@ -70,18 +94,27 @@ const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
     RegionChip,
     Paginator,
     Percent1Pipe,
-    RouterLink,
+    QueueActionPanel,
+    QueueBulkBar,
+    QueueRowActions,
     RouterOutlet,
     Skeleton,
     TranslatePipe,
   ],
   templateUrl: './officer-queue-page.html',
   styleUrl: './officer-queue-page.css',
-  host: { class: 'block' },
+  host: {
+    class: 'block',
+    // One listener pair for the whole screen rather than one per row: every confirm panel
+    // closes on Escape and on a click that lands outside any panel or its trigger.
+    '(document:click)': 'onDocumentClick($event)',
+    '(document:keydown.escape)': 'closePanel()',
+  },
 })
 export class OfficerQueuePage {
   protected readonly facade = inject(OfficerFacade);
   private readonly sse = inject(SseStore);
+  private readonly session = inject(SessionStore);
 
   /**
    * Set from the outlet's own `activate` / `deactivate` outputs rather than by reading the
@@ -114,8 +147,126 @@ export class OfficerQueuePage {
   });
 
   protected readonly noMatches = computed(
-    () => !this.facade.queue.isEmpty() && this.filteredRows().length === 0,
+    () => !this.facade.queue.isEmpty() && this.filteredRows().length === NONE,
   );
+
+  // ── Inline actions and selection ─────────────────────────────────────────────────────────
+
+  /** Which confirm panel is open, anywhere on the screen. At most one, by construction. */
+  protected readonly openPanel = signal<OpenPanel | null>(null);
+
+  /** The expansion row spans the table; kept beside the header list it has to match. */
+  protected readonly COLUMN_COUNT = COLUMN_COUNT;
+
+  /** Selected `reviewTaskId`s. A Set, not an array: membership is the only question asked. */
+  private readonly selectedIds = signal<ReadonlySet<string>>(new Set());
+
+  /**
+   * A row can be actioned when the case is not already decided and no OTHER officer holds the
+   * claim. `WEB-NFR-001` — this reads the server's `state` and `officerId`; it does not model
+   * claim expiry, which is the server's to decide and is re-checked by the claim call anyway.
+   */
+  protected canAction(view: QueueRowView): boolean {
+    const row = view.row;
+    if (TERMINAL_STATES.includes(row.state)) return false;
+    if (row.state === CLAIMED) return (row.officerId ?? null) === this.session.subjectId();
+    return true;
+  }
+
+  /**
+   * Approve is offered only where there is a diagnosis to publish AND a name to show for it.
+   * An `UNDETERMINED` case reaches the queue with no top disease at all, and an approve button
+   * there would either send an empty advisory or publish something the officer never saw.
+   */
+  protected canApprove(view: QueueRowView): boolean {
+    return this.canAction(view) && (view.row.topDiseaseNameBn ?? '') !== '';
+  }
+
+  protected lockedKey(view: QueueRowView): string {
+    if (TERMINAL_STATES.includes(view.row.state)) return 'officer.queue.action.locked.decided';
+    return 'officer.queue.action.locked.claimed';
+  }
+
+  protected readonly actionableRows = computed(() =>
+    this.filteredRows().filter((view) => this.canAction(view)),
+  );
+
+  /** In the server's order, because it is a filter of the server's list (`WEB-FR-200`). */
+  protected readonly selectedRows = computed(() =>
+    this.actionableRows().filter((view) => this.selectedIds().has(view.row.reviewTaskId)),
+  );
+
+  protected readonly noneActionable = computed(() => this.actionableRows().length === NONE);
+  protected readonly anySelected = computed(() => this.selectedRows().length > NONE);
+  protected readonly allSelected = computed(
+    () =>
+      this.actionableRows().length > NONE &&
+      this.selectedRows().length === this.actionableRows().length,
+  );
+  protected readonly someSelected = computed(() => this.anySelected() && !this.allSelected());
+
+  /** The bar survives the selection being cleared, so a finished run's report can be read. */
+  protected readonly showBulkBar = computed(
+    () => this.anySelected() || this.facade.bulk().total > NONE,
+  );
+
+  protected readonly bulkPanelKind = computed(() => {
+    const open = this.openPanel();
+    return open !== null && open.anchor === BULK_ANCHOR ? open.kind : null;
+  });
+
+  protected isSelected(view: QueueRowView): boolean {
+    return this.selectedIds().has(view.row.reviewTaskId);
+  }
+
+  protected panelKind(view: QueueRowView): QueuePopoverKind | null {
+    const open = this.openPanel();
+    return open !== null && open.anchor === view.row.reviewTaskId ? open.kind : null;
+  }
+
+  protected togglePanel(anchor: string, kind: QueuePopoverKind): void {
+    const open = this.openPanel();
+    const same = open !== null && open.anchor === anchor && open.kind === kind;
+    this.facade.clearRowActionProblem();
+    this.openPanel.set(same ? null : { anchor, kind });
+  }
+
+  protected closePanel(): void {
+    if (this.openPanel() === null) return;
+    this.facade.clearRowActionProblem();
+    this.openPanel.set(null);
+  }
+
+  protected onDocumentClick(event: Event): void {
+    if (this.openPanel() === null) return;
+    const target = event.target;
+    // A click inside ANY panel or trigger is a click in the popover system; only a click that
+    // lands outside all of them dismisses.
+    if (target instanceof Element && target.closest('[data-popover-root]') !== null) return;
+    this.closePanel();
+  }
+
+  protected toggleRow(view: QueueRowView): void {
+    const taskId = view.row.reviewTaskId;
+    this.selectedIds.update((current) => {
+      const next = new Set(current);
+      if (!next.delete(taskId)) next.add(taskId);
+      return next;
+    });
+  }
+
+  /** `WEB-FR-201` — the loaded page only. Never the rows the server has not sent. */
+  protected toggleAll(): void {
+    if (this.allSelected()) {
+      this.clearSelection();
+      return;
+    }
+    this.selectedIds.set(new Set(this.actionableRows().map((view) => view.row.reviewTaskId)));
+  }
+
+  protected clearSelection(): void {
+    this.selectedIds.set(new Set());
+  }
 
   /**
    * Utility classes, not component CSS, so this screen's stylesheet stays inside the 4 kB
@@ -167,10 +318,25 @@ export class OfficerQueuePage {
       if (!this.facade.queue.needsReload()) return;
       void this.facade.loadQueue();
     });
-  }
 
-  protected taskLink(row: QueueRowView): string {
-    return taskPath(row.row.reviewTaskId);
+    /**
+     * A selection that outlives the rows it was made from would submit cases the officer can no
+     * longer see. Every fresh page is therefore intersected with what is now on screen — which
+     * also drops the rows a bulk run has just taken out of an actionable state. The explicit
+     * clears in the filter and paging handlers below cover the same ground earlier, before the
+     * response arrives, so the bulk bar never sits there counting rows that are on their way out.
+     */
+    effect(() => {
+      this.facade.queue.loadedAt();
+      const present = new Set(untracked(this.rows).map((view) => view.row.reviewTaskId));
+      this.selectedIds.update(
+        (current) => new Set([...current].filter((taskId) => present.has(taskId))),
+      );
+      // A failed inline action reloads the queue (WEB-FR-243), and its problem is displayed
+      // INSIDE the confirm panel — so closing the panel here would close the only place the
+      // officer can read why it failed. The panel stays until they dismiss it themselves.
+      if (untracked(this.facade.rowActionProblem) === null) this.openPanel.set(null);
+    });
   }
 
   protected refresh(): void {
@@ -178,15 +344,25 @@ export class OfficerQueuePage {
   }
 
   protected goToPage(page: number): void {
+    this.startOver();
     void this.facade.loadQueue(page);
   }
 
   protected setSearchText(value: string): void {
+    this.startOver();
     this.searchText.set(value);
   }
 
   protected setStateFilter(value: string): void {
+    this.startOver();
     void this.facade.setStateFilter(value === '' ? null : (value as OfficerQueueRow['state']));
+  }
+
+  /** Any change to WHICH rows are on screen resets the selection and closes any open panel. */
+  private startOver(): void {
+    this.clearSelection();
+    this.closePanel();
+    this.facade.clearBulk();
   }
 
   /** Dynamic key rather than a switch: the four states come from the generated union. */

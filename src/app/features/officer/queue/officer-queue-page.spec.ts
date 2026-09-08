@@ -76,16 +76,72 @@ describe('OfficerQueuePage (WEB-FR-200…205)', () => {
     expect(caseIdsIn('[data-testid="queue-card"]')).toEqual(served);
   });
 
-  it('exposes no interactive column header (AC-11)', () => {
+  /**
+   * AC-11 forbids a SORT control in a header, not every element that can be focused. The one
+   * control now allowed there is the select-all checkbox, which changes which rows an action
+   * applies to and never the order they are read in — so it is named explicitly here and
+   * everything else in a header cell stays forbidden.
+   */
+  it('exposes no interactive column header beyond the select-all box (AC-11)', () => {
     const headers = Array.from(el().querySelectorAll('[data-testid="queue-table"] thead th'));
     expect(headers.length).toBeGreaterThan(0);
 
     for (const header of headers) {
-      expect(header.querySelector('button, a, [role="button"], input, select')).toBeNull();
+      expect(header.querySelector('button, a, [role="button"], select')).toBeNull();
+      expect(
+        header.querySelector('input:not([data-testid="queue-select-all"])'),
+      ).toBeNull();
       expect(header.getAttribute('aria-sort')).toBeNull();
       expect(header.getAttribute('tabindex')).toBeNull();
       expect(header.hasAttribute('data-sort')).toBe(false);
     }
+  });
+
+  it('offers per-row actions instead of a whole-row link', () => {
+    const first = el().querySelector<HTMLElement>('[data-testid="queue-row"]')!;
+
+    // The stretched link is gone: the farmer's name is text, and the row's only anchor is the
+    // explicit "view" control in the actions column.
+    expect(first.querySelectorAll('a').length).toBe(1);
+    expect(first.querySelector('[data-testid="queue-action-view"]')).not.toBeNull();
+    expect(first.querySelector('[data-testid="queue-action-approve"]')).not.toBeNull();
+    expect(first.querySelector('[data-testid="queue-action-reject"]')).not.toBeNull();
+  });
+
+  it('confirms before approving, naming what would be published', async () => {
+    const row = page.content[0];
+    el()
+      .querySelector<HTMLButtonElement>('[data-testid="queue-action-approve"]')!
+      .click();
+    await settle();
+
+    // The confirm panel reads the review task first — nothing is claimed and nothing written.
+    const read = http.expectOne((r) => r.url.endsWith(`/review/tasks/${row.reviewTaskId}`));
+    expect(read.request.method).toBe('GET');
+    read.flush({ topDiseaseId: 'disease-1', suggestedRemedies: [{ remedyId: 'r-1' }] });
+    await settle();
+
+    const panel = el().querySelector('[data-testid="queue-action-panel"]');
+    expect(panel).not.toBeNull();
+    expect(panel?.querySelector('[data-testid="queue-action-confirm"]')).not.toBeNull();
+  });
+
+  it('clears the selection when the page changes', async () => {
+    el().querySelector<HTMLInputElement>('[data-testid="queue-row-select"]')!.click();
+    await settle();
+    expect(el().querySelector('[data-testid="queue-bulk-bar"]')).not.toBeNull();
+
+    // A selection that survived a page change would submit rows the officer can no longer see.
+    el().querySelector<HTMLSelectElement>('[data-testid="queue-state-filter"]')!.value = 'PENDING';
+    el()
+      .querySelector<HTMLSelectElement>('[data-testid="queue-state-filter"]')!
+      .dispatchEvent(new Event('change'));
+    await settle();
+
+    http.expectOne((r) => r.url === QUEUE_URL).flush({ ...page, content: [] });
+    await settle();
+
+    expect(el().querySelector('[data-testid="queue-bulk-bar"]')).toBeNull();
   });
 
   it('offers no sort affordance anywhere on the screen', () => {
