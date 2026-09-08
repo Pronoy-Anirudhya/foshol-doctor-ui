@@ -82,6 +82,23 @@ step "Checking dependency pins"
 node scripts/check-pins.mjs || fail "One or more dependencies are not pinned to an exact version. See output above."
 ok "All dependencies pinned exactly"
 
+# Angular's build silently skips PostCSS (and therefore all of Tailwind — every design token,
+# every @theme/@utility in src/styles.css) if this file is absent. There is no build error and
+# no console warning: the app just renders with unstyled/undefined CSS custom properties, which
+# looks like a broken UI rather than a missing config file. Caught this exact failure once
+# already (the file existed on disk but was never git-tracked), so it's checked explicitly here
+# rather than trusted to "it worked on my machine".
+if [ ! -f .postcssrc.json ]; then
+  echo "${RED}✘${RESET} .postcssrc.json is missing." >&2
+  echo "  Without it, Angular never routes CSS through Tailwind's PostCSS plugin, and the" >&2
+  echo "  app renders with every design token undefined (a completely broken/black UI," >&2
+  echo "  with no build error to explain why)." >&2
+  echo "  Fix: create .postcssrc.json in the project root containing:" >&2
+  echo '    { "plugins": { "@tailwindcss/postcss": {} } }' >&2
+  exit 1
+fi
+ok ".postcssrc.json present (Tailwind will actually compile)"
+
 # ── 3. Generated API client ──────────────────────────────────────────────────
 # src/app/generated/ is committed and hand-verified; this script only generates it
 # when it is entirely absent (a fresh clone missing the directory for some reason).
