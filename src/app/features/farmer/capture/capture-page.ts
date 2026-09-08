@@ -32,6 +32,7 @@ import {
 import { NoteBox } from './note-box';
 import { QualityReject } from './quality-reject';
 import { QUALITY_ACCEPTED, unreadableVerdict, type QualityVerdict } from './quality-gate';
+import { CameraPanel } from './camera-panel';
 import { VoicePanel } from './voice-panel';
 import { VoiceRecorder } from './voice-recorder';
 
@@ -71,6 +72,7 @@ const SKELETON_TILES = 3;
   providers: [VoiceRecorder],
   host: { class: 'block' },
   imports: [
+    CameraPanel,
     CropGrid,
     ErrorPanel,
     ImageStrip,
@@ -128,21 +130,11 @@ const SKELETON_TILES = 3;
         }
 
         <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <!-- WEB-FR-110 — camera and file selection, restricted to the allowed types. -->
-          <label class="pick pick-primary touch-target">
-            <input
-              class="sr-only"
-              type="file"
-              data-testid="capture-camera-input"
-              capture="environment"
-              [attr.accept]="acceptTypes"
-              [attr.multiple]="canPickMany() ? true : null"
-              [disabled]="!canAddMore()"
-              (change)="onFilesChosen($event)"
-            />
-            <span aria-hidden="true">📷</span>
-            {{ 'farmer.capture.images.takePhoto' | translate }}
-          </label>
+          <!-- WEB-FR-110 — a live camera where the browser can open one (camera-panel.ts
+               requests getUserMedia directly, since a laptop browser never honours the
+               capture attribute below and would otherwise just show a file browser), the
+               mobile capture hint as its own fallback where it cannot. -->
+          <foshol-camera-panel [disabled]="!canAddMore()" (captured)="onLivePhoto($event)" />
 
           <label class="pick touch-target">
             <input
@@ -471,6 +463,18 @@ export class CapturePage {
       }
       void this.ingest(file);
     }
+  }
+
+  /** A frame from the live camera, or the fallback file input — either way, one photo. */
+  protected onLivePhoto(source: Blob): void {
+    if (this.slotsFree() <= NO_SLOTS) {
+      // WEB-DATA-004 — refused in place, never by silently dropping an existing photograph.
+      this.overflow.set(IMAGE_LIMIT_KEY);
+      return;
+    }
+    this.overflow.set(null);
+    this.draft.dismissRefusal();
+    void this.ingest(source);
   }
 
   protected removeImage(id: string): void {

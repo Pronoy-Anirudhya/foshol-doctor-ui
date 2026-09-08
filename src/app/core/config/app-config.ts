@@ -89,6 +89,13 @@ export const APP_CONFIG = {
     fallbackEdgePx: 1200, //             last resort before rejecting for size
     analysisEdgePx: 224, //              short edge of the quality-gate canvas
     /**
+     * The live in-page camera viewfinder (`PhotoCamera`) requests this as its `getUserMedia`
+     * ideal resolution. `capture.maxEdgePx`/`jpegQuality` above still govern the re-encode, so
+     * this only sets what the browser is ASKED for, never what leaves the device.
+     */
+    cameraIdealWidthPx: 1920,
+    cameraIdealHeightPx: 1080,
+    /**
      * WEB-FR-124 [DERIVED]. A hue/saturation coverage heuristic is the honest client-side
      * approximation of "is this a crop photograph" — there is no client-side model. Because
      * the heuristic is weak it NEVER permanently blocks a farmer: it always offers an
