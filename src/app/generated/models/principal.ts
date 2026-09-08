@@ -3,8 +3,14 @@
 
 export interface Principal {
   districtCode?: string;
+  districtNameBn?: string | null;
+  districtNameEn?: string | null;
+  divisionCode?: string;
+  divisionNameBn?: string | null;
+  divisionNameEn?: string | null;
   id: string;
   name: string;
   preferredLanguage?: 'bn' | 'en';
   role: 'FARMER' | 'OFFICER' | 'ADMIN';
+  username?: string | null;
 }

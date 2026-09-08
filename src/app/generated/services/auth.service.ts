@@ -10,8 +10,14 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
 import { AuthResponse } from '../models/auth-response';
+import { GeoDistrict } from '../models/geo-district';
+import { GeoDivision } from '../models/geo-division';
 import { getCurrentPrincipal } from '../fn/auth/get-current-principal';
 import { GetCurrentPrincipal$Params } from '../fn/auth/get-current-principal';
+import { listDistrictsByDivision } from '../fn/auth/list-districts-by-division';
+import { ListDistrictsByDivision$Params } from '../fn/auth/list-districts-by-division';
+import { listDivisions } from '../fn/auth/list-divisions';
+import { ListDivisions$Params } from '../fn/auth/list-divisions';
 import { officerLogin } from '../fn/auth/officer-login';
 import { OfficerLogin$Params } from '../fn/auth/officer-login';
 import { Principal } from '../models/principal';
@@ -132,6 +138,56 @@ export class AuthService extends BaseService {
   getCurrentPrincipal(params?: GetCurrentPrincipal$Params, context?: HttpContext): Promise<Principal> {
     const resp = this.getCurrentPrincipal$Response(params, context);
     return resp.then((r: StrictHttpResponse<Principal>): Principal => r.body);
+  }
+
+  /** Path part for operation `listDivisions()` */
+  static readonly ListDivisionsPath = '/api/v1/geo/divisions';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `listDivisions()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listDivisions$Response(params?: ListDivisions$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<GeoDivision>>> {
+    const obs = listDivisions(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `listDivisions$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listDivisions(params?: ListDivisions$Params, context?: HttpContext): Promise<Array<GeoDivision>> {
+    const resp = this.listDivisions$Response(params, context);
+    return resp.then((r: StrictHttpResponse<Array<GeoDivision>>): Array<GeoDivision> => r.body);
+  }
+
+  /** Path part for operation `listDistrictsByDivision()` */
+  static readonly ListDistrictsByDivisionPath = '/api/v1/geo/divisions/{divisionCode}/districts';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `listDistrictsByDivision()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listDistrictsByDivision$Response(params: ListDistrictsByDivision$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<GeoDistrict>>> {
+    const obs = listDistrictsByDivision(this.http, this.rootUrl, params, context);
+    return firstValueFrom(obs);
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `listDistrictsByDivision$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  listDistrictsByDivision(params: ListDistrictsByDivision$Params, context?: HttpContext): Promise<Array<GeoDistrict>> {
+    const resp = this.listDistrictsByDivision$Response(params, context);
+    return resp.then((r: StrictHttpResponse<Array<GeoDistrict>>): Array<GeoDistrict> => r.body);
   }
 
 }
