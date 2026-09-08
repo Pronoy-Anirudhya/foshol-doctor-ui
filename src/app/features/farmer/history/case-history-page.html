@@ -1,173 +1,176 @@
-<div class="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)] xl:items-start xl:gap-8">
-  <!-- WEB-UX-030 — below xl the list steps aside for an open case; at 360 px it is the page. -->
-  <section
-    class="grid gap-4 xl:block"
-    [class.hidden]="detailOpen()"
-    aria-labelledby="ch-heading"
-    data-testid="case-history"
-  >
-    <div class="flex flex-wrap items-end justify-between gap-3">
-      <div class="min-w-0">
-        <h1 id="ch-heading" class="m-0 text-2xl leading-tight text-ink">
-          {{ 'farmer.history.title' | translate }}
-        </h1>
-        <p class="mt-1.5 mb-0 text-sm text-ink-muted">
-          {{ 'farmer.history.subtitle' | translate }}
-        </p>
-      </div>
-
-      <a
-        [routerLink]="newCasePath"
-        class="touch-target inline-flex items-center gap-2 rounded-xl bg-paddy-600 px-4 font-semibold text-ink-invert shadow-card transition-colors duration-1 ease-settle hover:bg-paddy-700"
-      >
-        <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
-          <path
-            d="M8 3.2v9.6M3.2 8h9.6"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-        </svg>
-        {{ 'farmer.history.newCase' | translate }}
-      </a>
+<!-- "Full-bleed with a cap": below ~1600px viewport width this resolves to a plain
+     shell-relative box; above it, a viewport-centred 90rem (1440px) box that stops growing —
+     self-centering regardless of AppShell's own narrower cap, which this page deliberately
+     overrides so the case list can use the whole screen instead of a cramped single column. -->
+<div class="xl:w-[min(100vw,90rem)] xl:mx-[calc(50%-min(50vw,45rem))] xl:px-8">
+  <div class="mb-6 flex flex-wrap items-end justify-between gap-4" [class.hidden]="detailOpen()">
+    <div class="min-w-0">
+      <h1 id="ch-heading" class="m-0 text-2xl leading-tight text-ink">
+        {{ 'farmer.history.title' | translate }}
+      </h1>
+      <p class="mt-1.5 mb-0 text-sm text-ink-muted">
+        {{ 'farmer.history.subtitle' | translate }}
+      </p>
     </div>
 
-    @if (problem(); as failure) {
-      <foshol-error-panel [problem]="failure" (retry)="reload()" />
-    }
+    <a
+      [routerLink]="newCasePath"
+      class="touch-target inline-flex items-center gap-2 rounded-xl bg-paddy-600 px-5 font-semibold text-ink-invert shadow-card transition-colors duration-1 ease-settle hover:bg-paddy-700 hover:shadow-lift"
+    >
+      <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
+        <path
+          d="M8 3.2v9.6M3.2 8h9.6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+      {{ 'farmer.history.newCase' | translate }}
+    </a>
+  </div>
 
-    @if (loading() && rows().length === 0) {
-      <foshol-skeleton variant="block" [count]="3" />
-    }
+  <!-- WEB-UX-030 — below xl the list steps aside for an open case; at 360 px it is the page. -->
+  <div [class]="gridClass()">
+    <section
+      class="grid gap-4 xl:block"
+      [class.hidden]="detailOpen()"
+      aria-labelledby="ch-heading"
+      data-testid="case-history"
+    >
+      @if (problem(); as failure) {
+        <foshol-error-panel [problem]="failure" (retry)="reload()" />
+      }
 
-    @if (isEmpty()) {
-      <foshol-empty-state
-        titleKey="farmer.history.emptyTitle"
-        detailKey="farmer.history.emptyDetail"
-      />
-    } @else if (rows().length > 0) {
-      <ul
-        class="m-0 grid list-none gap-3 p-0"
-        [attr.aria-label]="'farmer.history.listLabel' | translate"
-      >
-        <!-- Rendered in the order received; the server owns "newest first" (WEB-FR-153). -->
-        @for (entry of rows(); track entry.row.caseId) {
-          <li>
-            <a
-              class="flex items-center gap-3 rounded-2xl border border-surface-3 bg-surface-0 p-3 transition-colors duration-1 ease-settle hover:bg-surface-1"
-              [routerLink]="[entry.row.caseId]"
-              routerLinkActive="border-paddy-600 bg-paddy-50"
-              [attr.data-status]="entry.status"
-              data-testid="case-history-row"
-            >
-              <span
-                class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-surface-3 bg-surface-1"
+      @if (loading() && rows().length === 0) {
+        <foshol-skeleton variant="block" [count]="3" />
+      }
+
+      @if (isEmpty()) {
+        <foshol-empty-state
+          titleKey="farmer.history.emptyTitle"
+          detailKey="farmer.history.emptyDetail"
+        />
+      } @else if (rows().length > 0) {
+        <ul [class]="listClass()" [attr.aria-label]="'farmer.history.listLabel' | translate">
+          <!-- Rendered in the order received; the server owns "newest first" (WEB-FR-153). -->
+          @for (entry of rows(); track entry.row.caseId) {
+            <li>
+              <a
+                class="flex items-center gap-3 rounded-2xl border border-surface-3 bg-surface-0 p-3 transition-colors duration-1 ease-settle hover:bg-surface-1 hover:shadow-card"
+                [routerLink]="[entry.row.caseId]"
+                routerLinkActive="border-paddy-600 bg-paddy-50"
+                [attr.data-status]="entry.status"
+                data-testid="case-history-row"
               >
-                @if (entry.row.thumbnailImageId; as thumbnailId) {
-                  <!-- WEB-FR-154 — through the presigned URL the API returned, nothing built. -->
-                  <foshol-secure-image
-                    class="block h-16 w-16"
-                    [caseId]="entry.row.caseId"
-                    [imageId]="thumbnailId"
-                    [alt]="
-                      'farmer.history.thumbnailAlt' | translate: { crop: entry.row.cropNameBn }
-                    "
-                  />
-                } @else {
-                  <svg
-                    viewBox="0 0 24 24"
-                    class="h-7 w-7 text-ink-faint"
-                    role="img"
-                    [attr.aria-label]="'farmer.history.noPhoto' | translate"
-                    fill="none"
-                  >
-                    <rect
-                      x="3.2"
-                      y="5.2"
-                      width="17.6"
-                      height="13.6"
-                      rx="2.4"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                    />
-                    <path
-                      d="M5 17l4.2-4.6 3 3 2.8-2.4L19 17"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                }
-              </span>
-
-              <span class="min-w-0 flex-1">
-                <!-- Server-supplied crop name, verbatim (WEB-UX-016). -->
-                <span class="block truncate font-bold text-ink">{{ entry.row.cropNameBn }}</span>
-                <span class="mt-1 block text-sm text-ink-muted">
-                  {{ 'badge.status.' + entry.status | translate }}
-                </span>
-                <time
-                  class="mt-0.5 block text-xs text-ink-faint"
-                  [attr.datetime]="entry.row.submittedAt"
+                <span
+                  class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-surface-3 bg-surface-1"
                 >
-                  {{ entry.row.submittedAt | dhakaDateTime }}
-                </time>
-              </span>
+                  @if (entry.row.thumbnailImageId; as thumbnailId) {
+                    <!-- WEB-FR-154 — through the presigned URL the API returned, nothing built. -->
+                    <foshol-secure-image
+                      class="block h-16 w-16"
+                      [caseId]="entry.row.caseId"
+                      [imageId]="thumbnailId"
+                      [alt]="
+                        'farmer.history.thumbnailAlt' | translate: { crop: entry.row.cropNameBn }
+                      "
+                    />
+                  } @else {
+                    <svg
+                      viewBox="0 0 24 24"
+                      class="h-7 w-7 text-ink-faint"
+                      role="img"
+                      [attr.aria-label]="'farmer.history.noPhoto' | translate"
+                      fill="none"
+                    >
+                      <rect
+                        x="3.2"
+                        y="5.2"
+                        width="17.6"
+                        height="13.6"
+                        rx="2.4"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                      />
+                      <path
+                        d="M5 17l4.2-4.6 3 3 2.8-2.4L19 17"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  }
+                </span>
 
-              <svg
-                viewBox="0 0 16 16"
-                class="h-4 w-4 shrink-0 text-ink-faint"
-                aria-hidden="true"
-                fill="none"
-              >
-                <path
-                  d="M6 3.5 10.5 8 6 12.5"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </a>
-          </li>
-        }
-      </ul>
+                <span class="min-w-0 flex-1">
+                  <!-- Server-supplied crop name, verbatim (WEB-UX-016). -->
+                  <span class="block truncate font-bold text-ink">{{ entry.row.cropNameBn }}</span>
+                  <span
+                    class="mt-1 inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    [class]="statusPillClass(entry.status)"
+                  >
+                    {{ 'badge.status.' + entry.status | translate }}
+                  </span>
+                  <time
+                    class="mt-1 block text-xs text-ink-faint"
+                    [attr.datetime]="entry.row.submittedAt"
+                  >
+                    {{ entry.row.submittedAt | dhakaDateTime }}
+                  </time>
+                </span>
 
-      <!-- WEB-API-003 — the four envelope numbers, read rather than inferred. -->
-      <foshol-paginator
-        [page]="pageIndex()"
-        [size]="pageSize()"
-        [totalElements]="totalElements()"
-        [totalPages]="totalPages()"
-        (pageChange)="goToPage($event)"
-      />
-    }
-  </section>
+                <svg
+                  viewBox="0 0 16 16"
+                  class="h-4 w-4 shrink-0 text-ink-faint"
+                  aria-hidden="true"
+                  fill="none"
+                >
+                  <path
+                    d="M6 3.5 10.5 8 6 12.5"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </a>
+            </li>
+          }
+        </ul>
 
-  <div class="min-w-0">
-    @if (detailOpen()) {
-      <a
-        routerLink="."
-        class="touch-target mb-4 inline-flex items-center gap-2 text-sm font-semibold text-paddy-700 underline xl:hidden"
-      >
-        <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
-          <path
-            d="M10 3.5 5.5 8l4.5 4.5"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        {{ 'farmer.history.backToList' | translate }}
-      </a>
-    }
+        <!-- WEB-API-003 — the four envelope numbers, read rather than inferred. -->
+        <foshol-paginator
+          class="mt-4 block"
+          [page]="pageIndex()"
+          [size]="pageSize()"
+          [totalElements]="totalElements()"
+          [totalPages]="totalPages()"
+          (pageChange)="goToPage($event)"
+        />
+      }
+    </section>
 
-    <router-outlet (activate)="setDetailOpen(true)" (deactivate)="setDetailOpen(false)" />
+    <div class="min-w-0">
+      @if (detailOpen()) {
+        <a
+          routerLink="."
+          class="touch-target mb-4 inline-flex items-center gap-2 text-sm font-semibold text-paddy-700 underline xl:hidden"
+        >
+          <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
+            <path
+              d="M10 3.5 5.5 8l4.5 4.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          {{ 'farmer.history.backToList' | translate }}
+        </a>
+      }
 
-    @if (!detailOpen()) {
-      <p class="hidden text-ink-muted xl:block">{{ 'farmer.history.pickPrompt' | translate }}</p>
-    }
+      <router-outlet (activate)="setDetailOpen(true)" (deactivate)="setDetailOpen(false)" />
+    </div>
   </div>
 </div>

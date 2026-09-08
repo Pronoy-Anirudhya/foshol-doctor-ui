@@ -91,9 +91,5 @@
     "en": "Photograph from the {{crop}} case"
   },
   "farmer.history.noPhoto": { "bn": "কোনো ছবি নেই", "en": "No photograph" },
-  "farmer.history.backToList": { "bn": "তালিকায় ফিরুন", "en": "Back to the list" },
-  "farmer.history.pickPrompt": {
-    "bn": "বিস্তারিত দেখতে একটি কেস বাছুন।",
-    "en": "Choose a case to see it in full."
-  }
+  "farmer.history.backToList": { "bn": "তালিকায় ফিরুন", "en": "Back to the list" }
 }

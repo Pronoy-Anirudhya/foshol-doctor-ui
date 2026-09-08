@@ -121,6 +121,29 @@ export class CaseHistoryPage {
   protected readonly totalElements = computed(() => this.pageValue()?.totalElements ?? FIRST_PAGE);
   protected readonly totalPages = computed(() => this.pageValue()?.totalPages ?? FIRST_PAGE);
 
+  /**
+   * With no case open, the list gets the whole page to itself and grows into a card grid; the
+   * instant a case opens, both computeds swap to a narrow list beside the detail pane, because
+   * a 3-up grid squeezed into a 26rem column would be nonsensical (`WEB-UX-030`).
+   */
+  protected readonly gridClass = computed(() =>
+    this.detailOpen()
+      ? 'grid gap-6 xl:grid-cols-[26rem_minmax(0,1fr)] xl:items-start xl:gap-8'
+      : 'grid gap-6',
+  );
+  protected readonly listClass = computed(() =>
+    this.detailOpen()
+      ? 'm-0 grid list-none gap-3 p-0'
+      : 'm-0 grid list-none gap-4 p-0 sm:grid-cols-2 xl:grid-cols-3',
+  );
+
+  /** WEB-UX-044 — colour is never the only carrier of meaning; the status text stays in the pill. */
+  protected statusPillClass(status: CaseStatus): string {
+    if (status === 'ADVISED') return 'bg-paddy-100 text-paddy-700';
+    if (status === 'REJECTED' || status === 'FAILED') return 'bg-clay-100 text-clay-700';
+    return 'bg-dawn-100 text-dawn-700';
+  }
+
   #seenResyncTick = this.sse.resyncTick();
 
   constructor() {

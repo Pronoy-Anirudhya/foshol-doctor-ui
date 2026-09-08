@@ -88,4 +88,22 @@ describe('Paginator (WEB-API-003)', () => {
 
     expect(emitted).toEqual([]);
   });
+
+  it('renders no numbered row when the server reports a single page', async () => {
+    const { host } = await render(0, 1);
+    expect(host.querySelectorAll('button').length).toBe(2);
+  });
+
+  it('renders a numbered button per page and jumps straight to the one clicked', async () => {
+    const { fixture, host } = await render(ENVELOPE.page, ENVELOPE.totalPages);
+    const numbered = [...host.querySelectorAll('button')].slice(2);
+    expect(numbered.map((button) => button.textContent?.trim())).toEqual(['1', '2', '3']);
+    expect(numbered[ENVELOPE.page]?.getAttribute('aria-current')).toBe('page');
+
+    const emitted: number[] = [];
+    fixture.componentInstance.pageChange.subscribe((page: number) => emitted.push(page));
+    numbered[0]?.click();
+
+    expect(emitted).toEqual([0]);
+  });
 });

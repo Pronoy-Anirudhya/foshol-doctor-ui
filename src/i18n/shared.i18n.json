@@ -68,6 +68,10 @@
     "bn": "পাতা {{page}} / {{totalPages}} · মোট {{totalElements}}",
     "en": "Page {{page}} of {{totalPages}} · {{totalElements}} in total"
   },
+  "shared.paginator.goToPage": {
+    "bn": "{{page}} নম্বর পাতায় যান",
+    "en": "Go to page {{page}}"
+  },
 
   "shared.bnFallback.marker": { "bn": "(bn)", "en": "(bn)" },
   "shared.bnFallback.description": {

@@ -13,6 +13,8 @@ import { TranslatePipe } from '@ngx-translate/core';
  */
 const FIRST_PAGE = 0;
 const HUMAN_PAGE_OFFSET = 1;
+/** How many numbered buttons to show on either side of the current page. */
+const PAGE_WINDOW_RADIUS = 2;
 
 @Component({
   selector: 'foshol-paginator',
@@ -25,7 +27,7 @@ const HUMAN_PAGE_OFFSET = 1;
         class="flex flex-wrap items-center justify-between gap-3"
         [attr.aria-label]="'shared.paginator.label' | translate"
       >
-        <p class="text-sm text-ink-muted tabular">
+        <p class="order-1 text-sm text-ink-muted tabular">
           {{
             'shared.paginator.status'
               | translate
@@ -37,7 +39,10 @@ const HUMAN_PAGE_OFFSET = 1;
           }}
         </p>
 
-        <div class="flex items-center gap-2">
+        <!-- DOM order keeps previous/next as the first two buttons in this component (relied
+             on by paginator.spec.ts); the order-2 utility below places the numbered row between
+             the status text and the prev/next pair visually without reordering the DOM. -->
+        <div class="order-3 flex items-center gap-2">
           <button
             type="button"
             class="touch-target inline-flex items-center gap-1.5 rounded-xl border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1 disabled:cursor-not-allowed disabled:text-ink-faint disabled:opacity-60"
@@ -74,6 +79,23 @@ const HUMAN_PAGE_OFFSET = 1;
             </svg>
           </button>
         </div>
+
+        @if (pageNumbers().length > 1) {
+          <div class="order-2 flex items-center gap-1.5">
+            @for (candidate of pageNumbers(); track candidate) {
+              <button
+                type="button"
+                class="touch-target inline-flex min-w-11 items-center justify-center rounded-xl border text-sm font-semibold transition-colors duration-1 ease-settle tabular"
+                [class]="candidate === page() ? 'border-paddy-600 bg-paddy-600 text-ink-invert' : 'border-surface-3 bg-surface-0 text-ink hover:bg-surface-1'"
+                [attr.aria-current]="candidate === page() ? 'page' : null"
+                [attr.aria-label]="'shared.paginator.goToPage' | translate: { page: candidate + 1 }"
+                (click)="goTo(candidate)"
+              >
+                {{ candidate + 1 }}
+              </button>
+            }
+          </div>
+        }
       </nav>
     }
   `,
@@ -95,6 +117,14 @@ export class Paginator {
   );
   protected readonly hasPrevious = computed(() => this.page() > FIRST_PAGE);
   protected readonly hasNext = computed(() => this.page() + HUMAN_PAGE_OFFSET < this.totalPages());
+
+  /** A window of zero-based page indices around the current page, clamped to what exists. */
+  protected readonly pageNumbers = computed<readonly number[]>(() => {
+    const start = Math.max(FIRST_PAGE, this.page() - PAGE_WINDOW_RADIUS);
+    const end = Math.min(this.totalPages() - HUMAN_PAGE_OFFSET, this.page() + PAGE_WINDOW_RADIUS);
+    if (end < start) return [];
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  });
 
   protected goTo(target: number): void {
     if (target < FIRST_PAGE || target >= this.totalPages()) return;
