@@ -1,0 +1,206 @@
+/* Filters wrap at any width; the table scrolls in its own container, never the page (WEB-UX-031). */
+
+.ac-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.ac-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ac-select {
+  min-height: 2.5rem;
+  min-width: 9rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: var(--radius-control);
+  background-color: var(--color-surface-0);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-ink);
+}
+
+/* Same wrapper chrome as `officer-queue-page`'s `.table-wrap`: rounded card, border, shadow —
+   the wide content scrolls inside this box, never the page (WEB-UX-031). */
+.ac-scroll {
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-0);
+  box-shadow: var(--shadow-card);
+}
+
+.ac-table {
+  width: 100%;
+  min-width: 62rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+/* Dark console header, matching `.queue-table thead` — the one header treatment every
+   selectable-rows table in this app shares. */
+.ac-table thead {
+  background: var(--color-console);
+}
+
+.ac-table th {
+  padding: 0.7rem 0.9rem;
+  text-align: start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-on-console);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.ac-table td {
+  padding: 0.65rem 0.9rem;
+  border-block-start: 1px solid var(--color-surface-2);
+  vertical-align: middle;
+  color: var(--color-ink);
+}
+
+/* Zebra striping, then hover on top — same order and same tokens as `.queue-table`. */
+.ac-table tbody tr:nth-child(even) {
+  background: var(--color-surface-1);
+}
+
+.ac-table tbody tr:hover {
+  background: var(--color-surface-2);
+}
+
+/* State-keyed accent on the row's leading edge, the same bare-attribute pattern as
+   `officer-queue-page.css` (`[data-state]` is scoped to this component by Angular's own
+   emulated encapsulation, so it only ever matches this table's rows). */
+[data-state='PENDING'] {
+  --wa: var(--color-dawn-600);
+}
+
+[data-state='CLAIMED'] {
+  --wa: var(--color-paddy-600);
+}
+
+[data-state='DONE'] {
+  --wa: var(--color-paddy-700);
+}
+
+[data-state='REJECTED'] {
+  --wa: var(--color-clay-600);
+}
+
+.ac-table tr td:first-child {
+  border-inline-start: 3px solid var(--wa, transparent);
+}
+
+.ac-pick {
+  inline-size: 2.5rem;
+  padding-inline-end: 0;
+}
+
+.ac-pick input:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.ac-num {
+  text-align: end;
+}
+
+.ac-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.ac-absent {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-2);
+  padding: 0.05rem 0.5rem;
+  font-size: 0.6875rem;
+}
+
+/* Amber pill, matching `.resub` on the officer queue — the same resubmission badge. */
+.ac-resub {
+  margin-inline-start: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-dawn-300);
+  background: var(--color-dawn-100);
+  color: var(--color-dawn-700);
+  padding: 0.1rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ac-state {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-1);
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.ac-state[data-state='PENDING'] { border-color: var(--color-dawn-300); background: var(--color-dawn-100); color: var(--color-dawn-700); }
+.ac-state[data-state='CLAIMED'] { border-color: var(--color-paddy-300); background: var(--color-paddy-100); color: var(--color-paddy-700); }
+.ac-state[data-state='DONE'] { border-color: var(--color-paddy-300); color: var(--color-paddy-700); }
+.ac-state[data-state='REJECTED'] { border-color: var(--color-clay-300); background: var(--color-clay-100); color: var(--color-clay-700); }
+
+/* The bulk bar mirrors `queue-bulk-bar`'s console chrome. */
+.ac-bulk {
+  margin-top: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-slate-700);
+  background-color: var(--color-console);
+  padding: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+
+.ac-btn-reject, .ac-btn-quiet, .ac-btn-quiet-dark {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-control);
+  padding: 0 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background-color var(--duration-1) var(--ease-settle);
+}
+
+.ac-btn-reject:disabled, .ac-btn-quiet:disabled, .ac-btn-quiet-dark:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ac-btn-reject { border: 1px solid var(--color-clay-300); background-color: var(--color-clay-100); color: var(--color-clay-700); }
+.ac-btn-reject:hover:not(:disabled) { background-color: var(--color-clay-300); color: var(--color-ink); }
+
+.ac-btn-quiet { border: 1px solid var(--color-slate-600); background-color: var(--color-slate-900); color: var(--color-on-console); }
+.ac-btn-quiet:hover:not(:disabled) { background-color: var(--color-slate-800); }
+
+.ac-btn-quiet-dark { border: 1px solid var(--color-surface-3); background-color: var(--color-surface-0); color: var(--color-ink); }
+.ac-btn-quiet-dark:hover:not(:disabled) { background-color: var(--color-surface-1); }

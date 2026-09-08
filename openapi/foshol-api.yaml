@@ -690,6 +690,43 @@ paths:
               schema: { $ref: '#/components/schemas/PageOfKpiBreach' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  /api/v1/admin/cases:
+    get:
+      tags: [admin]
+      operationId: listAdminCases
+      summary: District case list for ADMIN, newest first
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [TODAY, MONTH, YEAR, LIFETIME], default: LIFETIME }
+        - name: state
+          in: query
+          schema: { type: string, enum: [PENDING, CLAIMED, DONE, REJECTED, ALL], default: ALL }
+        - name: kpi
+          in: query
+          schema: { type: string, enum: [ASSIGNMENT, RESOLUTION] }
+        - name: officerId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: cropCode
+          in: query
+          schema: { type: string }
+        - name: decisionPath
+          in: query
+          schema: { type: string, enum: [PRIMARY, SECONDARY, UNDETERMINED] }
+        - name: resubmission
+          in: query
+          schema: { type: boolean }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Size' }
+      responses:
+        '200':
+          description: Page of district cases
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PageOfOfficerQueueRow' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   # ── stream ────────────────────────────────────────────────────────────────
   /api/v1/stream:
     get:
@@ -1193,11 +1230,22 @@ components:
 
     AdminStats:
       type: object
-      required: [casesToday, approvalRate, medianReviewSeconds, modelOfficerAgreementRate, thresholds]
+      required: [casesToday, casesThisMonth, casesThisYear, casesLifetime, approvalRate, agreementSampleSize]
       properties:
         casesToday:                { type: integer }
-        approvalRate:              { type: number, format: float, description: Advisories with action APPROVED over all published advisories }
+        casesThisMonth:            { type: integer }
+        casesThisYear:             { type: integer }
+        casesLifetime:             { type: integer }
+        approvalRate:              { type: number, format: float, nullable: true, description: Advisories with action APPROVED over all published advisories }
+        medianReviewMinutes:       { type: number, nullable: true }
         medianReviewSeconds:       { type: integer, nullable: true }
+        agreementRate:             { type: number, format: float, nullable: true }
+        agreementSampleSize:       { type: integer, format: int64 }
+        rejectionRate:
+          type: number
+          format: float
+          nullable: true
+          description: Share of terminal review tasks in the district whose state is REJECTED
         modelOfficerAgreementRate:
           type: number
           format: float
@@ -1213,6 +1261,8 @@ components:
             PRIMARY:      { type: integer }
             SECONDARY:    { type: integer }
             UNDETERMINED: { type: integer }
+        confidenceHigh:            { type: number, format: float }
+        confidenceLow:             { type: number, format: float }
         thresholds:                { $ref: '#/components/schemas/Thresholds' }
 
     PageMeta:
@@ -1328,15 +1378,26 @@ components:
       type: object
       required: [items]
       properties:
+        reasonCode:
+          type: string
+          enum: [BLURRY_IMAGE, NOT_A_CROP, WRONG_CROP, INSUFFICIENT_DETAIL, INAUDIBLE_AUDIO, OTHER]
+          description: Shared reason applied to items that omit reasonCode
+        messageBn:
+          type: string
+          maxLength: 500
+          description: Shared Bangla rejection message supplied by the caller; not a system default
         items:
           type: array
           items:
-            allOf:
-              - { $ref: '#/components/schemas/RejectCaseRequest' }
-              - type: object
-                required: [taskId]
-                properties:
-                  taskId: { type: string, format: uuid }
+            type: object
+            required: [taskId]
+            properties:
+              taskId: { type: string, format: uuid }
+              expectedVersion: { type: integer }
+              reasonCode:
+                type: string
+                enum: [BLURRY_IMAGE, NOT_A_CROP, WRONG_CROP, INSUFFICIENT_DETAIL, INAUDIBLE_AUDIO, OTHER]
+              messageBn: { type: string, maxLength: 500 }
 
     BulkOperationResult:
       type: object

@@ -100,6 +100,7 @@ const DEV_FIXED = 'DEV_FIXED';
                 aria-describedby="phone-hint"
                 [attr.aria-invalid]="phoneInvalid() ? 'true' : null"
                 [attr.aria-errormessage]="phoneInvalid() ? 'phone-error' : null"
+                (input)="phoneTouched.set(false)"
               />
               <p id="phone-hint" class="mt-1.5 text-xs text-ink-faint">
                 {{ 'auth.farmer.phoneHint' | translate }}
@@ -394,7 +395,7 @@ export class FarmerLoginPage {
 
   private readonly step = signal<'phone' | 'code'>('phone');
   private readonly _phone = signal('');
-  private readonly phoneTouched = signal(false);
+  protected readonly phoneTouched = signal(false);
   private readonly codeTouched = signal(false);
 
   protected readonly phone = this._phone.asReadonly();
@@ -475,6 +476,7 @@ export class FarmerLoginPage {
   }
 
   protected onInput(position: number, event: Event): void {
+    this.codeTouched.set(false);
     const element = event.target as HTMLInputElement;
     const typed = element.value.replace(NON_DIGIT, '');
 
@@ -493,6 +495,7 @@ export class FarmerLoginPage {
 
     if (event.key === 'Backspace' && element.value === '') {
       event.preventDefault();
+      this.codeTouched.set(false);
       this.writeDigits(replaceAt(this.digits(), position - 1, ''));
       this.focusBox(position - 1);
       return;
@@ -513,6 +516,7 @@ export class FarmerLoginPage {
     if (pasted.length === 0) return;
 
     event.preventDefault();
+    this.codeTouched.set(false);
     this.writeDigits(overlay(this.digits(), position, pasted));
     this.focusBox(position + pasted.length);
     if (this.codeComplete()) void this.submitCode();

@@ -1,0 +1,330 @@
+<section data-testid="admin-cases-section" aria-labelledby="admin-cases-heading">
+  <h2 id="admin-cases-heading" class="text-lg font-semibold text-ink">
+    {{ 'admin.cases.title' | translate }}
+  </h2>
+  <p class="mt-1 max-w-prose text-sm text-ink-muted">{{ 'admin.cases.subtitle' | translate }}</p>
+
+  <!-- WEB-FR-303 — every one of these writes the store, not the server. -->
+  <div class="ac-filters" role="group" [attr.aria-label]="'admin.cases.filters.label' | translate">
+    <label class="ac-filter">
+      <span>{{ 'admin.cases.filters.state.label' | translate }}</span>
+      <select class="ac-select" data-testid="cases-filter-state" [value]="filters().state" (change)="onState($event)">
+        <option value="ALL">{{ 'admin.cases.filters.state.ALL' | translate }}</option>
+        @for (choice of stateChoices; track choice) {
+          <option [value]="choice">{{ 'officer.queue.state.' + choice | translate }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="ac-filter">
+      <span>{{ 'admin.cases.filters.kpi.label' | translate }}</span>
+      <select class="ac-select" data-testid="cases-filter-kpi" [value]="filters().kpi ?? ''" (change)="onKpi($event)">
+        <option value="">{{ 'admin.cases.filters.kpi.ANY' | translate }}</option>
+        @for (choice of kpiChoices; track choice) {
+          <option [value]="choice">{{ 'admin.kpi.breaches.filter.' + choice | translate }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="ac-filter">
+      <span>{{ 'admin.cases.filters.officer.label' | translate }}</span>
+      <select
+        class="ac-select"
+        data-testid="cases-filter-officer"
+        [value]="filters().officerId ?? ''"
+        (change)="onOfficer($event)"
+      >
+        <option value="">{{ 'admin.cases.filters.officer.any' | translate }}</option>
+        @for (officer of officers(); track officer.officerId) {
+          <option [value]="officer.officerId">{{ officer.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="ac-filter">
+      <span>{{ 'admin.cases.filters.crop.label' | translate }}</span>
+      <select class="ac-select" data-testid="cases-filter-crop" [value]="filters().cropCode ?? ''" (change)="onCrop($event)">
+        <option value="">{{ 'admin.cases.filters.crop.any' | translate }}</option>
+        @for (crop of crops(); track crop.code) {
+          <option [value]="crop.code">{{ crop.nameBn }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="ac-filter">
+      <span>{{ 'admin.cases.filters.decisionPath.label' | translate }}</span>
+      <select
+        class="ac-select"
+        data-testid="cases-filter-path"
+        [value]="filters().decisionPath ?? ''"
+        (change)="onDecisionPath($event)"
+      >
+        <option value="">{{ 'admin.cases.filters.decisionPath.any' | translate }}</option>
+        @for (choice of decisionPathChoices; track choice) {
+          <option [value]="choice">{{ 'badge.decisionPath.' + choice | translate }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="ac-filter">
+      <span>{{ 'admin.cases.filters.resubmission.label' | translate }}</span>
+      <select
+        class="ac-select"
+        data-testid="cases-filter-resubmission"
+        [value]="resubmissionValue()"
+        (change)="onResubmission($event)"
+      >
+        <option value="">{{ 'admin.cases.filters.resubmission.any' | translate }}</option>
+        <option value="true">{{ 'admin.cases.filters.resubmission.yes' | translate }}</option>
+        <option value="false">{{ 'admin.cases.filters.resubmission.no' | translate }}</option>
+      </select>
+    </label>
+  </div>
+
+  @if (problem(); as failure) {
+    @if (store.stale()) {
+      <div class="mt-3 rounded-panel border border-warning bg-dawn-100 p-4" role="status" data-testid="cases-stale">
+        <p class="text-sm font-semibold text-dawn-700">{{ 'admin.stats.stale.title' | translate }}</p>
+        <p class="mt-1 max-w-prose text-sm text-ink">{{ 'admin.cases.staleDetail' | translate }}</p>
+      </div>
+    }
+    <foshol-error-panel class="mt-3" [problem]="failure" (retry)="reload()" />
+  }
+
+  @if (store.hasPage()) {
+    @if (countedEmpty()) {
+      <foshol-empty-state class="mt-4" titleKey="admin.cases.empty.title" detailKey="admin.cases.empty.detail" />
+    } @else {
+      <div class="ac-scroll">
+        <table class="ac-table" data-testid="cases-table">
+          <caption class="sr-only">{{ 'admin.cases.title' | translate }}</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="ac-pick">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 accent-paddy-600"
+                  data-testid="cases-select-all"
+                  [checked]="store.allSelected()"
+                  [indeterminate]="store.someSelected()"
+                  [disabled]="store.selectableRows().length === NONE"
+                  [attr.aria-label]="'officer.queue.select.all' | translate"
+                  (change)="toggleAll()"
+                />
+              </th>
+              <th scope="col">{{ 'officer.queue.col.farmer' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.crop' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.candidate' | translate }}</th>
+              <th scope="col" class="ac-num">{{ 'officer.queue.col.confidence' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.path' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.state' | translate }}</th>
+              <th scope="col">{{ 'admin.cases.column.officer' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.submitted' | translate }}</th>
+              <th scope="col">{{ 'admin.cases.column.due' | translate }}</th>
+              <th scope="col">
+                <span class="sr-only">{{ 'admin.kpi.breaches.column.open' | translate }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.reviewTaskId) {
+              <tr data-testid="cases-row" [attr.data-state]="row.state">
+                <td class="ac-pick">
+                  <input
+                    type="checkbox"
+                    class="h-5 w-5 accent-paddy-600"
+                    data-testid="cases-row-select"
+                    [checked]="store.selectedIds().has(row.reviewTaskId)"
+                    [disabled]="!store.isSelectable(row)"
+                    [attr.aria-label]="
+                      store.isSelectable(row)
+                        ? ('officer.queue.select.row' | translate: { farmer: row.farmerName })
+                        : ('admin.cases.select.disabled' | translate)
+                    "
+                    [title]="store.isSelectable(row) ? null : ('admin.cases.select.disabled' | translate)"
+                    (change)="toggleRow(row.reviewTaskId)"
+                  />
+                </td>
+                <td>
+                  <span class="font-bold text-ink">{{ row.farmerName }}</span>
+                  @if (row.isResubmission) {
+                    <span class="ac-resub" [title]="'officer.queue.resubmissionHint' | translate">
+                      <foshol-icon name="resubmit" size="xs" />
+                      {{ 'officer.queue.resubmission' | translate }}
+                    </span>
+                  }
+                </td>
+                <td>{{ row.cropNameBn || row.cropCode || '—' }}</td>
+                <td>{{ row.topDiseaseNameBn || '—' }}</td>
+                <td class="ac-num ac-time">
+                  @if (row.topConfidence !== null && row.topConfidence !== undefined) {
+                    {{ row.topConfidence | percent1 }}%
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  @if (row.decisionPath; as path) {
+                    <foshol-decision-path-badge [path]="path" />
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  <span class="ac-state" [attr.data-state]="row.state">
+                    {{ 'officer.queue.state.' + row.state | translate }}
+                  </span>
+                </td>
+                <td>
+                  @if (officerName(row.officerId); as name) {
+                    {{ name }}
+                  } @else if (row.officerId; as id) {
+                    <span class="font-latin ac-absent">{{ id }}</span>
+                  } @else {
+                    —
+                  }
+                </td>
+                <td class="ac-time">{{ row.submittedAt | dhakaDateTime }}</td>
+                <td class="ac-time">
+                  @if (dueAt(row); as due) {
+                    {{ due | dhakaDateTime }}
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  <!-- Icon-only action, matching `queue-row-actions`' view button: same touch
+                       target, same slate button, same eye glyph — an accessible name replaces
+                       the visible text since there is none. -->
+                  <a
+                    [routerLink]="taskLink(row)"
+                    class="touch-target inline-flex w-11 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 text-ink-invert transition-colors duration-1 ease-settle hover:bg-slate-900"
+                    data-testid="cases-open"
+                    [attr.aria-label]="'admin.kpi.breaches.column.open' | translate"
+                    [title]="'admin.kpi.breaches.column.open' | translate"
+                  >
+                    <foshol-icon name="view" size="sm" />
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <foshol-paginator
+      class="mt-4"
+      [page]="filters().page"
+      [size]="size()"
+      [totalElements]="totalElements()"
+      [totalPages]="totalPages()"
+      (pageChange)="goToPage($event)"
+    />
+  } @else if (!store.loading() && problem() === null) {
+    <foshol-empty-state class="mt-4" titleKey="admin.cases.notLoaded.title" detailKey="admin.cases.notLoaded.detail" />
+  }
+
+  <!-- Bulk reject — the one write this whole surface makes. -->
+  @if (store.selectedRows().length > NONE) {
+    <div class="ac-bulk" data-testid="cases-bulk-bar">
+      <div class="flex flex-wrap items-center gap-2">
+        <p class="mr-auto text-sm font-bold text-on-console">
+          {{ 'officer.queue.bulk.selected' | translate: { count: store.selectedRows().length } }}
+        </p>
+        <button
+          type="button"
+          class="ac-btn-reject"
+          data-testid="cases-bulk-reject"
+          [disabled]="submitting()"
+          (click)="openBulkReject()"
+        >
+          {{ 'officer.queue.bulk.reject' | translate }}
+        </button>
+        <button
+          type="button"
+          class="ac-btn-quiet"
+          data-testid="cases-bulk-clear"
+          [disabled]="submitting()"
+          (click)="store.clearSelection()"
+        >
+          {{ 'officer.queue.bulk.clear' | translate }}
+        </button>
+      </div>
+
+      @if (store.atCap()) {
+        <p class="mt-2 text-sm font-bold text-on-console" data-testid="cases-bulk-cap">
+          {{ 'officer.queue.bulk.cap' | translate: { max: maxSize } }}
+        </p>
+      }
+      @if (store.hasClaimedSelected()) {
+        <p class="mt-2 text-sm text-on-console-muted" data-testid="cases-bulk-claimed-warning">
+          {{ 'admin.cases.bulk.claimedWarning' | translate }}
+        </p>
+      }
+
+      @if (bulkOpen()) {
+        <div class="mt-3 rounded-xl border border-surface-3 bg-surface-0 p-3" role="group" data-testid="cases-bulk-panel">
+          <p class="text-sm text-ink-muted">
+            {{ 'officer.queue.bulk.rejectSummary' | translate: { count: store.selectedRows().length } }}
+          </p>
+          <foshol-queue-reject-fields
+            class="mt-2"
+            idPrefix="admin-cases-bulk"
+            [(reason)]="reason"
+            [(message)]="message"
+            [attempted]="attempted()"
+            [disabled]="submitting()"
+          />
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="ac-btn-reject"
+              data-testid="cases-bulk-confirm"
+              [disabled]="submitting()"
+              (click)="submitBulkReject()"
+            >
+              {{ (submitting() ? 'officer.action.submitting' : 'officer.queue.bulk.confirm') | translate }}
+            </button>
+            <button
+              type="button"
+              class="ac-btn-quiet-dark"
+              data-testid="cases-bulk-cancel"
+              [disabled]="submitting()"
+              (click)="cancelBulkReject()"
+            >
+              {{ 'officer.reject.cancel' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (result(); as outcome) {
+    <div class="ac-bulk mt-3" data-testid="cases-bulk-report">
+      <p class="text-sm font-bold text-on-console">
+        {{ 'officer.queue.bulk.finished' | translate: { succeeded: outcome.succeeded, failed: outcome.failed } }}
+      </p>
+      <ul class="mt-2 list-none p-0 text-sm">
+        @for (item of outcome.results; track item.taskId) {
+          <li class="flex flex-wrap items-center gap-x-2 py-0.5 text-on-console-muted" [attr.data-status]="item.status">
+            <foshol-icon class="shrink-0" [name]="item.status === 'OK' ? 'approve' : 'warning'" size="xs" />
+            <span class="font-bold text-on-console">{{ farmerFor(item.taskId) }}</span>
+            <span>{{ (item.status === 'OK' ? 'officer.queue.bulk.item.ok' : 'officer.queue.bulk.item.failed') | translate }}</span>
+            @if (item.errorCode; as code) {
+              <span class="font-latin">— {{ code }}</span>
+            }
+          </li>
+        }
+      </ul>
+      <button type="button" class="ac-btn-quiet-dark mt-2" data-testid="cases-bulk-dismiss" (click)="dismissResult()">
+        {{ 'officer.queue.bulk.dismiss' | translate }}
+      </button>
+    </div>
+  }
+
+  @if (requestProblem(); as failure) {
+    <foshol-error-panel class="mt-3" [problem]="failure" [retryable]="false" />
+  }
+</section>

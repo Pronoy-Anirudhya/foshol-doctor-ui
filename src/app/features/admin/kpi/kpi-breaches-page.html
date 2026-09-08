@@ -16,9 +16,6 @@
     >{{ 'admin.stats.readOnly' | translate }}</span
   >
 
-  <!-- The scope, named rather than filtered for: the server reads the district from the JWT. -->
-  <foshol-region-chip />
-
   <button
     type="button"
     class="touch-target inline-flex items-center gap-2 rounded-control bg-console px-4 font-semibold text-on-console shadow-stamp transition-colors duration-1 ease-settle hover:bg-slate-700"
@@ -128,12 +125,9 @@
            No officer column exists in this table. The rows have no owner because nobody had
            claimed the case; the heading names the district, which is what failed. -->
       <section class="mt-6" data-testid="assignment-section" aria-labelledby="kb-assignment-heading">
-        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <h2 id="kb-assignment-heading" class="text-lg font-semibold text-ink">
-            {{ 'admin.kpi.breaches.assignment.title' | translate }}
-          </h2>
-          <foshol-region-chip />
-        </div>
+        <h2 id="kb-assignment-heading" class="text-lg font-semibold text-ink">
+          {{ 'admin.kpi.breaches.assignment.title' | translate }}
+        </h2>
         <p class="mt-1 max-w-prose text-sm text-ink-muted">
           {{ 'admin.kpi.breaches.assignment.detail' | translate }}
         </p>

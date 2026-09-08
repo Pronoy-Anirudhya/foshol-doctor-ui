@@ -1,61 +1,49 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AuthFacade } from '../../../core/auth/auth-facade';
 import { homePathForRole } from '../../../core/auth/auth.guard';
 import { SessionStore } from '../../../core/auth/session-store';
-import { APP_CONFIG } from '../../../core/config/app-config';
+import { AccountMenu } from '../account-menu/account-menu';
+import { Icon } from '../icon/icon';
 import { LangToggle } from '../lang-toggle/lang-toggle';
 import { NotificationBell } from '../notification-bell/notification-bell';
-import { RegionChip } from '../region-chip/region-chip';
 import { SseIndicator } from '../sse-indicator/sse-indicator';
 
 /**
- * The application's one header: product mark, language toggle, live-connection state, who is
- * signed in, and the way out.
+ * The application's one header: a mobile nav toggle, product mark, language toggle,
+ * live-connection state, and the account menu (identity, location, sign-out — all in one place).
  *
  * The mark is hand-authored SVG — a leaf whose midrib is a pulse trace. WEB-NFR-007 permits
  * no icon pack, and in any case the whole product is "is this crop healthy?", which is what
  * the drawing says.
  *
- * WEB-SEC-006 — a phone number is displayed only as its last four digits. The frozen
- * `Principal` schema carries no phone field, so the only phone that can reach the header is a
- * farmer whose display name IS their number; when it matches `auth.phonePattern` it is masked
- * rather than printed. See the amendment note in the progress file.
- *
- * WEB-SEC-004 — sign-out goes through `AuthFacade`, which clears every registered store and
- * closes the stream before it navigates.
+ * Identity, region and sign-out used to be three separate elements in this bar; they are now
+ * `AccountMenu`, one trigger with everything verbose behind a click — see that component's own
+ * doc comment for the reasoning. `WEB-SEC-004`/`WEB-SEC-006` still apply, just inside it.
  */
 @Component({
   selector: 'foshol-app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, RegionChip, RouterLink],
+  imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, AccountMenu, Icon, RouterLink],
   templateUrl: './app-header.html',
   host: { class: 'block' },
 })
 export class AppHeader {
   private readonly session = inject(SessionStore);
-  private readonly auth = inject(AuthFacade);
 
   /** Slate for the officer and admin console, warm neutrals for the farmer surface. */
   readonly tone = input<'light' | 'dark'>('light');
+  /** Whether the collapsible left nav is currently open as a mobile overlay. */
+  readonly navOpen = input(false);
+
+  /** The mobile hamburger was pressed — the shell owns whether the nav is open. */
+  readonly menuToggle = output<void>();
 
   protected readonly authenticated = this.session.isAuthenticated;
   protected readonly role = this.session.role;
 
   /** Item 3 — the brand mark is a link home, home being whichever surface this role owns. */
   protected readonly homePath = computed(() => homePathForRole(this.role()));
-
-  protected readonly roleKey = computed(() => {
-    const role = this.role();
-    return role === null ? '' : `shared.header.role.${role}`;
-  });
-
-  /** WEB-SEC-006 — masked when it is a phone, printed when it is a name. Never both. */
-  protected readonly identity = computed(() => {
-    const name = this.session.displayName();
-    return APP_CONFIG.auth.phonePattern.test(name) ? SessionStore.maskPhone(name) : name;
-  });
 
   protected readonly barClass = computed(() =>
     this.tone() === 'dark'
@@ -67,13 +55,9 @@ export class AppHeader {
     this.tone() === 'dark' ? 'text-surface-2' : 'text-ink-muted',
   );
 
-  protected readonly signOutClass = computed(() =>
+  protected readonly menuButtonClass = computed(() =>
     this.tone() === 'dark'
-      ? 'border-slate-600 text-ink-invert hover:bg-slate-700'
-      : 'border-surface-3 text-ink hover:bg-surface-1',
+      ? 'bg-slate-900/70 text-surface-2 hover:bg-slate-700'
+      : 'bg-surface-2 text-ink-muted hover:text-ink',
   );
-
-  protected async signOut(): Promise<void> {
-    await this.auth.signOut();
-  }
 }

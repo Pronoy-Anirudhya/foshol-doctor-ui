@@ -1,0 +1,68 @@
+<button
+  type="button"
+  class="am-trigger touch-target inline-flex items-center gap-2 rounded-pill border py-1 pe-2.5 ps-1.5 transition-colors duration-1 ease-settle"
+  [class]="triggerClass()"
+  data-testid="account-menu-trigger"
+  [attr.aria-label]="'shared.header.accountAria' | translate: { name: identity() }"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="panelId"
+  (click)="toggle()"
+>
+  <span class="am-avatar" aria-hidden="true">{{ initial() }}</span>
+  <span class="hidden min-w-0 flex-col items-start leading-tight sm:flex">
+    <span class="max-w-32 truncate text-sm font-semibold">{{ identity() }}</span>
+    @if (districtLabel(); as district) {
+      <span class="max-w-32 truncate text-xs" [class]="mutedClass()">{{ district }}</span>
+    }
+  </span>
+  <svg viewBox="0 0 16 16" class="am-caret h-3.5 w-3.5 shrink-0" aria-hidden="true" fill="none">
+    <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</button>
+
+@if (open()) {
+  <!-- Same stacking note as `NotificationBell`: the header is z-40 and sticky, so z-10 here only
+       needs to clear this bar's own in-flow siblings, never the toast host's z-50. -->
+  <div
+    [id]="panelId"
+    role="menu"
+    class="am-panel fixed inset-x-3 top-20 z-10 overflow-hidden rounded-panel border border-surface-3 bg-surface-0 text-ink shadow-lift md:absolute md:inset-x-auto md:end-0 md:top-full md:mt-2 md:w-72"
+    data-testid="account-menu-panel"
+  >
+    <div class="flex items-center gap-3 border-b border-surface-3 px-4 py-3.5">
+      <span class="am-avatar am-avatar-lg" aria-hidden="true">{{ initial() }}</span>
+      <div class="min-w-0">
+        <p class="truncate text-sm font-bold text-ink" data-testid="account-menu-name">{{ identity() }}</p>
+        @if (roleKey()) {
+          <p class="truncate text-xs text-ink-muted">{{ roleKey() | translate }}</p>
+        }
+      </div>
+    </div>
+
+    @if (districtLabel(); as district) {
+      <dl class="am-details px-4 py-3">
+        <div>
+          <dt>{{ 'shared.header.location' | translate }}</dt>
+          <dd data-testid="account-menu-location">
+            <foshol-icon name="pin" size="xs" class="am-pin" />
+            {{ district }}@if (divisionLabel(); as division) {
+              <span class="text-ink-faint"> · {{ division }}</span>
+            }
+          </dd>
+        </div>
+      </dl>
+    }
+
+    <div class="border-t border-surface-3 p-2">
+      <button
+        type="button"
+        class="touch-target flex w-full items-center gap-2 rounded-control px-2.5 text-sm font-semibold text-clay-700 transition-colors duration-1 ease-settle hover:bg-clay-100"
+        data-testid="account-menu-sign-out"
+        (click)="signOut()"
+      >
+        <foshol-icon name="logout" size="sm" />
+        {{ 'shared.header.signOut' | translate }}
+      </button>
+    </div>
+  </div>
+}

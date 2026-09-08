@@ -4,6 +4,23 @@
   [attr.aria-label]="'shared.header.label' | translate"
 >
   <div class="mx-auto flex w-full max-w-[110rem] items-center gap-3 px-4 py-2.5 md:gap-5 md:px-6">
+    @if (authenticated()) {
+      <!-- The left nav's mobile drawer toggle. Hidden at `md+`, where the nav is a persistent
+           column instead of an overlay, so there is nothing here to toggle. -->
+      <button
+        type="button"
+        class="touch-target inline-flex items-center justify-center rounded-pill px-2 transition-colors duration-1 ease-settle md:hidden"
+        [class]="menuButtonClass()"
+        data-testid="nav-toggle"
+        [attr.aria-label]="'shared.header.menuToggle' | translate"
+        [attr.aria-expanded]="navOpen()"
+        aria-controls="foshol-side-nav"
+        (click)="menuToggle.emit()"
+      >
+        <foshol-icon name="menu" size="md" />
+      </button>
+    }
+
     <!-- Product mark: a leaf whose midrib is a pulse trace — crop, and its health. Links home,
          home being whichever surface this signed-in role owns (WEB-FR-001's HOME_BY_ROLE). -->
     <a
@@ -57,41 +74,9 @@
       <foshol-lang-toggle [tone]="tone()" />
 
       @if (authenticated()) {
-        <div class="hidden min-w-0 flex-col items-end leading-tight sm:flex">
-          <span class="sr-only">{{ 'shared.header.signedInAs' | translate }}</span>
-          <span class="truncate text-sm font-semibold">{{ identity() }}</span>
-          @if (roleKey()) {
-            <span class="truncate text-xs" [class]="mutedClass()">{{ roleKey() | translate }}</span>
-          }
-        </div>
-
-        <!-- Identity carries region, so region sits with identity. Read-only everywhere. -->
-        <foshol-region-chip class="hidden md:inline-flex" [tone]="tone()" />
-
-        <button
-          type="button"
-          class="touch-target inline-flex items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium transition-colors duration-1 ease-settle"
-          [class]="signOutClass()"
-          [attr.aria-label]="'shared.header.signOut' | translate"
-          (click)="signOut()"
-        >
-          <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
-            <path
-              d="M8 3.5H5.2A1.7 1.7 0 0 0 3.5 5.2v9.6A1.7 1.7 0 0 0 5.2 16.5H8"
-              stroke="currentColor"
-              stroke-width="1.7"
-              stroke-linecap="round"
-            />
-            <path
-              d="M12.5 13.5 16 10l-3.5-3.5M16 10H7.5"
-              stroke="currentColor"
-              stroke-width="1.7"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          <span class="hidden md:inline">{{ 'shared.header.signOut' | translate }}</span>
-        </button>
+        <!-- Identity, location and sign-out are one control now — see AccountMenu's own doc
+             comment for why the district chip that used to sit here is gone for good. -->
+        <foshol-account-menu [tone]="tone()" />
       }
     </div>
   </div>

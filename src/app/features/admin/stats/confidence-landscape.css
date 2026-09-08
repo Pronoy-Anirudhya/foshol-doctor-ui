@@ -1,6 +1,10 @@
 /* Every position arrives as a percentage string in --cl-low / --cl-high / --cl-x / --cl-h, set
    from signals, exactly as <foshol-confidence-bar> does it. Nothing here measures geometry, so
-   the drawing is testable in jsdom and can never disagree with the numbers beside it. */
+   the drawing is testable in jsdom and can never disagree with the numbers beside it.
+
+   Light-card palette: a plain `card`, like every other tile on the dashboard — ink text,
+   surface-tinted tracks, no console tones. Dawn marks the low threshold, paddy the high one,
+   consistently across the value pills, the rule lines and their chips. */
 
 :host {
   --cl-plot-h: 11rem;
@@ -11,8 +15,23 @@
 .cl-values {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1.75rem;
+  gap: 0.5rem;
   margin: 0;
+}
+
+.cl-value-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--color-surface-3);
+  background-color: var(--color-surface-1);
+  padding: 0.4rem 0.9rem;
+  border-inline-start: 3px solid var(--color-dawn-600);
+}
+
+.cl-value-pill[data-band='high'] {
+  border-inline-start-color: var(--color-paddy-600);
 }
 
 .cl-values dt {
@@ -20,20 +39,20 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-on-console-muted);
+  color: var(--color-ink-faint);
 }
 
 .cl-values dd {
-  margin: 0.1rem 0 0;
-  font-size: 1.5rem;
+  margin: 0;
+  font-size: 1.375rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.1;
   font-variant-numeric: tabular-nums;
-  color: var(--color-on-console);
+  color: var(--color-ink);
 }
 
 .cl-figure {
-  margin: 1.5rem 0 0;
+  margin: 1.75rem 0 0;
 }
 
 .cl-plot {
@@ -48,10 +67,10 @@
   grid-template-columns: repeat(var(--cl-bins), 1fr);
   align-items: end;
   height: var(--cl-plot-h);
-  border-bottom: 1px solid var(--color-slate-500);
+  border-bottom: 1px solid var(--color-surface-3);
   background-image: repeating-linear-gradient(
     to top,
-    var(--color-slate-500) 0 1px,
+    var(--color-surface-2) 0 1px,
     transparent 1px 25%
   );
 }
@@ -68,21 +87,21 @@
   height: var(--cl-h, 0%);
   /* A bin of 1 stays visible beside a bin of 40; a bin of 0 gets no element at all. */
   min-height: 3px;
-  border-radius: 3px 3px 0 0;
-  background-color: var(--color-paddy-400);
+  border-radius: 4px 4px 0 0;
+  background-image: linear-gradient(180deg, var(--color-paddy-400), var(--color-paddy-600));
   transition: height var(--duration-2) var(--ease-settle);
 }
 
 /* The fullest bin. Lighter AND capped AND named in the caption — three signals, not one. */
 .cl-bar[data-peak] {
-  background-color: var(--color-teal-300);
-  box-shadow: inset 0 3px 0 var(--color-on-console);
+  background-image: linear-gradient(180deg, var(--color-teal-300), var(--color-teal-600));
+  box-shadow: inset 0 3px 0 var(--color-surface-0);
 }
 
 .cl-rug {
   position: relative;
   height: var(--cl-rug-h);
-  margin-top: 0.4rem;
+  margin-top: 0.5rem;
 }
 
 .cl-tick {
@@ -92,7 +111,7 @@
   width: 2px;
   margin-inline-start: -1px;
   border-radius: 1px;
-  background-color: var(--color-slate-200);
+  background-color: var(--color-ink-faint);
 }
 
 .cl-rule {
@@ -101,8 +120,11 @@
   width: var(--cl-rule-w);
   margin-inline-start: calc(var(--cl-rule-w) / -2);
   border-radius: 1px;
-  background-color: var(--color-on-console);
-  box-shadow: 0 0 0 1px var(--color-console-deep);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-ink) 0 4px,
+    transparent 4px 8px
+  );
   pointer-events: none;
 }
 
@@ -116,17 +138,17 @@
 
 .cl-axis {
   position: relative;
-  height: 1.1rem;
-  margin-top: 0.45rem;
+  height: 1.6rem;
+  margin-top: 0.5rem;
   font-size: 0.75rem;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
-  color: var(--color-on-console-muted);
+  color: var(--color-ink-muted);
 }
 
 .cl-end {
   position: absolute;
-  top: 0;
+  top: 0.25rem;
 }
 
 .cl-end[data-end='start'] {
@@ -142,8 +164,6 @@
   top: 0;
   transform: translateX(-50%);
   white-space: nowrap;
-  font-weight: 700;
-  color: var(--color-on-console);
 }
 
 .cl-rule-label[data-threshold='low'] {
@@ -154,67 +174,76 @@
   left: var(--cl-high, 0%);
 }
 
+/* A small pill flag on each threshold rule, coloured to match the value pill above and the
+   legend band it opens — the same fact, in the same colour, in three places on this figure. */
+.cl-rule-chip {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-dawn-600);
+  padding: 0.05rem 0.5rem;
+  font-weight: 700;
+  color: var(--color-ink-invert);
+}
+
+.cl-rule-chip[data-threshold='high'] {
+  background-color: var(--color-paddy-600);
+}
+
 .cl-caption {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1.25rem;
   margin: 0.85rem 0 0;
   font-size: 0.8125rem;
-  color: var(--color-slate-200);
+  color: var(--color-ink-muted);
 }
 
 .cl-peak {
   font-weight: 600;
-  color: var(--color-teal-300);
+  color: var(--color-teal-700);
 }
 
 .cl-empty {
   margin: 0;
-  border: 1px dashed var(--color-slate-500);
+  border: 1px dashed var(--color-surface-3);
   border-radius: var(--radius-card);
   padding: 1.5rem 1rem;
   text-align: center;
   font-size: 0.875rem;
-  color: var(--color-slate-200);
+  color: var(--color-ink-muted);
 }
 
 /* The three bands the two rules cut the scale into. Distinguished by a lightness ladder
-   (slate-500 → paddy-400 → dawn-300), a hatch on the middle band, and the badge's own text and
+   (surface-3 → paddy-400 → dawn-300), a hatch on the middle band, and the badge's own text and
    glyph beside it — never by hue alone, which a deuteranope and a projector both lose. */
 .cl-rail {
   display: flex;
-  height: 0.5rem;
-  margin-top: 1.5rem;
+  height: 0.625rem;
+  margin-top: 1.75rem;
   overflow: hidden;
   border-radius: var(--radius-pill);
-  background-color: var(--color-slate-700);
-}
-
-.cl-rail-seg,
-.cl-swatch {
-  transition: width var(--duration-2) var(--ease-settle);
+  background-color: var(--color-surface-2);
+  box-shadow: inset 0 1px 2px rgb(20 33 27 / 0.12);
 }
 
 .cl-rail-seg {
   height: 100%;
+  transition: width var(--duration-2) var(--ease-settle);
 }
 
-[data-path='UNDETERMINED'] .cl-swatch,
 .cl-rail-seg[data-path='UNDETERMINED'] {
-  background-color: var(--color-slate-500);
+  background-color: var(--color-slate-300);
 }
 
-[data-path='SECONDARY'] .cl-swatch,
 .cl-rail-seg[data-path='SECONDARY'] {
   background-color: var(--color-dawn-300);
   background-image: repeating-linear-gradient(
     135deg,
-    var(--color-console-deep) 0 2px,
+    var(--color-surface-0) 0 2px,
     transparent 2px 6px
   );
 }
 
-[data-path='PRIMARY'] .cl-swatch,
 .cl-rail-seg[data-path='PRIMARY'] {
   background-color: var(--color-paddy-400);
 }
@@ -223,8 +252,8 @@
    component stylesheet would sit outside the breakpoint scale everything else uses. */
 .cl-legend {
   display: grid;
-  gap: 0.5rem;
-  margin: 0.75rem 0 0;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -235,22 +264,37 @@
   align-items: center;
   gap: 0.4rem 0.6rem;
   border-radius: var(--radius-chip);
-  background-color: var(--color-slate-700);
-  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-surface-3);
+  border-inline-start-width: 3px;
+  background-color: var(--color-surface-0);
+  padding: 0.6rem 0.8rem;
+  transition:
+    transform var(--duration-2) var(--ease-settle),
+    box-shadow var(--duration-2) var(--ease-settle);
 }
 
-.cl-swatch {
-  flex: none;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 3px;
+.cl-legend-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.cl-legend-item[data-path='UNDETERMINED'] {
+  border-inline-start-color: var(--color-slate-500);
+}
+
+.cl-legend-item[data-path='SECONDARY'] {
+  border-inline-start-color: var(--color-dawn-600);
+}
+
+.cl-legend-item[data-path='PRIMARY'] {
+  border-inline-start-color: var(--color-paddy-500);
 }
 
 .cl-range,
 .cl-count {
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
-  color: var(--color-ink-invert); /* 4.5:1 on slate-700, gated by check:contrast */
+  color: var(--color-ink);
 }
 
 .cl-count {
@@ -261,11 +305,11 @@
 .cl-note {
   margin: 0.75rem 0 0;
   font-size: 0.8125rem;
-  color: var(--color-on-console-muted);
+  color: var(--color-ink-muted);
 }
 
 .cl-gate {
   margin-top: 1.1rem;
-  border-top: 1px solid var(--color-slate-600);
+  border-top: 1px solid var(--color-surface-3);
   padding-top: 0.9rem;
 }

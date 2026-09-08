@@ -17,11 +17,12 @@
   <p class="sr-only">{{ ariaLabel() }}</p>
 
   <ul class="ofc-list">
-    @for (row of rows(); track row.officerId) {
-      <li class="ofc-row" data-testid="officer-row">
+    @for (row of rows(); track row.officerId; let rank = $index) {
+      <li class="ofc-row" [attr.data-top]="rank < 3 || null" data-testid="officer-row">
         <div class="ofc-head">
+          <span class="ofc-rank" aria-hidden="true">{{ rank + 1 }}</span>
           <!-- Server content: the officer's name exactly as sent, never translated. When the
-               server named nobody the id stands in — ugly, but true (cf. RegionChip). -->
+               server named nobody the id stands in — ugly, but true. -->
           <span class="ofc-name" [class.font-latin]="!row.named" data-testid="officer-name">{{
             row.label
           }}</span>

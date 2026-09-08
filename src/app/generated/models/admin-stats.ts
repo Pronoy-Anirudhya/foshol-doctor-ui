@@ -4,23 +4,36 @@
 import { Thresholds } from '../models/thresholds';
 export interface AdminStats {
   advisoriesPublished?: number;
+  agreementRate?: number | null;
+  agreementSampleSize: number;
 
   /**
    * Advisories with action APPROVED over all published advisories
    */
-  approvalRate: number;
+  approvalRate: number | null;
+  casesLifetime: number;
   casesRejected?: number;
+  casesThisMonth: number;
+  casesThisYear: number;
   casesToday: number;
-  medianReviewSeconds: number | null;
+  confidenceHigh?: number;
+  confidenceLow?: number;
+  medianReviewMinutes?: number | null;
+  medianReviewSeconds?: number | null;
 
   /**
    * Share of published advisories whose diseaseId equals the top-ranked case_candidate with source MODEL. This is the retraining signal.
    */
-  modelOfficerAgreementRate: number | null;
+  modelOfficerAgreementRate?: number | null;
   pathCounts?: {
 'PRIMARY'?: number;
 'SECONDARY'?: number;
 'UNDETERMINED'?: number;
 };
-  thresholds: Thresholds;
+
+  /**
+   * Share of terminal review tasks in the district whose state is REJECTED
+   */
+  rejectionRate?: number | null;
+  thresholds?: Thresholds;
 }

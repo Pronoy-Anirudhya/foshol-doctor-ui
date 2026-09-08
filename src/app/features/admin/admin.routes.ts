@@ -40,6 +40,12 @@ export const adminRoutes: Routes = [
     loadComponent: () => import('./stats/admin-stats-page').then((m) => m.AdminStatsPage),
   },
   {
+    // The case list is its own route, reachable from the left nav, rather than embedded in the
+    // dashboard — a dense filterable table and a stat-tile grid are two different reading modes.
+    path: 'cases',
+    loadComponent: () => import('./cases/admin-cases-page').then((m) => m.AdminCasesPage),
+  },
+  {
     // The KPI drill-down is a SIBLING of the summary rather than a child: it is a whole screen
     // of its own at every width, and nesting it would put a table inside a dashboard on a phone.
     path: 'kpis/breaches',
