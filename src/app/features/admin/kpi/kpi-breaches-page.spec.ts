@@ -151,8 +151,6 @@ describe('KpiBreachesPage', () => {
     expect(section?.textContent).not.toContain('Amina Khatun');
     expect(section?.textContent).not.toContain(adminFragment['admin.kpi.breaches.officerUnnamed'].bn);
     expect(section?.querySelector('[data-testid="resolution-officer"]')).toBeNull();
-    // The heading names the district instead, which is what actually failed.
-    expect(section?.querySelector('foshol-region-chip')).not.toBeNull();
   });
 
   it('names the officer on resolution rows and links both kinds through to the console', async () => {

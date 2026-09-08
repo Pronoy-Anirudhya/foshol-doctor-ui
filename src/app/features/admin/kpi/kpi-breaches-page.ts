@@ -11,7 +11,6 @@ import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
-import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 import { taskPath } from '../../officer/officer-paths';
 import { ADMIN_PATHS } from './admin-paths';
@@ -87,7 +86,6 @@ interface BreachRow {
     DhakaDateTimePipe,
     BackLink,
     PageHeading,
-    RegionChip,
     ErrorPanel,
     EmptyState,
     Spinner,
