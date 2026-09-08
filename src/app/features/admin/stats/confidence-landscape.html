@@ -1,20 +1,20 @@
 <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
   <div class="min-w-0">
-    <h2 class="text-lg font-semibold text-on-console">
+    <h2 class="text-lg font-semibold text-ink">
       {{ 'admin.stats.thresholds.title' | translate }}
     </h2>
-    <p class="mt-1 max-w-prose text-sm text-on-console-muted">
+    <p class="mt-1 max-w-prose text-sm text-ink-muted">
       {{ 'admin.stats.thresholds.subtitle' | translate }}
     </p>
   </div>
 
   <!-- WEB-FR-302 — both values, plainly, as the labelled read-only pair. -->
   <dl class="cl-values">
-    <div>
+    <div class="cl-value-pill" data-band="low">
       <dt>{{ 'admin.stats.thresholds.low' | translate }}</dt>
       <dd data-testid="threshold-low">{{ lowPercent() }}</dd>
     </div>
-    <div>
+    <div class="cl-value-pill" data-band="high">
       <dt>{{ 'admin.stats.thresholds.high' | translate }}</dt>
       <dd data-testid="threshold-high">{{ highPercent() }}</dd>
     </div>
@@ -58,10 +58,10 @@
         <span class="cl-end" data-end="start">{{ startPercent }}</span>
         <span class="cl-end" data-end="finish">{{ endPercent }}</span>
         <span class="cl-rule-label" data-testid="cl-rule-label" data-threshold="low">
-          {{ lowPercent() }}
+          <span class="cl-rule-chip" data-threshold="low">{{ lowPercent() }}</span>
         </span>
         <span class="cl-rule-label" data-testid="cl-rule-label" data-threshold="high">
-          {{ highPercent() }}
+          <span class="cl-rule-chip" data-threshold="high">{{ highPercent() }}</span>
         </span>
       </div>
 
@@ -109,7 +109,6 @@
 <ul class="cl-legend md:grid-cols-3">
   @for (band of bands(); track band.path) {
     <li class="cl-legend-item" [attr.data-path]="band.path" data-testid="cl-band">
-      <span class="cl-swatch" aria-hidden="true"></span>
       <foshol-decision-path-badge [path]="band.path" />
       <span class="cl-range">{{ band.rangeKey | translate: rangeParams() }}</span>
       @if (band.count !== null) {
