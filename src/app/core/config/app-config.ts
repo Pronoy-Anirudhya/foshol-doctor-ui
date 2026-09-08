@@ -73,6 +73,21 @@ export const APP_CONFIG = {
 
   review: {
     claimTtlMs: 900_000, //              foshol.review.claim.ttl (PT15M)
+    /**
+     * The server rejects a larger batch with `400 ERR_BULK_TOO_LARGE`, so the UI stops the
+     * officer at the same number rather than composing a request it knows will be refused.
+     * `WEB-NFR-010` — the server's limit is the one of record; this only shapes the control.
+     */
+    bulkMaxSize: 50, //                  foshol.review.bulk.max-size
+    /**
+     * The two operational clocks are frozen SERVER-side and arrive as instants
+     * (`assignmentDueAt`, `resolutionDueAt`). Nothing here recomputes a due time: the working
+     * calendar is Sunday–Thursday 10:00–17:00 Asia/Dhaka, so "now + 1 hour" is wrong on a
+     * Thursday afternoon and wrong again on a Friday. These are display bands only — how close
+     * to a due instant the countdown starts warning, and nothing else.
+     */
+    kpiWarnMs: 900_000, //               amber at fifteen minutes remaining
+    kpiCriticalMs: 300_000, //           clay at five
     /** Claim countdown presentation. Amber, then clay, each also changing text + glyph. */
     claimWarnMs: 180_000,
     claimCriticalMs: 60_000,
