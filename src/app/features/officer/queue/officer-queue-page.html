@@ -52,6 +52,54 @@
       }
     </div>
 
+    <!-- The state filter is the server's own GetReviewQueue$Params.state; search has no server
+         parameter to ride on and runs client-side over the loaded page — see
+         OfficerQueuePage's own doc comment on filteredRows. -->
+    <div class="mt-4 flex flex-wrap items-center gap-3" data-testid="queue-filters">
+      <label class="sr-only" for="queue-search">{{ 'officer.queue.search.label' | translate }}</label>
+      <div class="relative min-w-0 flex-1 sm:max-w-xs">
+        <svg
+          viewBox="0 0 20 20"
+          class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-faint"
+          aria-hidden="true"
+          fill="none"
+        >
+          <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.6" />
+          <path
+            d="m17 17-3.6-3.6"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
+        </svg>
+        <input
+          id="queue-search"
+          type="search"
+          class="touch-target w-full rounded-xl border border-surface-3 bg-surface-0 py-2 pr-3 pl-9 text-sm text-ink transition-colors duration-1 ease-settle hover:border-slate-600"
+          data-testid="queue-search-input"
+          [placeholder]="'officer.queue.search.placeholder' | translate"
+          [value]="searchText()"
+          (input)="setSearchText($any($event.target).value)"
+        />
+      </div>
+
+      <label class="sr-only" for="queue-state-filter">
+        {{ 'officer.queue.filter.state.label' | translate }}
+      </label>
+      <select
+        id="queue-state-filter"
+        class="touch-target rounded-xl border border-surface-3 bg-surface-0 px-3 text-sm text-ink transition-colors duration-1 ease-settle hover:border-slate-600"
+        data-testid="queue-state-filter"
+        [value]="stateFilter() ?? ''"
+        (change)="setStateFilter($any($event.target).value)"
+      >
+        <option value="">{{ 'officer.queue.filter.state.all' | translate }}</option>
+        @for (state of stateFilterOptions; track state) {
+          <option [value]="state">{{ 'officer.queue.state.' + state | translate }}</option>
+        }
+      </select>
+    </div>
+
     @if (facade.queueProblem(); as problem) {
       <foshol-error-panel class="mt-4 block" [problem]="problem" (retry)="refresh()" />
     }
@@ -64,10 +112,22 @@
         titleKey="officer.queue.empty.title"
         detailKey="officer.queue.empty.detail"
       />
+    } @else if (noMatches()) {
+      <foshol-empty-state
+        class="mt-4"
+        titleKey="officer.queue.noMatches.title"
+        detailKey="officer.queue.noMatches.detail"
+      />
     } @else {
+      @if (searchText().trim().length > 0) {
+        <p class="mt-4 text-sm text-ink-muted" data-testid="queue-filter-count">
+          {{ 'officer.queue.filter.count' | translate: { count: filteredRows().length } }}
+        </p>
+      }
+
       <!-- WEB-UX-032 — stacked cards below md. -->
       <ul class="mt-4 flex flex-col gap-3 list-none p-0 md:hidden" data-testid="queue-cards">
-        @for (view of rows(); track view.row.reviewTaskId) {
+        @for (view of filteredRows(); track view.row.reviewTaskId) {
           <li
             class="card queue-card relative cursor-pointer transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift active:translate-y-0"
             data-testid="queue-card"
@@ -178,7 +238,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (view of rows(); track view.row.reviewTaskId) {
+            @for (view of filteredRows(); track view.row.reviewTaskId) {
               <tr
                 class="relative cursor-pointer"
                 data-testid="queue-row"

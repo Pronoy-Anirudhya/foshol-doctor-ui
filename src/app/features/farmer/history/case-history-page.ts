@@ -48,6 +48,17 @@ interface HistoryRow {
   readonly status: CaseStatus;
 }
 
+/** `WEB-FR-153`'s statuses, in the order the status stepper already uses them elsewhere. */
+const STATUS_FILTER_OPTIONS: readonly CaseStatus[] = [
+  'SUBMITTED',
+  'ANALYSING',
+  'ANALYSED',
+  'IN_REVIEW',
+  'ADVISED',
+  'REJECTED',
+  'FAILED',
+];
+
 @Component({
   selector: 'foshol-case-history-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -81,8 +92,26 @@ export class CaseHistoryPage {
   /** The capture surface owns its own URLs; this page links to them rather than re-typing. */
   protected readonly newCasePath = FARMER_PATHS.newCase;
 
+  /**
+   * Filtering and search happen client-side, over whatever page is loaded: `listMyCases` takes
+   * only `page`/`size` (the OpenAPI contract is frozen — `WEB-API-001` forbids inventing a
+   * `q=` or `status=` parameter it does not define). A filter widens the fetch to the server's
+   * own maximum page size instead, so a search covers far more than the default 20 rows
+   * without asking the server for anything it does not already support.
+   */
+  protected readonly searchText = signal('');
+  protected readonly statusFilter = signal<CaseStatus | ''>('');
+  protected readonly statusFilterOptions = STATUS_FILTER_OPTIONS;
+
+  protected readonly filterActive = computed(
+    () => this.searchText().trim().length > 0 || this.statusFilter() !== '',
+  );
+
   private readonly casesResource = resource({
-    params: () => ({ page: this._page(), size: APP_CONFIG.page.defaultSize }),
+    params: () => ({
+      page: this._page(),
+      size: this.filterActive() ? APP_CONFIG.page.maxSize : APP_CONFIG.page.defaultSize,
+    }),
     loader: async ({ params }) => {
       const page = await this.cases.listMyCases({ page: params.page, size: params.size });
       this._loadedAt.set(Date.now());
@@ -115,6 +144,28 @@ export class CaseHistoryPage {
 
   protected readonly isEmpty = computed(
     () => this.pageValue() !== null && this.rows().length === 0,
+  );
+
+  /**
+   * `WEB-NFR-001` — filtering only ever hides rows, never reorders them: `rows()` above still
+   * maps the server array in place, and this is a plain `.filter` over that same order.
+   */
+  protected readonly filteredRows = computed<readonly HistoryRow[]>(() => {
+    const term = this.searchText().trim().toLowerCase();
+    const status = this.statusFilter();
+    return this.rows().filter((entry) => {
+      if (status !== '' && entry.status !== status) return false;
+      if (term === '') return true;
+      const crop = entry.row.cropNameBn.toLowerCase();
+      const disease = (entry.row.diseaseNameBn ?? '').toLowerCase();
+      return crop.includes(term) || disease.includes(term);
+    });
+  });
+
+  /** Cases exist, but none of them satisfy the current search/filter — distinct from "no cases
+      submitted yet", which `isEmpty` above already covers with its own empty state. */
+  protected readonly noMatches = computed(
+    () => !this.isEmpty() && this.filterActive() && this.filteredRows().length === 0,
   );
   protected readonly pageIndex = computed(() => this.pageValue()?.page ?? FIRST_PAGE);
   protected readonly pageSize = computed(
@@ -160,6 +211,16 @@ export class CaseHistoryPage {
 
   protected goToPage(page: number): void {
     this._page.set(page);
+  }
+
+  protected setSearchText(value: string): void {
+    this.searchText.set(value);
+    this._page.set(FIRST_PAGE);
+  }
+
+  protected setStatusFilter(value: string): void {
+    this.statusFilter.set(value as CaseStatus | '');
+    this._page.set(FIRST_PAGE);
   }
 
   protected reload(): void {

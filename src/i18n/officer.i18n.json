@@ -107,6 +107,22 @@
     "bn": "এই মুহূর্তে পর্যালোচনার অপেক্ষায় কোনো কেস নেই।",
     "en": "No cases are waiting for review right now."
   },
+  "officer.queue.search.label": { "bn": "সারিতে খুঁজুন", "en": "Search the queue" },
+  "officer.queue.search.placeholder": {
+    "bn": "কৃষক, ফসল বা রোগের নাম দিয়ে খুঁজুন",
+    "en": "Search by farmer, crop or disease name"
+  },
+  "officer.queue.filter.state.label": { "bn": "অবস্থা অনুযায়ী ছাঁকুন", "en": "Filter by state" },
+  "officer.queue.filter.state.all": { "bn": "সব অবস্থা", "en": "All states" },
+  "officer.queue.filter.count": {
+    "bn": "{{count}}টি কেস মিলেছে",
+    "en": "{{count}} matching cases"
+  },
+  "officer.queue.noMatches.title": { "bn": "কোনো কেস মেলেনি", "en": "No matching cases" },
+  "officer.queue.noMatches.detail": {
+    "bn": "অন্য নাম দিয়ে খুঁজুন বা অবস্থার ছাঁকনি সরিয়ে দেখুন।",
+    "en": "Try a different search term, or clear the state filter."
+  },
   "officer.queue.state.PENDING": {
     "bn": "অপেক্ষমাণ",
     "en": "Pending"

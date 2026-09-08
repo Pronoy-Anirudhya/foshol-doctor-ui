@@ -91,5 +91,22 @@
     "en": "Photograph from the {{crop}} case"
   },
   "farmer.history.noPhoto": { "bn": "কোনো ছবি নেই", "en": "No photograph" },
-  "farmer.history.backToList": { "bn": "তালিকায় ফিরুন", "en": "Back to the list" }
+  "farmer.history.backToList": { "bn": "তালিকায় ফিরুন", "en": "Back to the list" },
+
+  "farmer.history.search.label": { "bn": "কেস খুঁজুন", "en": "Search your cases" },
+  "farmer.history.search.placeholder": {
+    "bn": "ফসল বা রোগের নাম দিয়ে খুঁজুন",
+    "en": "Search by crop or disease name"
+  },
+  "farmer.history.filter.status.label": { "bn": "অবস্থা অনুযায়ী ছাঁকুন", "en": "Filter by status" },
+  "farmer.history.filter.status.all": { "bn": "সব অবস্থা", "en": "All statuses" },
+  "farmer.history.filter.count": {
+    "bn": "{{count}}টি কেস মিলেছে",
+    "en": "{{count}} matching cases"
+  },
+  "farmer.history.noMatches.title": { "bn": "কোনো কেস মেলেনি", "en": "No matching cases" },
+  "farmer.history.noMatches.detail": {
+    "bn": "অন্য নাম দিয়ে খুঁজুন বা অবস্থার ছাঁকনি সরিয়ে দেখুন।",
+    "en": "Try a different search term, or clear the status filter."
+  }
 }

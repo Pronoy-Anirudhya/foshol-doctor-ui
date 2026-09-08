@@ -42,6 +42,8 @@ import { adaptReviewTask, remedyId, type ReviewTaskSummary } from './review-task
  * `WEB-FR-244` — nothing here retries. A failed action surfaces the server's problem and waits
  * for the officer, because a silent retry of "publish this advisory" is a second advisory.
  */
+const FIRST_PAGE = 0;
+
 export type PublishAction = PublishAdvisoryRequest['action'];
 
 export const ACTION_APPROVED: PublishAction = 'APPROVED';
@@ -123,6 +125,12 @@ export class OfficerFacade {
   /**
    * `WEB-FR-205` — the manual refresh control calls this, and so does `WEB-FR-358` when the
    * stream reconnects after a gap. There is no timer anywhere in this class (`WEB-FR-356`).
+   *
+   * `GetReviewQueue$Params.state` is a real, generated query parameter — filtering by it is
+   * the server doing the filtering, not a client-side approximation of it. `QueueStore` holds
+   * which one is active (WEB-SEC-004: it already clears on sign-out with the rest of the queue
+   * state), so every caller here — this one included — keeps whatever filter is active without
+   * having to pass it through explicitly.
    */
   async loadQueue(page: number = this.queue.page()): Promise<void> {
     this.queue.beginLoad();
@@ -131,6 +139,7 @@ export class OfficerFacade {
       const result = await this.reviewApi.getReviewQueue({
         page,
         size: APP_CONFIG.page.defaultSize,
+        state: this.queue.stateFilter() ?? undefined,
       });
       // WEB-FR-200 — adopted whole, in the server's order. Nothing here sorts.
       this.queue.applyPage(result);
@@ -139,6 +148,13 @@ export class OfficerFacade {
       this.queue.failLoad(problem);
       this._queueProblem.set(problem);
     }
+  }
+
+  /** Changing the filter starts over at the first page — a page index from one filter means
+      nothing under another. */
+  async setStateFilter(state: OfficerQueueRow['state'] | null): Promise<void> {
+    this.queue.setStateFilter(state);
+    await this.loadQueue(FIRST_PAGE);
   }
 
   // ── Workspace ────────────────────────────────────────────────────────────────────────────

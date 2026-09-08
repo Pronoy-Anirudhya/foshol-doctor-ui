@@ -116,6 +116,37 @@ describe('CaseHistoryPage (WEB-FR-153)', () => {
     );
   });
 
+  it('filters the loaded rows by crop or disease name, client-side', async () => {
+    const searchInput = el().querySelector<HTMLInputElement>('[data-testid="case-search-input"]')!;
+    searchInput.value = historyPageJson.content[0]!.diseaseNameBn!;
+    searchInput.dispatchEvent(new Event('input'));
+    // Activating a filter widens the fetch to the server's max page size.
+    await respond((request) => request.url === LIST_URL, historyPageJson);
+
+    expect(rows().length).toBe(1);
+    expect(rows()[0]!.getAttribute('href')).toContain(historyPageJson.content[0]!.caseId);
+  });
+
+  it('filters the loaded rows by status', async () => {
+    const select = el().querySelector<HTMLSelectElement>('[data-testid="case-status-filter"]')!;
+    select.value = 'REJECTED';
+    select.dispatchEvent(new Event('change'));
+    await respond((request) => request.url === LIST_URL, historyPageJson);
+
+    expect(rows().length).toBe(1);
+    expect(rows()[0]!.getAttribute('data-status')).toBe('REJECTED');
+  });
+
+  it('shows a distinct empty state when a search matches nothing', async () => {
+    const searchInput = el().querySelector<HTMLInputElement>('[data-testid="case-search-input"]')!;
+    searchInput.value = 'no such crop or disease exists';
+    searchInput.dispatchEvent(new Event('input'));
+    await respond((request) => request.url === LIST_URL, historyPageJson);
+
+    expect(rows().length).toBe(0);
+    expect(el().querySelector('foshol-empty-state')).not.toBeNull();
+  });
+
   it('patches a row from an SSE frame without asking the server again', async () => {
     const target = historyPageJson.content[2]!;
     expect(rows()[2]!.getAttribute('data-status')).toBe(target.status);
