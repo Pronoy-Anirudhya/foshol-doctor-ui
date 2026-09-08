@@ -66,7 +66,7 @@
       />
     } @else {
       <!-- WEB-UX-032 — stacked cards below md. -->
-      <ul class="cards md:hidden" data-testid="queue-cards">
+      <ul class="mt-4 flex flex-col gap-3 list-none p-0 md:hidden" data-testid="queue-cards">
         @for (view of rows(); track view.row.reviewTaskId) {
           <li
             class="card queue-card"

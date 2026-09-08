@@ -51,14 +51,15 @@
 
 /* ── Cards, below md (WEB-UX-032) ───────────────────────────────────────────────────────── */
 
-.cards {
-  margin-block-start: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  list-style: none;
-  padding: 0;
-}
+/* `display`, spacing and `list-style` for `.cards` live as Tailwind utilities on the `<ul>`
+   itself (`flex flex-col gap-3 list-none p-0 md:hidden`), not here. A component-scoped
+   `.cards { display: flex }` compiles under Angular's emulated encapsulation to
+   `.cards[_ngcontent-x] { display: flex }` — specificity (0,2,0) — which beats the plain
+   Tailwind utility `.md\:hidden { display: none }` (0,1,0) inside its own media query,
+   regardless of viewport width. The desktop table then never got the chance to show: the
+   mobile card list rendered permanently, at every width. Keeping `display` and the
+   breakpoint entirely in the template, where WEB-UX-034 already requires every breakpoint to
+   live, is what makes this class of bug structurally impossible rather than merely fixed once. */
 
 .queue-card {
   padding: 0.9rem 1rem;
