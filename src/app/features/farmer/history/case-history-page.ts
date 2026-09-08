@@ -17,6 +17,7 @@ import type { CaseStatus } from '../../../generated/models/case-status';
 import type { FarmerCaseRow } from '../../../generated/models/farmer-case-row';
 import { CasesService } from '../../../generated/services/cases.service';
 import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
@@ -55,6 +56,7 @@ interface HistoryRow {
     RouterLinkActive,
     RouterOutlet,
     TranslatePipe,
+    BackLink,
     DhakaDateTimePipe,
     EmptyState,
     ErrorPanel,

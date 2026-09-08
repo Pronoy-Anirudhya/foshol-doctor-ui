@@ -56,7 +56,7 @@
           @for (entry of rows(); track entry.row.caseId) {
             <li>
               <a
-                class="flex items-center gap-3 rounded-2xl border border-surface-3 bg-surface-0 p-3 transition-colors duration-1 ease-settle hover:bg-surface-1 hover:shadow-card"
+                class="flex items-center gap-3 rounded-2xl border border-surface-3 bg-surface-0 p-3 transition-all duration-2 ease-settle hover:-translate-y-0.5 hover:bg-surface-1 hover:shadow-lift active:translate-y-0"
                 [routerLink]="[entry.row.caseId]"
                 routerLinkActive="border-paddy-600 bg-paddy-50"
                 [attr.data-status]="entry.status"
@@ -153,21 +153,7 @@
 
     <div class="min-w-0">
       @if (detailOpen()) {
-        <a
-          routerLink="."
-          class="touch-target mb-4 inline-flex items-center gap-2 text-sm font-semibold text-paddy-700 underline xl:hidden"
-        >
-          <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
-            <path
-              d="M10 3.5 5.5 8l4.5 4.5"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          {{ 'farmer.history.backToList' | translate }}
-        </a>
+        <foshol-back-link class="mb-4 block xl:hidden" to="." labelKey="farmer.history.backToList" />
       }
 
       <router-outlet (activate)="setDetailOpen(true)" (deactivate)="setDetailOpen(false)" />

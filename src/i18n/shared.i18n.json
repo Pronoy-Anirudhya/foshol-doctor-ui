@@ -8,7 +8,7 @@
   "shared.header.role.FARMER": { "bn": "কৃষক", "en": "Farmer" },
   "shared.header.role.OFFICER": { "bn": "মাঠ কর্মকর্তা", "en": "Field officer" },
   "shared.header.role.ADMIN": { "bn": "প্রশাসক", "en": "Administrator" },
-  "shared.brand.alt": { "bn": "ফসল ডক্টর প্রতীক", "en": "Foshol Doctor mark" },
+  "shared.brand.homeAria": { "bn": "হোমে যান — ফসল ডক্টর", "en": "Go to home — Foshol Doctor" },
 
   "shared.sse.OPEN": { "bn": "সরাসরি", "en": "Live" },
   "shared.sse.CONNECTING": { "bn": "সংযোগ হচ্ছে…", "en": "Connecting…" },

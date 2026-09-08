@@ -27,6 +27,10 @@
     "bn": "লাইভ ক্যামেরা ভিউ",
     "en": "Live camera view"
   },
+  "farmer.capture.crop.backToCases": {
+    "bn": "আপনার কেসগুলোতে ফিরুন",
+    "en": "Back to your cases"
+  },
   "farmer.capture.crop.continue": {
     "bn": "এগিয়ে যান",
     "en": "Continue"
@@ -66,6 +70,10 @@
   "farmer.capture.describe.stepTitle": {
     "bn": "সমস্যাটি জানান",
     "en": "Describe the problem"
+  },
+  "farmer.capture.backToCrop": {
+    "bn": "ফসল বাছাইয়ে ফিরুন",
+    "en": "Back to crop selection"
   },
   "farmer.capture.eyebrow": {
     "bn": "নতুন কেস",

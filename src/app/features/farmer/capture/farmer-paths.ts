@@ -1,5 +1,5 @@
 /**
- * The three farmer URLs this surface navigates between.
+ * The farmer URLs this surface navigates between.
  *
  * `farmer.routes.ts` is owned by another agent (`OWNERS.md`), so these paths are declared —
  * not routed — here, and named so a mismatch is a compile-time grep rather than a dead link
@@ -7,6 +7,8 @@
  * which is a different thing entirely.
  */
 export const FARMER_PATHS = {
+  /** The case list — also where the crop picker's and capture screen's back links return to. */
+  casesList: '/farmer/cases',
   /** The crop picker — the start of a new case. */
   newCase: '/farmer/new',
   /** The capture screen: crop, photographs, voice, note (`WEB-FR-100`…`150`). */

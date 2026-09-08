@@ -16,6 +16,7 @@ import { CaseDraftStore, IMAGE_LIMIT_KEY } from '../../../core/stores/case-draft
 import { newUuid } from '../../../core/util/uuid';
 import { CasesService } from '../../../generated/services/cases.service';
 import { KnowledgeService } from '../../../generated/services/knowledge.service';
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
@@ -83,9 +84,16 @@ const SKELETON_TILES = 3;
     Spinner,
     TranslatePipe,
     VoicePanel,
+    BackLink,
   ],
   template: `
     <div class="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 md:pt-10 xl:max-w-4xl">
+      <foshol-back-link
+        class="mb-4 block"
+        [to]="newCasePath"
+        labelKey="farmer.capture.backToCrop"
+      />
+
       <foshol-page-heading
         eyebrowKey="farmer.capture.eyebrow"
         titleKey="farmer.capture.title"
@@ -340,12 +348,17 @@ const SKELETON_TILES = 3;
       box-shadow: var(--shadow-card);
       transition:
         background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
+        box-shadow var(--duration-2) var(--ease-settle),
+        transform var(--duration-1) var(--ease-settle);
     }
 
     .submit:hover:not(:disabled) {
       background: var(--color-paddy-700);
       box-shadow: var(--shadow-lift);
+    }
+
+    .submit:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .submit:disabled {
@@ -365,6 +378,7 @@ export class CapturePage {
 
   protected readonly draft = inject(CaseDraftStore);
 
+  protected readonly newCasePath = FARMER_PATHS.newCase;
   protected readonly acceptTypes = APP_CONFIG.intake.allowedImageTypes.join(',');
   protected readonly maxImages = APP_CONFIG.intake.maxImages;
   protected readonly minImages = APP_CONFIG.intake.minImages;
