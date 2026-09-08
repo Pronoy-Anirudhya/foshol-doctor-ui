@@ -19,6 +19,14 @@ export interface SubmitCase$Params {
  * Set when resubmitting after a rejection
  */
 'parentCaseId'?: string;
+
+/**
+ * Farmer-reported field area (required for FO dose context)
+ */
+'fieldArea': number;
+'fieldAreaUnit': 'DECIMAL' | 'SQ_M' | 'SQ_FT' | 'HECTARE' | 'ACRE';
+'cropQuantity'?: number | null;
+'cropQuantityUnit'?: ('KG' | 'TON' | 'PLANTS' | 'BIGHAS_EQUIV') | null;
 'images': Array<Blob>;
 'audio'?: Blob;
 }
