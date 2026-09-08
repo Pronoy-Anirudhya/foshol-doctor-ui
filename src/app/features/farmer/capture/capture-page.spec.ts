@@ -107,11 +107,15 @@ describe('CapturePage — local quality gate (WEB-TEST-002, WEB-FR-120…125)', 
     return el().querySelector('[data-testid="quality-override"]');
   }
 
-  it('renders crops as icon tiles and NO <select> anywhere (AC-02, WEB-FR-100)', async () => {
+  it('renders crops as icon tiles and NO <select> in the crop step (AC-02, WEB-FR-100)', async () => {
     await setUp([passingImage()]);
 
     expect(el().querySelectorAll('[data-testid="crop-tile"]').length).toBe(crops.length);
-    expect(el().querySelector('select')).toBeNull();
+    // Scoped to the crop step: the field-metrics step below owns two unit dropdowns, and
+    // AC-02 is about how a CROP is chosen, not about the word `select` appearing on the page.
+    const cropStep = el().querySelector('[aria-labelledby="step-crop"]');
+    expect(cropStep).not.toBeNull();
+    expect(cropStep!.querySelector('select')).toBeNull();
     expect(el().querySelector('[role="radiogroup"]')).not.toBeNull();
   });
 
@@ -237,6 +241,8 @@ describe('CapturePage — local quality gate (WEB-TEST-002, WEB-FR-120…125)', 
   });
 });
 
+const FIELD_AREA = 2;
+
 describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
   let fixture: ComponentFixture<CapturePage>;
   let http: HttpTestingController;
@@ -273,6 +279,11 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     input!.dispatchEvent(new Event('change'));
     await new Promise((resolve) => setTimeout(resolve));
     await fixture.whenStable();
+
+    // Required by the multipart contract; without it the button never enables.
+    draft.setFieldArea(FIELD_AREA);
+    fixture.detectChanges();
+    await fixture.whenStable();
   }
 
   afterEach(() => {
@@ -298,8 +309,65 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     const body = request.request.body as FormData;
     expect(body.get('cropId')).toBe(crops[0]!.id);
     expect(body.getAll('images').length).toBe(1);
+    // The two parts the server now requires, and the optional pair left off entirely.
+    expect(body.get('fieldArea')).toBe(String(FIELD_AREA));
+    expect(body.get('fieldAreaUnit')).toBe(APP_CONFIG.intake.metrics.defaultFieldAreaUnit);
+    expect(body.has('cropQuantity')).toBe(false);
+    expect(body.has('cropQuantityUnit')).toBe(false);
     // WEB-DATA-005 — the key was minted for this attempt, not before the content settled.
     expect(key).toBeNull();
+
+    request.flush({ caseId: CASE_ID, status: 'SUBMITTED' }, { status: 202, statusText: 'Accepted' });
+    await fixture.whenStable();
+  });
+
+  it('refuses to send without a field area, and says why', async () => {
+    await setUpWithOneImage();
+    draft.setFieldArea(null);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(submitButton().disabled).toBe(true);
+    submitButton().click();
+    await fixture.whenStable();
+
+    // Nothing left for the server to reject: the 400 is prevented, not handled.
+    expect(http.match(SUBMIT_URL)).toEqual([]);
+
+    const hint = (fixture.nativeElement as HTMLElement).querySelector(
+      '[data-testid="capture-submit-hint"]',
+    );
+    expect(hint?.textContent?.trim()).toBe(BN_CATALOGUE['farmer.capture.submit.needArea']);
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[data-testid="field-area-error"]'),
+    ).not.toBeNull();
+  });
+
+  it('sends the optional crop quantity only when both the number and its unit are given', async () => {
+    await setUpWithOneImage();
+    // A number without a unit is not a quantity the server can use, so neither part goes.
+    draft.setCropQuantity(40);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    submitButton().click();
+    await fixture.whenStable();
+    const withoutUnit = http.expectOne(SUBMIT_URL);
+    expect((withoutUnit.request.body as FormData).has('cropQuantity')).toBe(false);
+    withoutUnit.flush(null, { status: 0, statusText: 'Network error' });
+    await new Promise((resolve) => setTimeout(resolve));
+    await fixture.whenStable();
+
+    draft.setCropQuantityUnit('KG');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    submitButton().click();
+    await fixture.whenStable();
+    const request = http.expectOne(SUBMIT_URL);
+    const body = request.request.body as FormData;
+    expect(body.get('cropQuantity')).toBe('40');
+    expect(body.get('cropQuantityUnit')).toBe('KG');
 
     request.flush({ caseId: CASE_ID, status: 'SUBMITTED' }, { status: 202, statusText: 'Accepted' });
     await fixture.whenStable();

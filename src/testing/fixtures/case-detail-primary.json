@@ -6,6 +6,11 @@
   "decisionPath": null,
   "noteBn": "[noteBn]",
   "parentCaseId": null,
+  "fieldArea": 2,
+  "fieldAreaUnit": "DECIMAL",
+  "cropQuantity": null,
+  "cropQuantityUnit": null,
+  "metricsSource": "FORM",
   "images": [
     {
       "imageId": "01a07ca3-bb8a-7ab0-9b90-0843b615b56b",

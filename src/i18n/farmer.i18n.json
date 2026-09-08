@@ -25,6 +25,9 @@
     "en": "Photograph {{position}} that you submitted"
   },
   "farmer.status.yourNote": { "bn": "আপনার লেখা", "en": "Your note" },
+  "farmer.status.yourField": { "bn": "আপনার জমির তথ্য", "en": "Your field details" },
+  "farmer.status.fieldArea": { "bn": "জমির পরিমাণ", "en": "Field area" },
+  "farmer.status.cropQuantity": { "bn": "ফসলের পরিমাণ", "en": "Crop quantity" },
 
   "farmer.advisory.eyebrow": { "bn": "যাচাই করা পরামর্শ", "en": "Verified advice" },
   "farmer.advisory.verifiedEyebrow": { "bn": "যাচাই করেছেন", "en": "Verified by" },
