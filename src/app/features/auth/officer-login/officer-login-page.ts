@@ -54,6 +54,7 @@ import { ProblemNotice } from '../shared/problem-notice';
               formControlName="username"
               [attr.aria-invalid]="usernameInvalid() ? 'true' : null"
               [attr.aria-errormessage]="usernameInvalid() ? 'username-error' : null"
+              (input)="usernameSubmitted.set(false)"
             />
             @if (usernameInvalid()) {
               <p id="username-error" class="field-error">
@@ -76,6 +77,7 @@ import { ProblemNotice } from '../shared/problem-notice';
                 formControlName="password"
                 [attr.aria-invalid]="passwordInvalid() ? 'true' : null"
                 [attr.aria-errormessage]="passwordInvalid() ? 'password-error' : null"
+                (input)="passwordSubmitted.set(false)"
               />
               <button
                 type="button"
@@ -242,19 +244,21 @@ export class OfficerLoginPage {
     password: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
 
-  private readonly submitted = signal(false);
+  protected readonly usernameSubmitted = signal(false);
+  protected readonly passwordSubmitted = signal(false);
   private readonly usernameInputRef = viewChild<ElementRef<HTMLInputElement>>('usernameInput');
   private readonly passwordInputRef = viewChild<ElementRef<HTMLInputElement>>('passwordInput');
 
   protected readonly usernameInvalid = computed(
-    () => this.submitted() && this.form.controls.username.invalid,
+    () => this.usernameSubmitted() && this.form.controls.username.invalid,
   );
   protected readonly passwordInvalid = computed(
-    () => this.submitted() && this.form.controls.password.invalid,
+    () => this.passwordSubmitted() && this.form.controls.password.invalid,
   );
 
   protected async submit(): Promise<void> {
-    this.submitted.set(true);
+    this.usernameSubmitted.set(true);
+    this.passwordSubmitted.set(true);
     if (this.form.invalid) {
       // First red field wins the focus — username precedes password on screen.
       const target = this.form.controls.username.invalid
@@ -274,6 +278,7 @@ export class OfficerLoginPage {
 
     const seeded = account === 'admin' ? DEMO_ACCOUNTS.admin : DEMO_ACCOUNTS.officer;
     this.form.setValue(seeded);
-    this.submitted.set(false);
+    this.usernameSubmitted.set(false);
+    this.passwordSubmitted.set(false);
   }
 }

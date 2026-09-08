@@ -267,12 +267,14 @@ export class CaseWorkspacePage {
   }
 
   protected setRejectReason(event: Event): void {
+    this.rejectAttempted.set(false);
     const target = event.target as HTMLSelectElement;
     const value = target.value;
     this.rejectReason.set(REJECTION_REASONS.find((reason) => reason === value) ?? null);
   }
 
   protected setRejectMessage(event: Event): void {
+    this.rejectAttempted.set(false);
     this.rejectMessage.set((event.target as HTMLTextAreaElement).value);
   }
 
