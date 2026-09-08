@@ -10,7 +10,11 @@
       eyebrowKey="officer.queue.eyebrow"
       titleKey="officer.queue.title"
       subtitleKey="officer.queue.subtitle"
-    />
+    >
+      <!-- The queue is district-scoped on the server. Saying which district turns an empty
+           queue from a suspected bug into a fact about this officer's patch. -->
+      <foshol-region-chip />
+    </foshol-page-heading>
 
     <!-- WEB-FR-202 — the sentence the queue exists to make visible, adjacent to the table and
          in the reading path. Not a footnote, not a tooltip. -->

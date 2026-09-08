@@ -104,8 +104,8 @@
     "en": "The queue is empty"
   },
   "officer.queue.empty.detail": {
-    "bn": "এই মুহূর্তে পর্যালোচনার অপেক্ষায় কোনো কেস নেই।",
-    "en": "No cases are waiting for review right now."
+    "bn": "আপনার জেলায় এই মুহূর্তে পর্যালোচনার অপেক্ষায় কোনো কেস নেই। আপনি নিজের জেলার কেসগুলোই দেখেন — উপরে জেলার নাম দেওয়া আছে।",
+    "en": "No cases are waiting for review in your district right now. You see your own district's cases; it is named above."
   },
   "officer.queue.search.label": { "bn": "সারিতে খুঁজুন", "en": "Search the queue" },
   "officer.queue.search.placeholder": {

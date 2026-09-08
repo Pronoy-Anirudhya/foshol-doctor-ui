@@ -19,6 +19,7 @@ import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Icon } from '../../../shared/ui/icon/icon';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
+import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { OfficerFacade } from '../officer-facade';
@@ -66,6 +67,7 @@ const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
     ErrorPanel,
     Icon,
     PageHeading,
+    RegionChip,
     Paginator,
     Percent1Pipe,
     RouterLink,

@@ -11,6 +11,7 @@ import { Percent1Pipe } from '../../../shared/pipes/percent1.pipe';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
+import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 import { toAdminStatsView } from '../admin-stats.adapter';
@@ -67,6 +68,7 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
     DhakaDateTimePipe,
     Percent1Pipe,
     PageHeading,
+    RegionChip,
     ErrorPanel,
     EmptyState,
     Spinner,
@@ -93,6 +95,11 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
         data-testid="read-only-chip"
         >{{ 'admin.stats.readOnly' | translate }}</span
       >
+
+      <!-- Every figure below is this admin's district only — the server scopes them from the
+           JWT and there is no national view. An unlabelled number would read as a national
+           one, so the district is named rather than filtered for. -->
+      <foshol-region-chip />
 
       <!-- WEB-FR-304 — the manual refresh. Two GETs, on a press, and nothing else. -->
       <button
