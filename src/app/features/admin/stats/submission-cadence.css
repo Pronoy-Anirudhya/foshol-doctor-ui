@@ -1,0 +1,89 @@
+/* The dots are positioned from --sc-x / --sc-y, percentage strings computed from signals. The
+   SVG holds only the polyline, because preserveAspectRatio="none" distorts everything else. */
+
+:host {
+  --sc-plot-h: 5.5rem;
+  --sc-dot: 7px;
+}
+
+.sc-figure {
+  margin: 1.25rem 0 0;
+}
+
+.sc-plot {
+  position: relative;
+  height: var(--sc-plot-h);
+  border-bottom: 1px solid var(--color-surface-3);
+}
+
+.sc-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sc-area {
+  fill: var(--color-accent-soft);
+}
+
+.sc-line {
+  fill: none;
+  stroke: var(--color-accent); /* 5.2:1 on surface-0, gated as the sparkline stroke */
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.sc-dot {
+  position: absolute;
+  left: var(--sc-x, 0%);
+  top: var(--sc-y, 0%);
+  width: var(--sc-dot);
+  height: var(--sc-dot);
+  margin: calc(var(--sc-dot) / -2);
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--color-surface-0);
+  background-color: var(--color-accent);
+}
+
+/* The busiest bucket: larger, ringed, and named with its count in the caption. */
+.sc-dot[data-peak] {
+  --sc-dot: 11px;
+  border-color: var(--color-surface-0);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.sc-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-faint);
+}
+
+.sc-empty {
+  margin: 0;
+  border: 1px dashed var(--color-surface-3);
+  border-radius: var(--radius-card);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+}
+
+.sc-caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.25rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+}
+
+.sc-peak {
+  font-weight: 600;
+  color: var(--color-accent); /* 5.2:1 on surface-0 — gated, and above the 4.5 text floor */
+}
