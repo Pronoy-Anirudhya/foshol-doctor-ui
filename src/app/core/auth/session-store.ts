@@ -4,6 +4,20 @@ import { APP_CONFIG } from '../config/app-config';
 import { roleFromToken, type Role } from './jwt';
 
 /**
+ * The principal's geography, as the server reported it. Codes are authoritative; the names are
+ * nullable on the contract, so every consumer must be able to fall back to the code rather than
+ * inventing a label — this application does not carry a district list of its own.
+ */
+export interface PrincipalRegion {
+  readonly districtCode: string | null;
+  readonly divisionCode: string | null;
+  readonly districtNameBn: string | null;
+  readonly districtNameEn: string | null;
+  readonly divisionNameBn: string | null;
+  readonly divisionNameEn: string | null;
+}
+
+/**
  * WEB-SEC-001 — the JWT lives in a private signal in memory and NOWHERE else: not
  * localStorage, not sessionStorage, not IndexedDB, not a cookie, not the URL, not the document
  * title, not a log statement.
@@ -29,6 +43,29 @@ export class SessionStore {
   readonly principal = this._principal.asReadonly();
   readonly expiresAt = this._expiresAt.asReadonly();
   readonly intendedUrl = this._intendedUrl.asReadonly();
+
+  /**
+   * Region is an identity attribute, not something the UI collects. The server snapshots the
+   * farmer's division and district onto the case at submit and scopes every officer and admin
+   * read to their own district, so the only honest source for it is the principal — never a
+   * picker, never a URL, never a second store. `null` when the server sent no district at all,
+   * so a caller renders nothing rather than an empty chip.
+   */
+  readonly region = computed<PrincipalRegion | null>(() => {
+    const principal = this._principal();
+    if (principal === undefined || principal === null) return null;
+    const districtCode = principal.districtCode ?? null;
+    const divisionCode = principal.divisionCode ?? null;
+    if (districtCode === null && divisionCode === null) return null;
+    return {
+      districtCode,
+      divisionCode,
+      districtNameBn: principal.districtNameBn ?? null,
+      districtNameEn: principal.districtNameEn ?? null,
+      divisionNameBn: principal.divisionNameBn ?? null,
+      divisionNameEn: principal.divisionNameEn ?? null,
+    };
+  });
 
   readonly isAuthenticated = computed(() => this.#token() !== null);
   readonly role = computed<Role | null>(() => this._principal()?.role ?? null);

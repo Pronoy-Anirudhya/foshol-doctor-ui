@@ -9,6 +9,10 @@
   "shared.header.role.OFFICER": { "bn": "মাঠ কর্মকর্তা", "en": "Field officer" },
   "shared.header.role.ADMIN": { "bn": "প্রশাসক", "en": "Administrator" },
   "shared.brand.homeAria": { "bn": "হোমে যান — ফসল ডক্টর", "en": "Go to home — Foshol Doctor" },
+  "shared.region.aria": {
+    "bn": "আপনার নিবন্ধিত এলাকা",
+    "en": "Your registered region"
+  },
 
   "shared.sse.OPEN": { "bn": "সরাসরি", "en": "Live" },
   "shared.sse.CONNECTING": { "bn": "সংযোগ হচ্ছে…", "en": "Connecting…" },
