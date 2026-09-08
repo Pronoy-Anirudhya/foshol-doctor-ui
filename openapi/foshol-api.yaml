@@ -1,0 +1,965 @@
+# Foshol Doctor — FROZEN API contract.
+# Owned by agent A1. Frozen at Day 0, before any other agent starts.
+# The Angular client in web/src/app/generated/ is generated from this file by ng-openapi-gen
+# and is never hand-edited (COMMON-NFR-043).
+# A backend endpoint that does not match this file is a Definition-of-Done failure (00-common §11.7).
+openapi: 3.0.3
+
+info:
+  title: Foshol Doctor API
+  version: 1.0.0
+  description: >
+    Crop-disease advisory for rice, tomato and potato. Every case, on every decision path,
+    is reviewed by a human field officer before any advice reaches the farmer.
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+tags:
+  - name: auth
+  - name: knowledge
+  - name: cases
+  - name: analysis
+  - name: review
+  - name: admin
+  - name: stream
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  # ── auth ──────────────────────────────────────────────────────────────────
+  /api/v1/auth/otp/request:
+    post:
+      tags: [auth]
+      operationId: requestOtp
+      security: []
+      summary: Request an OTP for a farmer phone number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OtpRequest' }
+      responses:
+        '202': { description: Accepted; a challenge was created if the phone is known }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /api/v1/auth/otp/verify:
+    post:
+      tags: [auth]
+      operationId: verifyOtp
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OtpVerifyRequest' }
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/v1/auth/officer/login:
+    post:
+      tags: [auth]
+      operationId: officerLogin
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OfficerLoginRequest' }
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/v1/me:
+    get:
+      tags: [auth]
+      operationId: getCurrentPrincipal
+      responses:
+        '200':
+          description: The authenticated principal
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Principal' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # ── knowledge ─────────────────────────────────────────────────────────────
+  /api/v1/crops:
+    get:
+      tags: [knowledge]
+      operationId: listCrops
+      responses:
+        '200':
+          description: All crops in scope
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Crop' }
+
+  /api/v1/crops/{cropId}/diseases:
+    get:
+      tags: [knowledge]
+      operationId: listDiseasesByCrop
+      parameters: [ { $ref: '#/components/parameters/CropId' } ]
+      responses:
+        '200':
+          description: Diseases for the crop
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Disease' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/diseases/{diseaseId}:
+    get:
+      tags: [knowledge]
+      operationId: getDisease
+      parameters: [ { $ref: '#/components/parameters/DiseaseId' } ]
+      responses:
+        '200':
+          description: Disease
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Disease' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/diseases/{diseaseId}/remedies:
+    get:
+      tags: [knowledge]
+      operationId: listRemedies
+      parameters: [ { $ref: '#/components/parameters/DiseaseId' } ]
+      responses:
+        '200':
+          description: Active remedies, ordered
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Remedy' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/symptoms:
+    get:
+      tags: [knowledge]
+      operationId: listSymptoms
+      responses:
+        '200':
+          description: The full symptom taxonomy
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SymptomRef' }
+
+  # ── cases ─────────────────────────────────────────────────────────────────
+  /api/v1/cases:
+    post:
+      tags: [cases]
+      operationId: submitCase
+      summary: Submit a diagnosis case (role FARMER)
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [cropId, images]
+              properties:
+                cropId: { type: string, format: uuid }
+                noteBn: { type: string, maxLength: 2000 }
+                parentCaseId: { type: string, format: uuid, description: Set when resubmitting after a rejection }
+                images:
+                  type: array
+                  minItems: 1
+                  maxItems: 3
+                  items: { type: string, format: binary }
+                audio: { type: string, format: binary }
+      responses:
+        '202':
+          description: Accepted for analysis
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaseAccepted' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422':
+          description: An image failed the local quality gate; nothing was stored
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/QualityGateProblem' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    get:
+      tags: [cases]
+      operationId: listMyCases
+      summary: The authenticated farmer's case history (role FARMER)
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Size' }
+      responses:
+        '200':
+          description: Page of case history rows
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PageOfFarmerCaseRow' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/v1/cases/{caseId}:
+    get:
+      tags: [cases]
+      operationId: getCase
+      parameters: [ { $ref: '#/components/parameters/CaseId' } ]
+      responses:
+        '200':
+          description: Case detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaseDetail' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/cases/{caseId}/images/{imageId}/content:
+    get:
+      tags: [cases]
+      operationId: getCaseImage
+      description: >
+        Redirects to a presigned object URL valid for foshol.storage.presign-ttl.
+        Returns 404, never 403, for a case belonging to another farmer.
+      parameters:
+        - { $ref: '#/components/parameters/CaseId' }
+        - name: imageId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: variant
+          in: query
+          required: false
+          schema: { type: string, enum: [ORIGINAL, DERIVATIVE], default: DERIVATIVE }
+      responses:
+        '302': { description: Redirect to the presigned URL }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/cases/{caseId}/analysis:
+    get:
+      tags: [analysis]
+      operationId: getCaseAnalysis
+      parameters: [ { $ref: '#/components/parameters/CaseId' } ]
+      responses:
+        '200':
+          description: >
+            Analysis detail. The only endpoint permitted to expose raw model label
+            strings (COMMON-DATA-016).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnalysisDetail' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/cases/{caseId}/gradcam:
+    get:
+      tags: [analysis]
+      operationId: getCaseGradcam
+      parameters: [ { $ref: '#/components/parameters/CaseId' } ]
+      responses:
+        '302': { description: Redirect to the presigned overlay PNG }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: No overlay exists for this case }
+
+  /api/v1/cases/{caseId}/advisory:
+    get:
+      tags: [review]
+      operationId: getCaseAdvisory
+      parameters: [ { $ref: '#/components/parameters/CaseId' } ]
+      responses:
+        '200':
+          description: The current published advisory
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Advisory' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/cases/{caseId}/advisories:
+    get:
+      tags: [review]
+      operationId: getAdvisoryHistory
+      description: Every version of the advisory, newest first. Prior versions are retained.
+      parameters: [ { $ref: '#/components/parameters/CaseId' } ]
+      responses:
+        '200':
+          description: Advisory version history
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Advisory' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── review ────────────────────────────────────────────────────────────────
+  /api/v1/review/queue:
+    get:
+      tags: [review]
+      operationId: getReviewQueue
+      summary: Officer queue, ordered least-confident first (role OFFICER, ADMIN)
+      description: >
+        Ordering is fixed by the server (state, top_confidence ASC NULLS FIRST, submitted_at ASC)
+        and is not client-controllable.
+      parameters:
+        - name: state
+          in: query
+          required: false
+          schema: { type: string, enum: [PENDING, CLAIMED, DONE, REJECTED] }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Size' }
+      responses:
+        '200':
+          description: Page of queue rows
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PageOfOfficerQueueRow' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/review/tasks/{taskId}:
+    get:
+      tags: [review]
+      operationId: getReviewTask
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      responses:
+        '200':
+          description: Everything the officer needs to decide
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReviewCaseDetail' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/v1/review/tasks/{taskId}/claim:
+    post:
+      tags: [review]
+      operationId: claimReviewTask
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      responses:
+        '200':
+          description: Claimed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReviewTask' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/review/tasks/{taskId}/release:
+    post:
+      tags: [review]
+      operationId: releaseReviewTask
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      responses:
+        '200':
+          description: Returned to the pool
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReviewTask' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/review/tasks/{taskId}/symptoms:
+    post:
+      tags: [review]
+      operationId: recordOfficerSymptoms
+      description: Officer-observed symptoms; recorded with source OFFICER.
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [symptomIds]
+              properties:
+                symptomIds:
+                  type: array
+                  items: { type: string, format: uuid }
+      responses:
+        '204': { description: Recorded }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/review/tasks/{taskId}/approve:
+    post:
+      tags: [review]
+      operationId: publishAdvisory
+      summary: Approve, edit or replace, and publish the advisory
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublishAdvisoryRequest' }
+      responses:
+        '201':
+          description: Advisory published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Advisory' }
+          headers:
+            Location: { schema: { type: string } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/review/tasks/{taskId}/reject:
+    post:
+      tags: [review]
+      operationId: rejectCase
+      description: Terminal. The farmer is invited to submit a new case linked by parentCaseId.
+      parameters: [ { $ref: '#/components/parameters/TaskId' } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RejectCaseRequest' }
+      responses:
+        '200':
+          description: Rejected
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Rejection' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/v1/advisories/{advisoryId}/revise:
+    post:
+      tags: [review]
+      operationId: reviseAdvisory
+      description: >
+        Append-only. Creates a new advisory version superseding this one; the prior version is
+        retained and the farmer is notified again.
+      parameters:
+        - name: advisoryId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublishAdvisoryRequest' }
+      responses:
+        '201':
+          description: New advisory version published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Advisory' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  # ── admin ─────────────────────────────────────────────────────────────────
+  /api/v1/admin/stats:
+    get:
+      tags: [admin]
+      operationId: getAdminStats
+      summary: Read-only stats strip (role ADMIN)
+      responses:
+        '200':
+          description: Stats
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminStats' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  # ── stream ────────────────────────────────────────────────────────────────
+  /api/v1/stream:
+    get:
+      tags: [stream]
+      operationId: openEventStream
+      summary: Server-sent events for the authenticated principal
+      description: >
+        Farmers receive events for their own cases only; officers receive queue events.
+        Event names are CASE_STATUS_CHANGED, ADVISORY_PUBLISHED, ADVISORY_REVISED,
+        CASE_REJECTED and QUEUE_CHANGED.
+      parameters:
+        - name: Last-Event-ID
+          in: header
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: An open event stream
+          content:
+            text/event-stream:
+              schema: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    CaseId:    { name: caseId,    in: path, required: true, schema: { type: string, format: uuid } }
+    CropId:    { name: cropId,    in: path, required: true, schema: { type: string, format: uuid } }
+    DiseaseId: { name: diseaseId, in: path, required: true, schema: { type: string, format: uuid } }
+    TaskId:    { name: taskId,    in: path, required: true, schema: { type: string, format: uuid } }
+    Page:      { name: page, in: query, required: false, schema: { type: integer, minimum: 0, default: 0 } }
+    Size:      { name: size, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+
+  responses:
+    BadRequest:
+      description: Validation failure
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    Unauthorized:
+      description: Missing or invalid credentials
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    Forbidden:
+      description: Authenticated but not permitted
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    NotFound:
+      description: Unknown, or not visible to this caller
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    Conflict:
+      description: Illegal state transition, or idempotency key reused with a different body
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    PayloadTooLarge:
+      description: Upload exceeds the configured limit
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    UnsupportedMediaType:
+      description: Detected content type is not allowed
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+    ServiceUnavailable:
+      description: A required downstream is unavailable
+      content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+
+  schemas:
+
+    Problem:
+      type: object
+      description: RFC 9457 problem details (COMMON-API-002)
+      required: [type, title, status, code, correlationId]
+      properties:
+        type:          { type: string, format: uri }
+        title:         { type: string }
+        status:        { type: integer }
+        detail:        { type: string }
+        instance:      { type: string }
+        code:          { type: string, description: A constant from common.ErrorCodes }
+        correlationId: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:   { type: string }
+              message: { type: string }
+
+    QualityGateProblem:
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          properties:
+            rejectedImages:
+              type: array
+              items:
+                type: object
+                properties:
+                  position: { type: integer }
+                  reason:
+                    type: string
+                    enum: [BLURRY, UNDEREXPOSED, OVEREXPOSED, TOO_SMALL, UNREADABLE]
+                  messageBn: { type: string }
+
+    OtpRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone: { type: string, description: E.164, never echoed back or logged }
+
+    OtpVerifyRequest:
+      type: object
+      required: [phone, code]
+      properties:
+        phone: { type: string }
+        code:  { type: string, minLength: 6, maxLength: 6 }
+
+    OfficerLoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+
+    AuthResponse:
+      type: object
+      required: [token, expiresAt, principal]
+      properties:
+        token:     { type: string }
+        expiresAt: { type: string, format: date-time }
+        principal: { $ref: '#/components/schemas/Principal' }
+
+    Principal:
+      type: object
+      required: [id, name, role]
+      properties:
+        id:                { type: string, format: uuid }
+        name:              { type: string }
+        role:              { type: string, enum: [FARMER, OFFICER, ADMIN] }
+        districtCode:      { type: string }
+        preferredLanguage: { type: string, enum: [bn, en] }
+
+    Crop:
+      type: object
+      required: [id, code, nameBn]
+      properties:
+        id:           { type: string, format: uuid }
+        code:         { type: string }
+        nameBn:       { type: string }
+        nameEn:       { type: string, nullable: true }
+        nameEnFallback: { type: boolean, description: True when nameEn fell back to Bangla (COMMON-NFR-038) }
+        iconKey:      { type: string }
+
+    Disease:
+      type: object
+      required: [id, cropId, code, nameBn, severity, healthy]
+      properties:
+        id:            { type: string, format: uuid }
+        cropId:        { type: string, format: uuid }
+        code:          { type: string }
+        nameBn:        { type: string }
+        nameEn:        { type: string, nullable: true }
+        nameEnFallback: { type: boolean }
+        descriptionBn: { type: string, nullable: true }
+        severity:      { type: string, enum: [LOW, MODERATE, HIGH, CRITICAL, NONE] }
+        healthy:       { type: boolean }
+
+    Remedy:
+      type: object
+      required: [id, diseaseId, type, titleBn, stepsBn, sourceRef]
+      properties:
+        id:        { type: string, format: uuid }
+        diseaseId: { type: string, format: uuid }
+        type:      { type: string, enum: [CULTURAL, ORGANIC, BIOLOGICAL, CHEMICAL] }
+        titleBn:   { type: string }
+        stepsBn:   { type: array, items: { type: string } }
+        dosageBn:  { type: string, nullable: true }
+        phiDays:   { type: integer, nullable: true, description: Mandatory when type is CHEMICAL }
+        costTier:  { type: string, enum: [LOW, MEDIUM, HIGH] }
+        efficacy:  { type: string, enum: [LOW, MEDIUM, HIGH] }
+        sourceRef: { type: string }
+
+    SymptomRef:
+      type: object
+      required: [id, code, nameBn, organ]
+      properties:
+        id:     { type: string, format: uuid }
+        code:   { type: string }
+        nameBn: { type: string }
+        nameEn: { type: string, nullable: true }
+        organ:  { type: string, enum: [LEAF, STEM, ROOT, PANICLE, FRUIT, TUBER, WHOLE] }
+
+    CaseAccepted:
+      type: object
+      required: [caseId, status]
+      properties:
+        caseId: { type: string, format: uuid }
+        status: { type: string, enum: [SUBMITTED] }
+
+    CaseStatus:
+      type: string
+      enum: [SUBMITTED, ANALYSING, ANALYSED, IN_REVIEW, ADVISED, REJECTED, FAILED]
+
+    DecisionPath:
+      type: string
+      enum: [PRIMARY, SECONDARY, UNDETERMINED]
+
+    AnalysisMode:
+      type: string
+      enum: [REPLAY, LIVE]
+
+    CaseImage:
+      type: object
+      required: [imageId, position, primary]
+      properties:
+        imageId:      { type: string, format: uuid }
+        position:     { type: integer }
+        primary:      { type: boolean }
+        qualityScore: { type: number, format: float, nullable: true }
+        width:        { type: integer, nullable: true }
+        height:       { type: integer, nullable: true }
+
+    CaseDetail:
+      type: object
+      required: [caseId, cropId, status, images, submittedAt]
+      properties:
+        caseId:       { type: string, format: uuid }
+        cropId:       { type: string, format: uuid }
+        cropNameBn:   { type: string }
+        status:       { $ref: '#/components/schemas/CaseStatus' }
+        decisionPath: { $ref: '#/components/schemas/DecisionPath' }
+        noteBn:       { type: string, nullable: true }
+        parentCaseId: { type: string, format: uuid, nullable: true }
+        images:       { type: array, items: { $ref: '#/components/schemas/CaseImage' } }
+        audio:
+          type: object
+          nullable: true
+          properties:
+            audioId:       { type: string, format: uuid }
+            durationMs:    { type: integer }
+            transcriptBn:  { type: string, nullable: true }
+        submittedAt:  { type: string, format: date-time }
+
+    FarmerCaseRow:
+      type: object
+      required: [caseId, cropNameBn, status, submittedAt]
+      properties:
+        caseId:              { type: string, format: uuid }
+        cropNameBn:          { type: string }
+        status:              { $ref: '#/components/schemas/CaseStatus' }
+        decisionPath:        { $ref: '#/components/schemas/DecisionPath' }
+        diseaseNameBn:       { type: string, nullable: true }
+        officerName:         { type: string, nullable: true }
+        advisoryVersion:     { type: integer, nullable: true }
+        rejectionMessageBn:  { type: string, nullable: true }
+        thumbnailImageId:    { type: string, format: uuid, nullable: true }
+        submittedAt:         { type: string, format: date-time }
+        publishedAt:         { type: string, format: date-time, nullable: true }
+
+    Candidate:
+      type: object
+      required: [diseaseId, diseaseCode, diseaseNameBn, confidence, rank, source]
+      properties:
+        diseaseId:     { type: string, format: uuid }
+        diseaseCode:   { type: string }
+        diseaseNameBn: { type: string }
+        confidence:    { type: number, format: float }
+        rank:          { type: integer }
+        source:        { type: string, enum: [MODEL, KB, MERGED] }
+
+    ExtractedSymptom:
+      type: object
+      required: [symptomId, symptomCode, nameBn, score, source]
+      properties:
+        symptomId:   { type: string, format: uuid }
+        symptomCode: { type: string }
+        nameBn:      { type: string }
+        score:       { type: number, format: float }
+        source:      { type: string, enum: [SPEECH, VISION, OFFICER] }
+        matcher:     { type: string, enum: [VECTOR, FUZZY, MANUAL], nullable: true }
+
+    AnalysisDetail:
+      type: object
+      required: [caseId, decisionPath, mode, candidates, symptoms, thresholds]
+      properties:
+        caseId:              { type: string, format: uuid }
+        decisionPath:        { $ref: '#/components/schemas/DecisionPath' }
+        mode:                { $ref: '#/components/schemas/AnalysisMode' }
+        top1Confidence:      { type: number, format: float, nullable: true }
+        top2Confidence:      { type: number, format: float, nullable: true }
+        margin:              { type: number, format: float, nullable: true }
+        candidates:          { type: array, items: { $ref: '#/components/schemas/Candidate' } }
+        symptoms:            { type: array, items: { $ref: '#/components/schemas/ExtractedSymptom' } }
+        transcriptBn:        { type: string, nullable: true }
+        asrConfidence:       { type: number, format: float, nullable: true }
+        hasGradcam:          { type: boolean }
+        unmappedLabels:      { type: array, items: { type: string } }
+        visionModelId:       { type: string, nullable: true }
+        visionModelVersion:  { type: string, nullable: true }
+        latencyMs:           { type: integer }
+        errorCode:           { type: string, nullable: true }
+        thresholds:          { $ref: '#/components/schemas/Thresholds' }
+
+    Thresholds:
+      type: object
+      description: Read-only; the two routing thresholds the confidence bars draw.
+      required: [high, low]
+      properties:
+        high: { type: number, format: float }
+        low:  { type: number, format: float }
+
+    OfficerQueueRow:
+      type: object
+      required: [caseId, reviewTaskId, state, submittedAt, slaDueAt]
+      properties:
+        caseId:            { type: string, format: uuid }
+        reviewTaskId:      { type: string, format: uuid }
+        farmerName:        { type: string }
+        cropCode:          { type: string }
+        cropNameBn:        { type: string }
+        districtCode:      { type: string }
+        decisionPath:      { $ref: '#/components/schemas/DecisionPath' }
+        topDiseaseNameBn:  { type: string, nullable: true }
+        topConfidence:     { type: number, format: float, nullable: true }
+        imageCount:        { type: integer }
+        hasAudio:          { type: boolean }
+        analysisMode:      { $ref: '#/components/schemas/AnalysisMode' }
+        state:             { type: string, enum: [PENDING, CLAIMED, DONE, REJECTED] }
+        officerId:         { type: string, format: uuid, nullable: true }
+        isResubmission:    { type: boolean }
+        submittedAt:       { type: string, format: date-time }
+        slaDueAt:          { type: string, format: date-time }
+
+    ReviewTask:
+      type: object
+      required: [taskId, caseId, state, version, slaDueAt]
+      properties:
+        taskId:       { type: string, format: uuid }
+        caseId:       { type: string, format: uuid }
+        state:        { type: string, enum: [PENDING, CLAIMED, DONE, REJECTED] }
+        officerId:    { type: string, format: uuid, nullable: true }
+        officerName:  { type: string, nullable: true }
+        claimedAt:    { type: string, format: date-time, nullable: true }
+        claimExpiresAt: { type: string, format: date-time, nullable: true }
+        slaDueAt:     { type: string, format: date-time }
+        requeueCount: { type: integer }
+        version:      { type: integer, description: Optimistic lock; echo it back on write }
+
+    ReviewCaseDetail:
+      type: object
+      required: [task, case, analysis, suggestedRemedies]
+      properties:
+        task:              { $ref: '#/components/schemas/ReviewTask' }
+        case:              { $ref: '#/components/schemas/CaseDetail' }
+        farmerName:        { type: string }
+        analysis:          { $ref: '#/components/schemas/AnalysisDetail' }
+        suggestedDiseaseId: { type: string, format: uuid, nullable: true }
+        suggestedRemedies: { type: array, items: { $ref: '#/components/schemas/Remedy' } }
+        priorAdvisory:     { $ref: '#/components/schemas/Advisory' }
+
+    PublishAdvisoryRequest:
+      type: object
+      required: [action, diseaseId, remedyIds, expectedVersion]
+      properties:
+        action:          { type: string, enum: [APPROVED, EDITED, REPLACED] }
+        diseaseId:       { type: string, format: uuid }
+        remedyIds:       { type: array, items: { type: string, format: uuid } }
+        officerNoteBn:   { type: string, nullable: true, maxLength: 2000 }
+        expectedVersion: { type: integer, description: The review task version the officer holds }
+
+    RejectCaseRequest:
+      type: object
+      required: [reasonCode, messageBn, expectedVersion]
+      properties:
+        reasonCode:
+          type: string
+          enum: [BLURRY_IMAGE, NOT_A_CROP, WRONG_CROP, INSUFFICIENT_DETAIL, INAUDIBLE_AUDIO, OTHER]
+        messageBn:       { type: string, maxLength: 1000 }
+        expectedVersion: { type: integer }
+
+    Advisory:
+      type: object
+      required: [advisoryId, caseId, officerId, officerName, action, version, remedies, publishedAt]
+      properties:
+        advisoryId:    { type: string, format: uuid }
+        caseId:        { type: string, format: uuid }
+        diseaseId:     { type: string, format: uuid, nullable: true }
+        diseaseNameBn: { type: string, nullable: true }
+        officerId:     { type: string, format: uuid }
+        officerName:   { type: string }
+        action:        { type: string, enum: [APPROVED, EDITED, REPLACED] }
+        officerNoteBn: { type: string, nullable: true }
+        version:       { type: integer }
+        supersedesId:  { type: string, format: uuid, nullable: true }
+        remedies:      { type: array, items: { $ref: '#/components/schemas/Remedy' } }
+        publishedAt:   { type: string, format: date-time }
+
+    Rejection:
+      type: object
+      required: [caseId, officerId, officerName, reasonCode, messageBn, createdAt]
+      properties:
+        caseId:      { type: string, format: uuid }
+        officerId:   { type: string, format: uuid }
+        officerName: { type: string }
+        reasonCode:
+          type: string
+          enum: [BLURRY_IMAGE, NOT_A_CROP, WRONG_CROP, INSUFFICIENT_DETAIL, INAUDIBLE_AUDIO, OTHER]
+        messageBn:   { type: string }
+        createdAt:   { type: string, format: date-time }
+
+    AdminStats:
+      type: object
+      required: [casesToday, approvalRate, medianReviewSeconds, modelOfficerAgreementRate, thresholds]
+      properties:
+        casesToday:                { type: integer }
+        approvalRate:              { type: number, format: float, description: Advisories with action APPROVED over all published advisories }
+        medianReviewSeconds:       { type: integer, nullable: true }
+        modelOfficerAgreementRate:
+          type: number
+          format: float
+          nullable: true
+          description: >
+            Share of published advisories whose diseaseId equals the top-ranked case_candidate
+            with source MODEL. This is the retraining signal.
+        advisoriesPublished:       { type: integer }
+        casesRejected:             { type: integer }
+        pathCounts:
+          type: object
+          properties:
+            PRIMARY:      { type: integer }
+            SECONDARY:    { type: integer }
+            UNDETERMINED: { type: integer }
+        thresholds:                { $ref: '#/components/schemas/Thresholds' }
+
+    PageMeta:
+      type: object
+      required: [page, size, totalElements, totalPages]
+      properties:
+        page:          { type: integer }
+        size:          { type: integer }
+        totalElements: { type: integer, format: int64 }
+        totalPages:    { type: integer }
+
+    PageOfFarmerCaseRow:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content: { type: array, items: { $ref: '#/components/schemas/FarmerCaseRow' } }
+
+    PageOfOfficerQueueRow:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content: { type: array, items: { $ref: '#/components/schemas/OfficerQueueRow' } }

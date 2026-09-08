@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/ng-openapi-gen/ng-openapi-gen-schema.json",
+  "input": "openapi/foshol-api.yaml",
+  "output": "src/app/generated",
+  "services": true,
+  "serviceSuffix": "Service",
+  "promises": true,
+  "ignoreUnusedModels": false,
+  "enumStyle": "alias",
+  "enumArray": true,
+  "modelIndex": false,
+  "serviceIndex": false,
+  "functionIndex": false,
+  "indexFile": false,
+  "removeStaleFiles": true
+}

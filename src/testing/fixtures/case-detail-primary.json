@@ -1,0 +1,21 @@
+{
+  "caseId": "01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70",
+  "cropId": "01800000-0000-7000-8000-000000000001",
+  "cropNameBn": "[cropNameBn]",
+  "status": "ANALYSING",
+  "decisionPath": null,
+  "noteBn": "[noteBn]",
+  "parentCaseId": null,
+  "images": [
+    {
+      "imageId": "01a07ca3-bb8a-7ab0-9b90-0843b615b56b",
+      "position": 1,
+      "primary": true,
+      "qualityScore": 0.732,
+      "width": 960,
+      "height": 642
+    }
+  ],
+  "audio": null,
+  "submittedAt": "2026-09-07T16:11:40.236803Z"
+}

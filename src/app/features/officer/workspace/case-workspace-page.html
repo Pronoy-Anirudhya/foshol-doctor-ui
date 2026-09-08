@@ -1,0 +1,537 @@
+<a class="back" [routerLink]="queuePath">
+  <span aria-hidden="true">←</span>
+  {{ 'officer.case.back' | translate }}
+</a>
+
+@if (facade.caseProblem(); as problem) {
+  <foshol-error-panel class="mt-3 block" [problem]="problem" (retry)="refresh()" />
+}
+
+@if (store.loading() && caseDetail() === null) {
+  <foshol-spinner class="mt-6" [showLabel]="true" labelKey="officer.case.loading" />
+} @else if (caseDetail(); as detail) {
+  <header class="mt-2 flex flex-wrap items-start justify-between gap-3">
+    <div class="min-w-0">
+      <p class="text-xs font-bold tracking-wide text-ink-faint uppercase">
+        {{ 'officer.case.eyebrow' | translate }}
+      </p>
+      <h2 class="mt-0.5 text-2xl leading-snug font-bold text-ink [overflow-wrap:anywhere]">
+        @if (facade.farmerName(); as farmer) {
+          {{ farmer }}
+        } @else {
+          {{ 'officer.case.farmer' | translate }}
+        }
+      </h2>
+      <p class="text-ink-muted">{{ detail.cropNameBn }}</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- WEB-FR-215 / WEB-FR-216 — as received, on every case, never computed. -->
+      @if (analysis(); as view) {
+        <foshol-decision-path-badge [path]="view.decisionPath" />
+        <foshol-analysis-mode-badge [mode]="view.mode" />
+      }
+      @if (facade.isResubmission()) {
+        <span class="resub">
+          <span aria-hidden="true">↩</span>
+          {{ 'officer.queue.resubmission' | translate }}
+        </span>
+      }
+    </div>
+  </header>
+
+  <dl class="case-meta">
+    <div>
+      <dt>{{ 'officer.case.status' | translate }}</dt>
+      <dd>{{ 'badge.status.' + detail.status | translate }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'officer.case.submitted' | translate }}</dt>
+      <dd class="tabular">{{ detail.submittedAt | dhakaDateTime }}</dd>
+    </div>
+    @if (facade.slaDueAt(); as sla) {
+      <div>
+        <dt>{{ 'officer.case.sla' | translate }}</dt>
+        <dd class="tabular">{{ sla | dhakaDateTime }}</dd>
+      </div>
+    }
+    <div>
+      <dt>{{ 'officer.case.caseId' | translate }}</dt>
+      <dd class="font-latin id">{{ detail.caseId }}</dd>
+    </div>
+  </dl>
+
+  <!-- WEB-FR-219 — demo beat 8. The code is named, and every action below stays available. -->
+  @if (analysis()?.errorCode; as errorCode) {
+    <!-- WEB-FR-219 — a failure turned into a demonstrated behaviour. Loud enough to be seen
+         from the back of the room, and it takes nothing away: every action below stays live. -->
+    <section
+      class="mt-4 flex items-start gap-3 rounded-2xl border border-dawn-300 bg-dawn-100 px-4 py-3.5"
+      role="status"
+      data-testid="degraded-banner"
+    >
+      <span class="text-lg leading-snug" aria-hidden="true">⚠</span>
+      <div>
+        <h3 class="font-bold text-dawn-700">{{ 'officer.case.degraded.title' | translate }}</h3>
+        <p class="mt-0.5 max-w-[68ch] text-sm text-ink">
+          {{ 'officer.case.degraded.detail' | translate: { code: errorCode } }}
+        </p>
+      </div>
+    </section>
+  }
+
+  <!-- ── Claim (WEB-FR-240…243) ─────────────────────────────────────────────────────── -->
+  <section class="claim" data-testid="claim-panel" [attr.data-state]="claimState()">
+    <div class="flex flex-wrap items-center gap-4">
+      <div class="min-w-32">
+        <p class="label">{{ 'officer.claim.legend' | translate }}</p>
+        <p class="claim-value" data-testid="claim-state">{{ claimStateKey() | translate }}</p>
+      </div>
+
+      <!-- WEB-FR-241 — the countdown, whenever there is a claim to count down. -->
+      @if (showTimer()) {
+        <foshol-claim-timer-ring />
+      }
+
+      <div class="ms-auto flex flex-wrap gap-2">
+        @if (heldByMe()) {
+          <button
+            type="button"
+            [class]="btnQuiet"
+            data-testid="claim-release"
+            [disabled]="facade.claimPending()"
+            (click)="release()"
+          >
+            {{
+              (facade.claimPending() ? 'officer.claim.releasing' : 'officer.claim.release')
+                | translate
+            }}
+          </button>
+        } @else if (!readOnly()) {
+          <button
+            type="button"
+            [class]="btnConsole"
+            data-testid="claim-take"
+            [disabled]="facade.claimPending()"
+            (click)="claim()"
+          >
+            {{
+              (facade.claimPending()
+                ? 'officer.claim.taking'
+                : expired()
+                  ? 'officer.claim.reclaim'
+                  : 'officer.claim.take'
+              ) | translate
+            }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (expired()) {
+      <!-- WEB-FR-242 — the banner, the disabled actions, the retained edits, the re-claim. -->
+      <p class="claim-banner" role="status" data-testid="claim-expired">
+        <strong>{{ 'officer.claim.expired.title' | translate }}</strong>
+        <span>{{ 'officer.claim.expired.detail' | translate }}</span>
+      </p>
+    } @else if (readOnly()) {
+      <!-- WEB-FR-243 — read-only, text kept visible, and an explanation of why. -->
+      <p class="claim-banner" role="status" data-testid="claim-readonly">
+        <strong>{{ 'officer.claim.other.title' | translate }}</strong>
+        <span>{{ 'officer.claim.other.detail' | translate }}</span>
+      </p>
+    } @else if (!heldByMe()) {
+      <p class="mt-2.5 text-sm text-ink-muted">{{ 'officer.claim.required' | translate }}</p>
+    }
+  </section>
+
+  @if (facade.actionProblem(); as problem) {
+    <section class="mt-4" data-testid="action-problem">
+      @if (facade.conflicted()) {
+        <!-- WEB-FR-235 — state conflict, the case refreshed, the editor content untouched. -->
+        <h3 class="font-bold text-clay-700">{{ 'officer.action.conflict.title' | translate }}</h3>
+        <p class="mt-0.5 max-w-[68ch] text-sm text-ink">
+          {{ 'officer.action.conflict.detail' | translate }}
+        </p>
+        <p class="mt-0.5 max-w-[68ch] text-sm text-ink">
+          {{ 'officer.action.retryManual' | translate }}
+        </p>
+      }
+      <foshol-error-panel class="mt-3 block" [problem]="problem" [retryable]="false" />
+    </section>
+  }
+
+  <!-- ── Evidence: image beside candidates at xl (WEB-UX-030) ───────────────────────── -->
+  <div class="mt-5 grid gap-4 xl:grid-cols-2 xl:items-start">
+    <details class="panel" open>
+      <summary class="panel-head">{{ 'officer.case.section.images' | translate }}</summary>
+      @if (activeImage(); as image) {
+        <!-- WEB-FR-210 — zoom by pointer AND keyboard, from the shared control.
+             WEB-FR-211/212 — the Grad-CAM toggle lives inside `foshol-gradcam-view` and exists
+             only where the analysis says an overlay exists. Where it does not, there is no
+             control at all — never a disabled or broken one. -->
+        <foshol-image-zoom>
+          <foshol-gradcam-view
+            [caseId]="detail.caseId"
+            [imageId]="image.imageId"
+            [imageAlt]="'officer.case.imageAlt' | translate: { position: image.position }"
+            [hasGradcam]="analysis()?.hasGradcam === true"
+          />
+        </foshol-image-zoom>
+
+        @if (images().length > 1) {
+          <ul class="m-0 mt-3 flex list-none flex-wrap gap-2 p-0">
+            @for (thumb of images(); track thumb.imageId) {
+              <li>
+                <button
+                  type="button"
+                  class="thumb touch-target"
+                  [attr.data-active]="thumb.imageId === image.imageId"
+                  [attr.aria-pressed]="thumb.imageId === image.imageId"
+                  (click)="pickImage(thumb.imageId)"
+                >
+                  <foshol-secure-image
+                    [caseId]="detail.caseId"
+                    [imageId]="thumb.imageId"
+                    [alt]="'officer.case.imagePick' | translate: { position: thumb.position }"
+                  />
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      } @else {
+        <p class="muted">{{ 'officer.case.imagesEmpty' | translate }}</p>
+      }
+
+      <div class="mt-4 border-t border-surface-2 pt-3">
+        <p class="label">{{ 'officer.case.note' | translate }}</p>
+        @if (detail.noteBn) {
+          <!-- COMMON-CON-003 / WEB-UX-016 — the farmer's own words, verbatim, never translated. -->
+          <p class="mt-1 max-w-[68ch] text-ink [overflow-wrap:anywhere]">{{ detail.noteBn }}</p>
+        } @else {
+          <p class="muted">{{ 'officer.case.noteEmpty' | translate }}</p>
+        }
+      </div>
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head">{{ 'officer.case.section.candidates' | translate }}</summary>
+      @if (analysis(); as view) {
+        <!-- WEB-NFR-011 — thresholds bound from the analysis payload, never from APP_CONFIG. -->
+        <foshol-candidate-list
+          [candidates]="view.candidates"
+          [thresholds]="view.thresholds"
+          [selectedDiseaseId]="draft().diseaseId"
+        />
+      }
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head">{{ 'officer.case.section.audio' | translate }}</summary>
+      <!-- WEB-FR-213 — the player and the Bangla transcript, side by side. The transcript is
+           rendered exactly as returned and is NEVER translated. -->
+      <foshol-audio-player
+        [caseId]="detail.caseId"
+        [hasAudio]="detail.audio !== null && detail.audio !== undefined"
+        [transcriptBn]="analysis()?.transcriptBn ?? detail.audio?.transcriptBn ?? null"
+        [durationMs]="detail.audio?.durationMs ?? null"
+      />
+      @if (detail.audio) {
+        <p class="muted small">{{ 'officer.case.transcriptNotice' | translate }}</p>
+        @if (analysis()?.asrConfidence; as asr) {
+          <p class="muted small tabular">
+            {{ 'officer.case.asrConfidence' | translate }}: {{ asr | percent1 }}%
+          </p>
+        }
+      }
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head">{{ 'officer.case.section.symptoms' | translate }}</summary>
+      <!-- WEB-FR-214 — name, score and the matcher that found it. A fuzzy token match and a
+           vector match are not the same claim, and an officer's trust depends on knowing which. -->
+      @if (store.symptoms().length === 0) {
+        <p class="muted">{{ 'officer.case.symptomsEmpty' | translate }}</p>
+      } @else {
+        <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+          @for (symptom of store.symptoms(); track symptom.symptomId) {
+            <li
+              class="inline-flex items-center gap-1.5 rounded-full border border-surface-3 bg-surface-1 px-2.5 py-1"
+              data-testid="symptom-chip"
+            >
+              <span class="font-semibold text-ink">{{ symptom.nameBn }}</span>
+              @if (symptom.matcher; as matcher) {
+                <foshol-matcher-chip [matcher]="matcher" [score]="symptom.score" />
+              } @else {
+                <span class="tabular text-xs font-bold text-ink-muted"
+                  >{{ symptom.score | percent1 }}%</span
+                >
+              }
+            </li>
+          }
+        </ul>
+      }
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head">{{ 'officer.case.section.model' | translate }}</summary>
+      <!-- WEB-FR-217 — identity, version, latency, margin, and the count of unmapped outputs. -->
+      <dl class="model-meta">
+        <div>
+          <dt>{{ 'officer.case.model.id' | translate }}</dt>
+          <dd class="font-latin">
+            {{ analysis()?.visionModelId ?? ('officer.case.model.none' | translate) }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'officer.case.model.version' | translate }}</dt>
+          <dd class="font-latin id">
+            {{ analysis()?.visionModelVersion ?? ('officer.case.model.none' | translate) }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'officer.case.model.latency' | translate }}</dt>
+          <dd class="tabular">
+            {{ 'officer.case.model.latencyValue' | translate: { ms: analysis()?.latencyMs ?? 0 } }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'officer.case.model.margin' | translate }}</dt>
+          <dd class="tabular">
+            @if (analysis()?.margin !== null && analysis()?.margin !== undefined) {
+              {{ analysis()?.margin | percent1 }}%
+            } @else {
+              {{ 'officer.case.model.none' | translate }}
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'officer.case.model.unmapped' | translate }}</dt>
+          <dd class="tabular" data-testid="unmapped-count">
+            {{ 'officer.case.model.unmappedValue' | translate: { count: unmappedCount() } }}
+          </dd>
+        </div>
+      </dl>
+      @if (unmappedCount() > 0) {
+        <p class="muted small">{{ 'officer.case.model.unmappedHint' | translate }}</p>
+      }
+    </details>
+  </div>
+
+  <!-- ── Decision (WEB-FR-230…235) ──────────────────────────────────────────────────── -->
+  <section class="card mt-5 p-4">
+    <h3 class="sr-only">{{ 'officer.case.section.decision' | translate }}</h3>
+
+    <foshol-remedy-editor
+      [remedies]="facade.remedies()"
+      [selectedIds]="draft().remedyIds"
+      [note]="draft().officerNoteBn"
+      [loading]="facade.remediesLoading()"
+      [disabled]="!canAct()"
+      [diseaseName]="selectedDiseaseName()"
+      (toggleRemedy)="toggleRemedy($event)"
+      (noteChange)="setNote($event)"
+    />
+
+    @if (canAct() && !hasDisease()) {
+      <p class="mt-3 text-sm font-semibold text-dawn-700">
+        {{ 'officer.remedy.needDisease' | translate }}
+      </p>
+    } @else if (canAct() && !hasRemedy()) {
+      <p class="mt-3 text-sm font-semibold text-dawn-700">
+        {{ 'officer.remedy.needRemedy' | translate }}
+      </p>
+    }
+
+    <!-- WEB-FR-232 — a different disease from the crop's list, refilling the editor. -->
+    @if (replaceOpen()) {
+      <div class="replace" data-testid="replace-panel">
+        <h4 class="replace-title">{{ 'officer.replace.title' | translate }}</h4>
+        <p class="muted small">{{ 'officer.replace.hint' | translate }}</p>
+        <p class="label mt-2">{{ 'officer.replace.pick' | translate }}</p>
+        @if (facade.diseasesLoading()) {
+          <p class="muted small">{{ 'officer.replace.loading' | translate }}</p>
+        } @else {
+          <ul class="disease-list">
+            @for (disease of facade.diseases(); track disease.id) {
+              <li>
+                <label
+                  class="disease touch-target"
+                  [attr.data-current]="disease.id === draft().diseaseId"
+                >
+                  <input
+                    type="radio"
+                    name="replace-disease"
+                    [value]="disease.id"
+                    [checked]="disease.id === draft().diseaseId"
+                    [disabled]="!canAct()"
+                    (change)="chooseDisease(disease.id)"
+                  />
+                  <span class="disease-name">{{ disease.nameBn }}</span>
+                  @if (disease.id === draft().diseaseId) {
+                    <span class="current">{{ 'officer.replace.current' | translate }}</span>
+                  }
+                </label>
+              </li>
+            }
+          </ul>
+          <div class="mt-3.5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              [class]="btnPrimary"
+              data-testid="replace-confirm"
+              [disabled]="!canSubmit()"
+              (click)="confirmReplace()"
+            >
+              {{
+                (facade.actionPending() ? 'officer.action.submitting' : 'officer.action.replace')
+                  | translate
+              }}
+            </button>
+            <button type="button" [class]="btnQuiet" (click)="openReplace()">
+              {{ 'officer.replace.close' | translate }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- WEB-FR-233 — a RejectionReason AND a Bangla message, both required. -->
+    @if (rejectOpen()) {
+      <div class="reject" data-testid="reject-panel">
+        <h4 class="reject-title">{{ 'officer.reject.title' | translate }}</h4>
+
+        <label [class]="fieldLabelClass" for="reject-reason">{{
+          'officer.reject.reason' | translate
+        }}</label>
+        <select
+          id="reject-reason"
+          [class]="fieldClass + ' touch-target'"
+          data-testid="reject-reason"
+          [disabled]="!canAct()"
+          (change)="setRejectReason($event)"
+        >
+          <option value="">{{ 'officer.reject.reasonPlaceholder' | translate }}</option>
+          @for (reason of rejectionReasons; track reason) {
+            <option [value]="reason">{{ 'officer.reject.reason.' + reason | translate }}</option>
+          }
+        </select>
+        @if (rejectAttempted() && rejectReason() === null) {
+          <p [class]="fieldErrorClass">{{ 'officer.reject.reasonRequired' | translate }}</p>
+        }
+
+        <label [class]="fieldLabelClass" for="reject-message">
+          {{ 'officer.reject.message' | translate }}
+        </label>
+        <p class="muted small" id="reject-message-hint">
+          {{ 'officer.reject.messageHint' | translate }}
+        </p>
+        <textarea
+          id="reject-message"
+          [class]="fieldClass"
+          data-testid="reject-message"
+          rows="3"
+          aria-describedby="reject-message-hint"
+          [value]="rejectMessage()"
+          [disabled]="!canAct()"
+          (input)="setRejectMessage($event)"
+        ></textarea>
+        @if (rejectAttempted() && rejectMessage().trim().length === 0) {
+          <p [class]="fieldErrorClass">{{ 'officer.reject.messageRequired' | translate }}</p>
+        }
+
+        <div class="mt-3.5 flex flex-wrap gap-2">
+          <button
+            type="button"
+            [class]="btnDanger"
+            data-testid="reject-confirm"
+            [disabled]="!canAct() || facade.actionPending()"
+            (click)="submitReject()"
+          >
+            {{
+              (facade.actionPending() ? 'officer.action.submitting' : 'officer.reject.submit')
+                | translate
+            }}
+          </button>
+          <button type="button" [class]="btnQuiet" (click)="openReject()">
+            {{ 'officer.reject.cancel' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- WEB-UX-030 — a sticky bottom bar at 360 px, in the flow from md up. -->
+    <h4 class="sr-only">{{ 'officer.action.legend' | translate }}</h4>
+    <div [class]="actionBarClass" data-testid="action-bar">
+      <button
+        type="button"
+        [class]="btnPrimary"
+        data-testid="action-approve"
+        [disabled]="!canSubmit()"
+        (click)="approve()"
+      >
+        {{ 'officer.action.approve' | translate }}
+      </button>
+      <button
+        type="button"
+        [class]="btnConsole"
+        data-testid="action-edit"
+        [disabled]="!canSubmit()"
+        (click)="edit()"
+      >
+        {{ 'officer.action.edit' | translate }}
+      </button>
+      <button
+        type="button"
+        [class]="btnQuiet"
+        data-testid="action-replace"
+        [attr.aria-expanded]="replaceOpen()"
+        [disabled]="!canAct()"
+        (click)="openReplace()"
+      >
+        {{ 'officer.action.replace' | translate }}
+      </button>
+      <button
+        type="button"
+        [class]="btnDanger"
+        data-testid="action-reject"
+        [attr.aria-expanded]="rejectOpen()"
+        [disabled]="!canAct()"
+        (click)="openReject()"
+      >
+        {{ 'officer.action.reject' | translate }}
+      </button>
+    </div>
+
+    <!-- What each of the four actions means, in one place. The distinction between them is
+         the product's argument, so it is written down rather than implied by a button. -->
+    <dl class="mt-3.5 grid gap-x-5 gap-y-2 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="font-bold text-ink">{{ 'officer.action.approve' | translate }}</dt>
+        <dd class="m-0 text-ink-muted">{{ 'officer.action.approveHint' | translate }}</dd>
+      </div>
+      <div>
+        <dt class="font-bold text-ink">{{ 'officer.action.edit' | translate }}</dt>
+        <dd class="m-0 text-ink-muted">{{ 'officer.action.editHint' | translate }}</dd>
+      </div>
+      <div>
+        <dt class="font-bold text-ink">{{ 'officer.action.replace' | translate }}</dt>
+        <dd class="m-0 text-ink-muted">{{ 'officer.action.replaceHint' | translate }}</dd>
+      </div>
+      <div>
+        <dt class="font-bold text-ink">{{ 'officer.action.reject' | translate }}</dt>
+        <dd class="m-0 text-ink-muted">{{ 'officer.action.rejectHint' | translate }}</dd>
+      </div>
+    </dl>
+
+    <p class="muted small">{{ 'officer.action.serverDerived' | translate }}</p>
+  </section>
+} @else if (!store.loading()) {
+  <section class="mt-8 text-center">
+    <h2 class="mt-0.5 text-2xl leading-snug font-bold text-ink [overflow-wrap:anywhere]">
+      {{ 'officer.case.notFound.title' | translate }}
+    </h2>
+    <p class="muted">{{ 'officer.case.notFound.detail' | translate }}</p>
+  </section>
+}

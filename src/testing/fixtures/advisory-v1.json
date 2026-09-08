@@ -1,0 +1,29 @@
+{
+  "advisoryId": "01a07d17-fde2-75c6-bfc0-42f7418543db",
+  "caseId": "01a07c99-705d-7564-964f-9fb2da09c294",
+  "diseaseId": "01800000-0000-7000-8000-000000000103",
+  "diseaseNameBn": "[diseaseNameBn]",
+  "officerId": "01800000-0000-7000-8000-000000000202",
+  "officerName": "Demo Officer",
+  "action": "EDITED",
+  "officerNoteBn": "[officerNoteBn]",
+  "version": 1,
+  "supersedesId": null,
+  "remedies": [
+    {
+      "remedyId": "01800000-0000-7000-8000-000000000507",
+      "type": "CULTURAL",
+      "titleBn": "[titleBn]",
+      "stepsBn": [
+        "[step 1]",
+        "[step 2]",
+        "[step 3]",
+        "[step 4]"
+      ],
+      "dosageBn": null,
+      "phiDays": null,
+      "sourceRef": "[sourceRef]"
+    }
+  ],
+  "publishedAt": "2026-09-07T18:18:39.458353Z"
+}

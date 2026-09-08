@@ -1,0 +1,69 @@
+:host {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink);
+}
+
+/* LIVE reads as present tense. */
+:host([data-mode='LIVE']) {
+  background-color: var(--color-paddy-100);
+  border-color: var(--color-paddy-600);
+  color: var(--color-paddy-700);
+}
+
+/* REPLAY reads as archival: a dashed edge is the visual of something filed away. */
+:host([data-mode='REPLAY']) {
+  border-style: dashed;
+  color: var(--color-ink-muted);
+}
+
+.am-glyph {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.am-live {
+  position: relative;
+  display: inline-flex;
+  width: 0.65rem;
+  height: 0.65rem;
+  flex: 0 0 auto;
+}
+
+.am-live-dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background-color: var(--color-paddy-600);
+}
+
+/* The halo, not the dot, is what pulses: the dot itself stays fully opaque so the badge never
+   looks like it is fading out. */
+.am-live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid var(--color-paddy-600);
+  animation: am-pulse 2s var(--ease-settle) infinite;
+}
+
+@keyframes am-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+.am-text {
+  line-height: 1.4;
+}

@@ -1,0 +1,49 @@
+@if (candidates().length === 0) {
+  <p class="empty">{{ 'officer.case.candidatesEmpty' | translate }}</p>
+} @else {
+  <div class="candidates" data-testid="candidate-list">
+    <!-- The column heads. Each bar also labels its own two lines; this pair names them once
+         for the whole list, which is what makes the rules read as columns rather than as
+         decoration. WEB-UX-044 — the values are text, at the top, before any colour. -->
+    <p class="scale-head">
+      <span class="scale-label" data-threshold="low" data-testid="threshold-head">
+        {{ 'officer.case.thresholdLow' | translate: { value: lowPercent() } }}
+      </span>
+      <span class="scale-label" data-threshold="high" data-testid="threshold-head">
+        {{ 'officer.case.thresholdHigh' | translate: { value: highPercent() } }}
+      </span>
+    </p>
+
+    <!-- The signature moment. Two full-height rules at the two threshold positions, drawn
+         once across the whole list. Decorative to a screen reader: every value they mark is
+         already read out by each bar's own labelled lines and numeric text. -->
+    <div class="rules" aria-hidden="true">
+      <span class="rule" data-testid="threshold-rule" data-threshold="low"></span>
+      <span class="rule" data-testid="threshold-rule" data-threshold="high"></span>
+    </div>
+
+    @for (candidate of candidates(); track candidate.diseaseId) {
+      <article
+        class="cand"
+        data-testid="candidate"
+        [attr.data-disease-id]="candidate.diseaseId"
+        [attr.data-selected]="candidate.diseaseId === selectedDiseaseId()"
+      >
+        <header class="cand-head">
+          <span class="rank tabular" aria-hidden="true">{{ candidate.rank }}</span>
+          <!-- COMMON-CON-003 — a human-supplied disease name, rendered exactly as received. -->
+          <span class="cand-name">{{ candidate.diseaseNameBn }}</span>
+          <foshol-candidate-source-chip [source]="candidate.source" />
+        </header>
+
+        <foshol-confidence-bar
+          [confidence]="candidate.confidence"
+          [low]="thresholds().low"
+          [high]="thresholds().high"
+        />
+      </article>
+    }
+  </div>
+
+  <p class="caption">{{ 'officer.case.thresholdCaption' | translate }}</p>
+}

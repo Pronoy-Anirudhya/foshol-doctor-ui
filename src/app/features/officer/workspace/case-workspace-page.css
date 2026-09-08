@@ -1,0 +1,229 @@
+/* The officer workspace, in the slate console chrome.
+   WEB-UX-034 — every breakpoint in this screen is a Tailwind variant in the template; no
+   media query lives in this file. */
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-block-size: 44px;
+  font-weight: 600;
+  color: var(--color-slate-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.resub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-dawn-300);
+  background: var(--color-dawn-100);
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-dawn-700);
+}
+
+.case-meta {
+  margin: 1rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.6rem 1.25rem;
+  font-size: 0.8125rem;
+}
+
+.case-meta dt,
+.model-meta dt {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.case-meta dd,
+.model-meta dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.id {
+  font-size: 0.75rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  color: var(--color-ink-muted);
+}
+
+/* ── Claim ──────────────────────────────────────────────────────────────────────────────── */
+
+.claim {
+  margin-block-start: 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-0);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.claim[data-state='HELD_BY_ME'] {
+  border-color: var(--color-paddy-300);
+}
+
+.claim[data-state='EXPIRED'],
+.claim[data-state='HELD_BY_OTHER'] {
+  border-color: var(--color-clay-300);
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.claim-value {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.claim-banner {
+  margin-block-start: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-clay-300);
+  background: var(--color-clay-100);
+  padding: 0.7rem 0.85rem;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+.claim-banner strong {
+  color: var(--color-clay-700);
+}
+
+/* ── Panels ─────────────────────────────────────────────────────────────────────────────── */
+
+/* WEB-UX-030 — at 360 px the sections are a collapsible accordion; they open by default at
+   every width so nothing is hidden on a desk, and a phone can fold away what it is not
+   reading. `<details>` gives that with no script and full keyboard support (WEB-UX-040). */
+.panel {
+  border-radius: 1rem;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-0);
+  padding: 0.85rem 1rem 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.panel-head {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-slate-800);
+  list-style-position: inside;
+  margin-block-end: 0.6rem;
+  min-block-size: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.thumb {
+  display: block;
+  inline-size: 4.5rem;
+  block-size: 4.5rem;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 2px solid var(--color-surface-3);
+  padding: 0;
+  background: var(--color-surface-1);
+}
+
+.thumb[data-active='true'] {
+  border-color: var(--color-paddy-600);
+  box-shadow: var(--shadow-card);
+}
+
+.muted {
+  color: var(--color-ink-muted);
+}
+
+.small {
+  margin-block-start: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.model-meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.6rem 1.25rem;
+  font-size: 0.8125rem;
+}
+
+/* ── Decision ───────────────────────────────────────────────────────────────────────────── */
+
+.replace,
+.reject {
+  margin-block-start: 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-1);
+  padding: 0.85rem 1rem;
+}
+
+.replace-title,
+.reject-title {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.disease-list {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  list-style: none;
+}
+
+.disease {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 0.6rem;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+}
+
+.disease:hover {
+  background: var(--color-surface-2);
+}
+
+.disease input {
+  accent-color: var(--color-paddy-600);
+}
+
+.disease-name {
+  font-weight: 600;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.current {
+  border-radius: 999px;
+  border: 1px solid var(--color-paddy-300);
+  background: var(--color-paddy-50);
+  padding: 0.05rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-paddy-700);
+}
+
+/* The action bar, the four button variants, the reject/replace form fields and the action
+   hint list are all expressed as Tailwind utilities in the component class (see the `*Class`
+   members there). Tailwind scans TypeScript, so they are emitted exactly as if written in the
+   template — and this stylesheet stays inside the 4 kB per-component budget. */

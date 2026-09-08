@@ -1,0 +1,50 @@
+<!-- WEB-FR-212 — @if, not [disabled]. When there is no overlay the control does not exist. -->
+@if (toggleVisible()) {
+  <div class="bar">
+    <button
+      type="button"
+      class="toggle touch-target"
+      fosholPointerHold
+      [attr.aria-pressed]="latched()"
+      [attr.data-on]="overlayVisible()"
+      (holdStart)="onHoldStart()"
+      (holdEnd)="onHoldEnd()"
+    >
+      <span class="dot" aria-hidden="true"></span>
+      <span>{{ (latched() ? 'media.gradcam.hide' : 'media.gradcam.show') | translate }}</span>
+    </button>
+
+    <!-- WEB-UX-044 — the state is text, never only the colour of the dot or of the picture. -->
+    <span class="state">
+      {{ (overlayVisible() ? 'media.gradcam.state.on' : 'media.gradcam.state.off') | translate }}
+    </span>
+
+    <span class="hint">{{ 'media.gradcam.hint' | translate }}</span>
+  </div>
+}
+
+<div class="stack">
+  <!-- The zoom view wants the full-resolution object, not the queue thumbnail. -->
+  <foshol-secure-image
+    class="primary"
+    [caseId]="caseId()"
+    [imageId]="imageId()"
+    [variant]="originalVariant"
+    [alt]="imageAlt()"
+    fit="contain"
+  />
+
+  @if (overlayUrl(); as url) {
+    <!-- WEB-UX-042 — the overlay is an image in its own right and says what it is, not
+         "gradcam.png". It is aria-hidden while invisible so a screen reader is not told about
+         a layer that is not currently shown. -->
+    <img
+      class="overlay"
+      [src]="url"
+      [alt]="'media.gradcam.alt' | translate"
+      [attr.aria-hidden]="overlayVisible() ? null : 'true'"
+      [class.visible]="overlayVisible()"
+      decoding="async"
+    />
+  }
+</div>

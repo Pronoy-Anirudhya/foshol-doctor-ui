@@ -1,0 +1,68 @@
+[
+  {
+    "id": "01800000-0000-7000-8000-000000000103",
+    "cropId": "01800000-0000-7000-8000-000000000001",
+    "code": "blast",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "descriptionBn": "[descriptionBn]",
+    "severity": "HIGH",
+    "healthy": false
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000101",
+    "cropId": "01800000-0000-7000-8000-000000000001",
+    "code": "brown_spot",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "descriptionBn": "[descriptionBn]",
+    "severity": "MODERATE",
+    "healthy": false
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000102",
+    "cropId": "01800000-0000-7000-8000-000000000001",
+    "code": "leaf_scald",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "descriptionBn": "[descriptionBn]",
+    "severity": "MODERATE",
+    "healthy": false
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000105",
+    "cropId": "01800000-0000-7000-8000-000000000001",
+    "code": "sheath_blight",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "descriptionBn": "[descriptionBn]",
+    "severity": "HIGH",
+    "healthy": false
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000104",
+    "cropId": "01800000-0000-7000-8000-000000000001",
+    "code": "tungro",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "descriptionBn": "[descriptionBn]",
+    "severity": "HIGH",
+    "healthy": false
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000106",
+    "cropId": "01800000-0000-7000-8000-000000000001",
+    "code": "healthy",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "descriptionBn": "[descriptionBn]",
+    "severity": "NONE",
+    "healthy": true
+  }
+]

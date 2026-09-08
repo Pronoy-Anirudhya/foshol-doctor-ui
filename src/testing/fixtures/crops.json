@@ -1,0 +1,29 @@
+[
+  {
+    "id": "01800000-0000-7000-8000-000000000001",
+    "code": "rice",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "iconKey": "crop-rice",
+    "displayOrder": 1
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000002",
+    "code": "tomato",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "iconKey": "crop-tomato",
+    "displayOrder": 2
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000003",
+    "code": "potato",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "iconKey": "crop-potato",
+    "displayOrder": 3
+  }
+]

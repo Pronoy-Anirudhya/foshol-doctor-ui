@@ -1,0 +1,9 @@
+{
+  "casesToday": 0,
+  "approvalRate": null,
+  "medianReviewMinutes": null,
+  "agreementRate": null,
+  "agreementSampleSize": 0,
+  "confidenceHigh": 0.75,
+  "confidenceLow": 0.45
+}

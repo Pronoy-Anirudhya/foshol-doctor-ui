@@ -1,0 +1,95 @@
+<div class="editor-head">
+  <div class="min-w-0">
+    <h3 class="editor-title">{{ 'officer.remedy.title' | translate }}</h3>
+    <p class="editor-disease">
+      <span class="label">{{ 'officer.remedy.disease' | translate }}</span>
+      @if (diseaseName()) {
+        <!-- COMMON-CON-003 — human-supplied, rendered verbatim, never translated. -->
+        <strong>{{ diseaseName() }}</strong>
+      } @else {
+        <em>{{ 'officer.remedy.diseaseNone' | translate }}</em>
+      }
+    </p>
+  </div>
+  <p class="count tabular">
+    {{ 'officer.remedy.selected' | translate: { count: selectedCount() } }}
+  </p>
+</div>
+
+<!-- The sentence that keeps the line visible: this text was written by a person, and the UI
+     only chooses which of it goes out. -->
+<p class="notice">{{ 'officer.remedy.prefillNote' | translate }}</p>
+
+@if (loading()) {
+  <p class="sr-only">{{ 'officer.remedy.loading' | translate }}</p>
+  <foshol-skeleton class="mt-3" variant="block" [count]="2" />
+} @else if (remedies().length === 0) {
+  <p class="empty">{{ 'officer.remedy.none' | translate }}</p>
+} @else {
+  <ul class="remedies">
+    @for (remedy of remedies(); track identity(remedy)) {
+      <li
+        class="remedy"
+        [attr.data-selected]="isSelected(remedy)"
+        [attr.data-remedy-id]="identity(remedy)"
+      >
+        <label class="remedy-pick touch-target">
+          <input
+            type="checkbox"
+            class="tick"
+            data-testid="remedy-tick"
+            [checked]="isSelected(remedy)"
+            [disabled]="disabled()"
+            (change)="onToggle(remedy)"
+          />
+          <span class="sr-only">{{ 'officer.remedy.include' | translate }}</span>
+          <foshol-remedy-type-icon [type]="remedy.type" size="sm" />
+          <span class="remedy-title">{{ remedy.titleBn }}</span>
+        </label>
+
+        <p class="steps-label">{{ 'officer.remedy.steps' | translate }}</p>
+        <ol class="steps">
+          @for (step of remedy.stepsBn; track $index) {
+            <li>{{ step }}</li>
+          }
+        </ol>
+
+        <dl class="remedy-meta">
+          @if (remedy.dosageBn) {
+            <div>
+              <dt>{{ 'officer.remedy.dosage' | translate }}</dt>
+              <dd>{{ remedy.dosageBn }}</dd>
+            </div>
+          }
+          @if (remedy.phiDays !== null && remedy.phiDays !== undefined) {
+            <div>
+              <dt>{{ 'officer.remedy.phi' | translate }}</dt>
+              <dd class="tabular">
+                {{ 'officer.remedy.phiValue' | translate: { days: remedy.phiDays } }}
+              </dd>
+            </div>
+          }
+          <div>
+            <dt>{{ 'officer.remedy.source' | translate }}</dt>
+            <dd class="source font-latin">{{ remedy.sourceRef }}</dd>
+          </div>
+        </dl>
+      </li>
+    }
+  </ul>
+}
+
+<div class="note-block">
+  <label class="note-label" for="officer-note">{{ 'officer.remedy.note' | translate }}</label>
+  <p class="note-hint" id="officer-note-hint">{{ 'officer.remedy.noteHint' | translate }}</p>
+  <textarea
+    id="officer-note"
+    class="note"
+    data-testid="officer-note"
+    rows="3"
+    aria-describedby="officer-note-hint"
+    [value]="note()"
+    [disabled]="disabled()"
+    (input)="onNote($event)"
+  ></textarea>
+</div>

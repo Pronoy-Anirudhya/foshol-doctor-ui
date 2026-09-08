@@ -1,0 +1,39 @@
+{
+  "caseId": "01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70",
+  "decisionPath": "PRIMARY",
+  "mode": "REPLAY",
+  "top1Confidence": 0.91,
+  "top2Confidence": 0.04,
+  "margin": 0.87,
+  "candidates": [
+    {
+      "diseaseId": "01800000-0000-7000-8000-000000000103",
+      "diseaseCode": "blast",
+      "diseaseNameBn": "[diseaseNameBn]",
+      "confidence": 0.91,
+      "rank": 1,
+      "source": "MODEL"
+    },
+    {
+      "diseaseId": "01800000-0000-7000-8000-000000000101",
+      "diseaseCode": "brown_spot",
+      "diseaseNameBn": "[diseaseNameBn]",
+      "confidence": 0.04,
+      "rank": 2,
+      "source": "MODEL"
+    }
+  ],
+  "symptoms": [],
+  "transcriptBn": null,
+  "asrConfidence": null,
+  "hasGradcam": true,
+  "unmappedLabels": [],
+  "visionModelId": "kssrikar4/Rice-Leaf-Disease-Classification",
+  "visionModelVersion": "02a6e6ea1b5da9b0458b12c4ec8bccd0582a4f26",
+  "latencyMs": 25,
+  "errorCode": null,
+  "thresholds": {
+    "low": 0.45,
+    "high": 0.75
+  }
+}

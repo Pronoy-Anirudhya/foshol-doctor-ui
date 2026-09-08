@@ -1,0 +1,63 @@
+<!-- The control bar sits OUTSIDE the pannable viewport. A control inside it would be dragged
+     around with the picture and would swallow the pointer that starts a pan. -->
+<div class="bar">
+  <button
+    type="button"
+    class="control touch-target"
+    [disabled]="!canZoomOut()"
+    [attr.aria-label]="'media.zoom.out' | translate"
+    (click)="zoomOut()"
+  >
+    <span aria-hidden="true">−</span>
+  </button>
+
+  <!-- WEB-UX-044 — the magnification is readable as a number, not inferred from how big the
+       picture looks. `aria-live` announces it because the buttons change something the officer
+       may not be looking at. -->
+  <output class="level tabular" aria-live="polite">
+    {{ 'media.zoom.level' | translate: { level: scaleLabel() } }}
+  </output>
+
+  <button
+    type="button"
+    class="control touch-target"
+    [disabled]="!canZoomIn()"
+    [attr.aria-label]="'media.zoom.in' | translate"
+    (click)="zoomIn()"
+  >
+    <span aria-hidden="true">+</span>
+  </button>
+
+  <button type="button" class="control reset touch-target" [disabled]="!zoomed()" (click)="reset()">
+    {{ 'media.zoom.reset' | translate }}
+  </button>
+
+  <ng-content select="[zoomBarEnd]" />
+</div>
+
+<!-- tabindex makes the viewport itself focusable so the keyed gestures have somewhere to land.
+     No focus trap: tab moves straight on, and the global :focus-visible rule draws the ring
+     (WEB-UX-041). -->
+<div
+  #viewport
+  class="viewport"
+  tabindex="0"
+  role="group"
+  [attr.aria-label]="'media.zoom.region' | translate"
+  [attr.data-zoomed]="zoomed()"
+  [style.touch-action]="touchAction()"
+  (keydown)="onKeydown($event)"
+  (wheel)="onWheel($event)"
+  (dblclick)="toggleActual()"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp()"
+  (pointercancel)="onPointerUp()"
+  (lostpointercapture)="onPointerUp()"
+>
+  <div class="layer" [class.dragging]="dragging()" [style.transform]="transform()">
+    <ng-content />
+  </div>
+</div>
+
+<p class="hint">{{ 'media.zoom.hint' | translate }}</p>

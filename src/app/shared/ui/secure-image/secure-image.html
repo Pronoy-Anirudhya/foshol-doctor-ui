@@ -1,0 +1,34 @@
+<!-- WEB-FR-400 — the skeleton fills the region from the first frame, so nothing is ever blank
+     and the image fades in over a box that is already the right size. -->
+<div class="skeleton" aria-hidden="true"></div>
+
+@if (state() !== 'failed') {
+  @if (src(); as url) {
+    <!-- No `crossorigin` attribute: this stays a plain no-CORS subresource load, which is what
+         keeps the JWT on the API origin (WEB-SEC-003) and MinIO free of CORS configuration. -->
+    <img
+      class="frame"
+      [src]="url"
+      [alt]="alt()"
+      [style.object-fit]="fit()"
+      loading="lazy"
+      decoding="async"
+      (load)="onLoad()"
+      (error)="onError()"
+    />
+  }
+} @else {
+  <!-- Never the browser's broken-image glyph. A calm translated line, plus the alt text the
+       caller supplied, so the region still says what it was meant to show (WEB-UX-042). -->
+  <p class="fallback">
+    <span aria-hidden="true">▨</span>
+    <span>{{ 'media.image.unavailable' | translate }}</span>
+    <span class="sr-only">{{ alt() }}</span>
+  </p>
+}
+
+<span class="sr-only" role="status">
+  @if (state() === 'loading') {
+    {{ 'media.image.loading' | translate }}
+  }
+</span>

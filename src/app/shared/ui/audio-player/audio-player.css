@@ -1,0 +1,94 @@
+.player {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: 1rem;
+  background-color: var(--color-surface-0);
+}
+
+.play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--color-paddy-600);
+  color: var(--color-ink-invert);
+  font-size: 0.9375rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--duration-1) var(--ease-settle);
+}
+
+.play:hover:not(:disabled) {
+  background-color: var(--color-paddy-700);
+}
+
+.play:disabled {
+  background-color: var(--color-surface-3);
+  color: var(--color-ink-faint);
+  cursor: default;
+}
+
+.scrub {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  accent-color: var(--color-paddy-600);
+  cursor: pointer;
+  /* The track is thin; the thumb must still be catchable by a thumb (WEB-UX-033). */
+  block-size: 44px;
+}
+
+.scrub:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.clock {
+  flex: none;
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+}
+
+.notice {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-ink-faint);
+}
+
+.transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.transcriptTitle {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-ink-muted);
+}
+
+.transcriptBody {
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  border-inline-start: 3px solid var(--color-paddy-300);
+  border-radius: 0.5rem;
+  background-color: var(--color-surface-1);
+  color: var(--color-ink);
+  font-size: 1rem;
+  /* A farmer's own words, quoted; they get room to breathe rather than being crammed. */
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}

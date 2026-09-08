@@ -1,0 +1,73 @@
+<!-- A photograph-only case is the normal case, so it gets no player and no notice. -->
+@if (hasAudio()) {
+  <section class="player" [attr.aria-label]="'media.audio.label' | translate">
+    @if (src(); as url) {
+      <!-- No `controls`: the native chrome is replaced by the transport below. `preload` is
+           metadata only, so the duration is known without pulling the whole clip on a field
+           connection. -->
+      <audio
+        #clip
+        class="sr-only"
+        [src]="url"
+        preload="metadata"
+        (loadedmetadata)="onLoadedMetadata()"
+        (timeupdate)="onTimeUpdate()"
+        (play)="onPlay()"
+        (pause)="onPause()"
+        (ended)="onEnded()"
+        (error)="onError()"
+      ></audio>
+    }
+
+    @if (failed()) {
+      <p class="notice">{{ 'media.audio.unavailable' | translate }}</p>
+    } @else {
+      <div class="transport">
+        <button
+          type="button"
+          class="play touch-target"
+          [disabled]="src() === null"
+          [attr.aria-label]="(playing() ? 'media.audio.pause' : 'media.audio.play') | translate"
+          (click)="toggle()"
+        >
+          <span aria-hidden="true">{{ playing() ? '❚❚' : '▶' }}</span>
+        </button>
+
+        <!-- A range input is keyboard-operable for free: arrows step, Home and End jump
+             (WEB-UX-040). aria-valuetext gives it a clock rather than a bare number. -->
+        <input
+          class="scrub"
+          type="range"
+          min="0"
+          [max]="seekMax()"
+          [step]="seekStep"
+          [value]="position()"
+          [disabled]="src() === null"
+          [attr.aria-label]="'media.audio.seek' | translate"
+          [attr.aria-valuetext]="
+            'media.audio.position' | translate: { elapsed: elapsedLabel(), total: totalLabel() }
+          "
+          (input)="onSeek($event)"
+        />
+
+        <output class="clock tabular font-latin">{{ elapsedLabel() }} / {{ totalLabel() }}</output>
+      </div>
+
+      @if (loading()) {
+        <p class="notice" role="status">{{ 'media.audio.loading' | translate }}</p>
+      }
+    }
+
+    <!-- WEB-UX-016 — the farmer's own words, interpolated as text, never translated, never
+         summarised, and marked `lang="bn"` so a screen reader reaches for a Bangla voice even
+         when the interface is in English. -->
+    <div class="transcript">
+      <h3 class="transcriptTitle">{{ 'media.audio.transcript' | translate }}</h3>
+      @if (transcript(); as text) {
+        <p class="transcriptBody" lang="bn">{{ text }}</p>
+      } @else {
+        <p class="notice">{{ 'media.audio.transcriptMissing' | translate }}</p>
+      }
+    </div>
+  </section>
+}

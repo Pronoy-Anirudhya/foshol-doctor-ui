@@ -1,0 +1,35 @@
+:host {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink);
+}
+
+/* The model's own output stays neutral: it is a suggestion, not an authority. */
+:host([data-source='MODEL']) {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-ink-muted);
+  color: var(--color-ink);
+}
+
+/* The knowledge base is the authoritative side of the analysis/knowledge split. */
+:host([data-source='KB']) {
+  background-color: var(--color-paddy-100);
+  border-color: var(--color-paddy-600);
+  color: var(--color-paddy-700);
+}
+
+:host([data-source='MERGED']) {
+  background-color: var(--color-dawn-100);
+  border-color: var(--color-dawn-600);
+  color: var(--color-dawn-700);
+}
+
+.cs-glyph {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+}
+
+.cs-text {
+  line-height: 1.4;
+}

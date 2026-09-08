@@ -1,0 +1,47 @@
+/* Three matchers, three claims of different strength. The border treatment says it before the
+   colour does: solid for a vector neighbourhood, dashed for an approximate token match, and a
+   flat human-recorded chip that makes no machine claim at all. */
+
+:host {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink);
+}
+
+:host([data-matcher='VECTOR']) {
+  background-color: var(--color-paddy-100);
+  border-color: var(--color-paddy-600);
+  color: var(--color-paddy-700);
+}
+
+:host([data-matcher='FUZZY']) {
+  background-color: var(--color-dawn-100);
+  border-color: var(--color-dawn-600);
+  border-style: dashed;
+  color: var(--color-dawn-700);
+}
+
+:host([data-matcher='MANUAL']) {
+  background-color: var(--color-surface-0);
+  border-color: var(--color-ink-muted);
+  color: var(--color-ink);
+}
+
+.mc-glyph {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+}
+
+.mc-text {
+  line-height: 1.4;
+}
+
+.mc-score {
+  padding-inline-start: 0.4rem;
+  margin-inline-start: 0.1rem;
+  border-inline-start: 1px solid currentColor;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.4;
+}

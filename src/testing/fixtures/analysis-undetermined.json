@@ -1,0 +1,19 @@
+{
+  "caseId": "01a07caa-0000-7000-8000-00000000fffe",
+  "decisionPath": "UNDETERMINED",
+  "mode": "LIVE",
+  "top1Confidence": null,
+  "top2Confidence": null,
+  "margin": null,
+  "candidates": [],
+  "symptoms": [],
+  "transcriptBn": null,
+  "asrConfidence": null,
+  "hasGradcam": false,
+  "unmappedLabels": [],
+  "visionModelId": null,
+  "visionModelVersion": null,
+  "latencyMs": 8012,
+  "errorCode": "ERR_SIDECAR_UNAVAILABLE",
+  "thresholds": { "high": 0.75, "low": 0.45 }
+}

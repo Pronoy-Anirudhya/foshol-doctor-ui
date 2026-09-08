@@ -1,0 +1,75 @@
+<!-- Vertical at 360 px, horizontal from md up — Tailwind breakpoints only (WEB-UX-034). -->
+<ol class="ss-list flex flex-col md:flex-row" [attr.aria-label]="'badge.status.label' | translate">
+  @for (step of steps(); track step.key; let first = $first) {
+    <li
+      class="ss-step flex items-start gap-3 md:flex-1 md:flex-col md:items-center md:gap-2 md:text-center"
+      data-testid="ss-step"
+      [attr.data-state]="step.state"
+      [attr.data-status]="step.status"
+      [attr.data-outcome]="step.outcome"
+      [attr.aria-current]="step.state === 'current' ? 'step' : null"
+    >
+      <span class="ss-rail relative flex flex-col items-center md:w-full">
+        <span
+          class="ss-connector h-6 w-0.5 md:absolute md:top-1/2 md:right-1/2 md:h-0.5 md:w-full md:-translate-y-1/2"
+          data-testid="ss-connector"
+          [attr.data-flow]="first ? 'none' : step.connector"
+          aria-hidden="true"
+        ></span>
+
+        <span class="ss-dot relative z-10" aria-hidden="true">
+          <svg viewBox="0 0 16 16" focusable="false">
+            @switch (step.glyph) {
+              @case ('check') {
+                <path
+                  d="M3.6 8.5 6.6 11.5 12.4 5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              }
+              @case ('dot') {
+                <circle cx="8" cy="8" r="3.4" fill="currentColor" />
+              }
+              @case ('cross') {
+                <path
+                  d="M4.8 4.8 11.2 11.2M11.2 4.8 4.8 11.2"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              }
+              @case ('warn') {
+                <path
+                  d="M8 3.8v4.6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <circle cx="8" cy="11.6" r="1.05" fill="currentColor" />
+              }
+              @default {
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="3.2"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+              }
+            }
+          </svg>
+        </span>
+      </span>
+
+      <span class="ss-label mt-6 md:mt-0">
+        {{ step.labelKey | translate }}
+        <span class="sr-only">{{ step.stateKey | translate }}</span>
+      </span>
+    </li>
+  }
+</ol>

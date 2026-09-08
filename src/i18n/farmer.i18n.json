@@ -1,0 +1,99 @@
+{
+  "farmer.status.eyebrow": { "bn": "আপনার কেস", "en": "Your case" },
+  "farmer.status.title": { "bn": "কেসের অবস্থা", "en": "Case status" },
+  "farmer.status.submittedAt": { "bn": "জমা দেওয়া হয়েছে", "en": "Submitted" },
+  "farmer.status.refresh": { "bn": "নতুন করে দেখুন", "en": "Refresh" },
+  "farmer.status.reviewingTitle": {
+    "bn": "একজন মাঠ কর্মকর্তা আপনার ছবি দেখছেন",
+    "en": "A field officer is looking at your photographs"
+  },
+  "farmer.status.reviewingBody": {
+    "bn": "প্রতিটি পরামর্শ একজন মানুষ নিজে দেখে নিশ্চিত করেন, তারপরই আপনার কাছে যায়। তাই একটু সময় লাগে — এটাই নিয়ম।",
+    "en": "Every piece of advice is checked by a person before it reaches you. That is why it takes a little time, and it is meant to."
+  },
+  "farmer.status.failedTitle": {
+    "bn": "বিশ্লেষণ শেষ করা যায়নি",
+    "en": "The analysis could not be completed"
+  },
+  "farmer.status.failedBody": {
+    "bn": "এই কেসটি এগোয়নি। একটু পরে আবার দেখুন, অথবা নতুন একটি কেস পাঠান।",
+    "en": "This case did not go through. Look again in a moment, or send a new one."
+  },
+  "farmer.status.yourPhotos": { "bn": "আপনার পাঠানো ছবি", "en": "The photographs you sent" },
+  "farmer.status.photoAlt": {
+    "bn": "আপনার পাঠানো {{position}} নম্বর ছবি",
+    "en": "Photograph {{position}} that you submitted"
+  },
+  "farmer.status.yourNote": { "bn": "আপনার লেখা", "en": "Your note" },
+
+  "farmer.advisory.eyebrow": { "bn": "যাচাই করা পরামর্শ", "en": "Verified advice" },
+  "farmer.advisory.verifiedEyebrow": { "bn": "যাচাই করেছেন", "en": "Verified by" },
+  "farmer.advisory.revised": {
+    "bn": "সংশোধিত · সংস্করণ {{version}}",
+    "en": "Revised · version {{version}}"
+  },
+  "farmer.advisory.publishedAt": { "bn": "দেওয়া হয়েছে", "en": "Issued" },
+  "farmer.advisory.officerNote": { "bn": "কর্মকর্তার মন্তব্য", "en": "The officer's note" },
+  "farmer.advisory.remediesTitle": { "bn": "প্রতিকার", "en": "Remedies" },
+  "farmer.advisory.dosage": { "bn": "মাত্রা", "en": "Dosage" },
+  "farmer.advisory.phiLabel": {
+    "bn": "ফসল তোলার আগে অপেক্ষা",
+    "en": "Pre-harvest interval"
+  },
+  "farmer.advisory.phiValue": { "bn": "{{days}} দিন", "en": "{{days}} days" },
+  "farmer.advisory.source": { "bn": "সূত্র", "en": "Source" },
+  "farmer.advisory.previousTitle": { "bn": "আগের সংস্করণ", "en": "Previous versions" },
+  "farmer.advisory.showPrevious": {
+    "bn": "আগে যা বলা হয়েছিল দেখুন",
+    "en": "See what you were told before"
+  },
+  "farmer.advisory.hidePrevious": { "bn": "আগের সংস্করণ লুকান", "en": "Hide previous versions" },
+  "farmer.advisory.previousLoading": {
+    "bn": "আগের সংস্করণ আসছে…",
+    "en": "Loading previous versions…"
+  },
+  "farmer.advisory.previousFailed": {
+    "bn": "আগের সংস্করণ এখন আনা গেল না।",
+    "en": "The previous versions could not be loaded right now."
+  },
+  "farmer.advisory.previousNone": {
+    "bn": "আগের কোনো সংস্করণ নেই।",
+    "en": "There is no earlier version."
+  },
+  "farmer.advisory.versionLabel": { "bn": "সংস্করণ {{version}}", "en": "Version {{version}}" },
+
+  "farmer.rejection.title": {
+    "bn": "এই কেসটি নিয়ে এগোনো যায়নি",
+    "en": "This case could not be taken forward"
+  },
+  "farmer.rejection.lead": {
+    "bn": "নিরাপদে সিদ্ধান্ত নেওয়ার মতো যথেষ্ট কিছু কর্মকর্তা দেখতে পাননি।",
+    "en": "The officer could not see enough to decide safely."
+  },
+  "farmer.rejection.officerMessage": { "bn": "কর্মকর্তার বার্তা", "en": "The officer's message" },
+  "farmer.rejection.reassurance": {
+    "bn": "এটি আপনার ভুল নয়। ভালো আলোতে কাছ থেকে আরেকটি ছবি তুললেই সাধারণত যথেষ্ট হয়।",
+    "en": "This is not your mistake. Another close photograph in good light is usually all it takes."
+  },
+  "farmer.rejection.newCase": { "bn": "নতুন কেস পাঠান", "en": "Submit a new case" },
+
+  "farmer.history.title": { "bn": "আপনার কেসগুলো", "en": "Your cases" },
+  "farmer.history.subtitle": { "bn": "নতুনগুলো আগে", "en": "Newest first" },
+  "farmer.history.newCase": { "bn": "নতুন কেস", "en": "New case" },
+  "farmer.history.emptyTitle": { "bn": "এখনো কোনো কেস নেই", "en": "No cases yet" },
+  "farmer.history.emptyDetail": {
+    "bn": "একটি ছবি পাঠালে সেটি এখানে দেখা যাবে।",
+    "en": "Send a photograph and it will appear here."
+  },
+  "farmer.history.listLabel": { "bn": "আপনার কেসের তালিকা", "en": "Your cases" },
+  "farmer.history.thumbnailAlt": {
+    "bn": "{{crop}} কেসের ছবি",
+    "en": "Photograph from the {{crop}} case"
+  },
+  "farmer.history.noPhoto": { "bn": "কোনো ছবি নেই", "en": "No photograph" },
+  "farmer.history.backToList": { "bn": "তালিকায় ফিরুন", "en": "Back to the list" },
+  "farmer.history.pickPrompt": {
+    "bn": "বিস্তারিত দেখতে একটি কেস বাছুন।",
+    "en": "Choose a case to see it in full."
+  }
+}

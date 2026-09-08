@@ -1,0 +1,12 @@
+{
+  "app.title": { "bn": "ফসল ডক্টর", "en": "Foshol Doctor" },
+  "app.tagline": {
+    "bn": "প্রতিটি পরামর্শ একজন মাঠ কর্মকর্তা যাচাই করেন",
+    "en": "Every advisory is verified by a field officer"
+  },
+  "app.loading": { "bn": "লোড হচ্ছে…", "en": "Loading…" },
+  "app.language.bn": { "bn": "বাংলা", "en": "Bangla" },
+  "app.language.en": { "bn": "English", "en": "English" },
+  "app.language.switch": { "bn": "ভাষা পরিবর্তন করুন", "en": "Change language" },
+  "app.skipToContent": { "bn": "মূল অংশে যান", "en": "Skip to main content" }
+}

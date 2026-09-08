@@ -1,0 +1,9 @@
+{
+  "type": "https://foshol.local/problems/err-validation",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "One or more fields failed validation.",
+  "code": "ERR_VALIDATION",
+  "correlationId": "01a07caa-d705-7ad0-a51b-f334668c9f99",
+  "errors": [{ "field": "phone", "message": "must be E.164" }]
+}

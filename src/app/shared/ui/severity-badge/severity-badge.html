@@ -1,0 +1,49 @@
+<span class="sr-only">{{ 'badge.severity.label' | translate }}</span>
+
+<svg class="sv-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  @switch (severity()) {
+    @case ('NONE') {
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <path d="M4.9 8h6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+    }
+    @case ('LOW') {
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <circle cx="8" cy="8" r="2.6" fill="currentColor" />
+    }
+    @case ('MODERATE') {
+      <path
+        d="M8 1.9 15 14H1z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+      <path d="M8 6.1v3.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      <circle cx="8" cy="11.6" r="0.85" fill="currentColor" />
+    }
+    @case ('HIGH') {
+      <path
+        d="M8 1.4 14.6 8 8 14.6 1.4 8z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+      <path d="M8 4.7v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      <circle cx="8" cy="11.2" r="0.9" fill="currentColor" />
+    }
+    @case ('CRITICAL') {
+      <path
+        d="M5.5 1.3h5L14.7 5.5v5L10.5 14.7h-5L1.3 10.5v-5z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+      <path d="M8 4.4v4.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+      <circle cx="8" cy="11.5" r="0.95" fill="currentColor" />
+    }
+  }
+</svg>
+
+<span class="sv-text">{{ labelKey() | translate }}</span>

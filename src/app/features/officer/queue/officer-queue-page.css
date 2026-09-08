@@ -1,0 +1,245 @@
+/* The console chrome: slate, analytic, deliberately not the farmer's warm surface.
+   WEB-UX-034 — no media query lives here; every breakpoint is a Tailwind variant in the
+   template. Anything a Tailwind utility already expresses (the refresh button, spacing) lives
+   in the template so this file stays inside the per-component style budget. */
+
+/* WEB-FR-202 — the order note is styled as a statement, not as fine print. It is the one
+   sentence that explains why this screen is ordered the way it is. */
+.order-note {
+  margin-block-start: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border-inline-start: 4px solid var(--color-slate-700);
+  border-radius: 0 0.875rem 0.875rem 0;
+  background: linear-gradient(90deg, var(--color-surface-0), var(--color-surface-1));
+  padding: 0.85rem 1.1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.order-note-lead {
+  font-weight: 700;
+  color: var(--color-slate-800);
+}
+
+.order-note-detail {
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  max-inline-size: 62ch;
+}
+
+.queue-bar {
+  margin-block-start: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stale {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-dawn-300);
+  background: var(--color-dawn-100);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-dawn-700);
+}
+
+/* ── Cards, below md (WEB-UX-032) ───────────────────────────────────────────────────────── */
+
+.cards {
+  margin-block-start: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+}
+
+.queue-card {
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.card-link,
+.row-link {
+  /* WEB-UX-033 — a row's one control is still a touch target. */
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  font-weight: 700;
+  color: var(--color-slate-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.card-crop,
+.card-candidate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-ink);
+}
+
+.card-candidate {
+  font-weight: 600;
+}
+
+.confidence {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-slate-800);
+}
+
+.card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.card-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.card-meta dt {
+  color: var(--color-ink-faint);
+}
+
+.card-meta dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+/* ── Table, md and above (WEB-UX-032) ───────────────────────────────────────────────────── */
+
+/* WEB-UX-031 — the wide thing scrolls inside its own box; the page never scrolls sideways. */
+.table-wrap {
+  margin-block-start: 1rem;
+  overflow-x: auto;
+  border-radius: 1rem;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-0);
+  box-shadow: var(--shadow-card);
+}
+
+.queue-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.queue-table thead {
+  background: var(--color-slate-800);
+}
+
+/* WEB-FR-200 — a header cell, and nothing more. There is no control here to make interactive:
+   no button, no cursor change, no hover affordance that would suggest one. */
+.queue-table th {
+  padding: 0.7rem 0.9rem;
+  text-align: start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-invert);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.queue-table th.num,
+.queue-table td.num {
+  text-align: end;
+}
+
+.queue-table td {
+  padding: 0.65rem 0.9rem;
+  border-block-start: 1px solid var(--color-surface-2);
+  vertical-align: middle;
+  color: var(--color-ink);
+}
+
+.queue-table tbody tr:hover {
+  background: var(--color-surface-1);
+}
+
+.queue-table td.num {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-slate-800);
+}
+
+/* The reduced column set at md and the full set at xl (WEB-UX-030) are expressed as
+   `hidden xl:table-cell` on the cells themselves. WEB-UX-034 forbids an ad-hoc media query
+   here, and Tailwind's own breakpoint is the only breakpoint this file is allowed to use. */
+
+.media {
+  display: block;
+  white-space: nowrap;
+}
+
+.resub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline-start: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-dawn-300);
+  background: var(--color-dawn-100);
+  padding: 0.1rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-dawn-700);
+  white-space: nowrap;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-1);
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.state[data-state='CLAIMED'] {
+  border-color: var(--color-paddy-300);
+  background: var(--color-paddy-100);
+  color: var(--color-paddy-700);
+}
+
+.state[data-state='REJECTED'] {
+  border-color: var(--color-clay-300);
+  background: var(--color-clay-100);
+  color: var(--color-clay-700);
+}
+
+.live-status {
+  display: block;
+  margin-block-start: 0.2rem;
+  font-size: 0.6875rem;
+  color: var(--color-ink-faint);
+}

@@ -1,0 +1,26 @@
+{
+  "caseId": "01a07caa-0000-7000-8000-00000000ffff",
+  "decisionPath": "SECONDARY",
+  "mode": "REPLAY",
+  "top1Confidence": 0.61,
+  "top2Confidence": 0.34,
+  "margin": 0.27,
+  "candidates": [
+    { "diseaseId": "01800000-0000-7000-8000-000000000101", "diseaseCode": "brown_spot", "diseaseNameBn": "[diseaseNameBn]", "confidence": 0.61, "rank": 1, "source": "MERGED" },
+    { "diseaseId": "01800000-0000-7000-8000-000000000103", "diseaseCode": "blast", "diseaseNameBn": "[diseaseNameBn]", "confidence": 0.34, "rank": 2, "source": "MODEL" },
+    { "diseaseId": "01800000-0000-7000-8000-000000000102", "diseaseCode": "bacterial_blight", "diseaseNameBn": "[diseaseNameBn]", "confidence": 0.05, "rank": 3, "source": "KB" }
+  ],
+  "symptoms": [
+    { "symptomId": "01800000-0000-7000-8000-000000000301", "symptomCode": "leaf_yellow", "nameBn": "[nameBn]", "score": 0.81, "source": "SPEECH", "matcher": "VECTOR" },
+    { "symptomId": "01800000-0000-7000-8000-000000000309", "symptomCode": "concentric_rings", "nameBn": "[nameBn]", "score": 0.44, "source": "SPEECH", "matcher": "FUZZY" }
+  ],
+  "transcriptBn": "[transcriptBn]",
+  "asrConfidence": 0.74,
+  "hasGradcam": true,
+  "unmappedLabels": ["Leaf_smut", "Tungro"],
+  "visionModelId": "replay",
+  "visionModelVersion": null,
+  "latencyMs": 840,
+  "errorCode": null,
+  "thresholds": { "high": 0.75, "low": 0.45 }
+}

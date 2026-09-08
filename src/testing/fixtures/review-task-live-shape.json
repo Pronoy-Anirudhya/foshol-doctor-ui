@@ -1,0 +1,105 @@
+{
+  "caseId": "01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70",
+  "reviewTaskId": "01a07ca3-bbd0-73b6-b530-dfa384487234",
+  "farmerName": "Demo Farmer",
+  "cropCode": "rice",
+  "cropNameBn": "[cropNameBn]",
+  "districtCode": "DHA",
+  "decisionPath": "PRIMARY",
+  "topDiseaseId": "01800000-0000-7000-8000-000000000103",
+  "topDiseaseNameBn": "[topDiseaseNameBn]",
+  "topConfidence": 0.91,
+  "imageCount": 1,
+  "hasAudio": false,
+  "analysisMode": "REPLAY",
+  "state": "PENDING",
+  "officerId": null,
+  "isResubmission": false,
+  "requeueCount": 0,
+  "submittedAt": "2026-09-07T16:11:40.236803Z",
+  "slaDueAt": "2026-09-07T20:11:40.356467Z",
+  "top1Confidence": 0.91,
+  "top2Confidence": 0.04,
+  "margin": 0.87,
+  "candidates": [
+    {
+      "diseaseId": "01800000-0000-7000-8000-000000000103",
+      "diseaseCode": "blast",
+      "diseaseNameBn": "[diseaseNameBn]",
+      "confidence": 0.91,
+      "rank": 1,
+      "source": "MODEL"
+    },
+    {
+      "diseaseId": "01800000-0000-7000-8000-000000000101",
+      "diseaseCode": "brown_spot",
+      "diseaseNameBn": "[diseaseNameBn]",
+      "confidence": 0.04,
+      "rank": 2,
+      "source": "MODEL"
+    }
+  ],
+  "symptoms": [],
+  "transcriptBn": null,
+  "asrConfidence": null,
+  "gradcamObjectKey": "cases/01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70/gradcam/01a07ca3-bb8a-7ab0-9b90-0843b615b56b.png",
+  "images": [
+    {
+      "imageId": "01a07ca3-bb8a-7ab0-9b90-0843b615b56b",
+      "objectKey": "cases/01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70/img/01a07ca3-bb8a-7ab0-9b90-0843b615b56b.jpg",
+      "derivativeObjectKey": "cases/01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70/img/01a07ca3-bb8a-7ab0-9b90-0843b615b56b.jpg",
+      "sha256": "e33c67cdb8132995a330b1df145529af9cbbad9bc59724d4028ee30f6339a59a",
+      "qualityScore": 0.732,
+      "primary": true,
+      "position": 1
+    }
+  ],
+  "audio": null,
+  "parentCaseId": null,
+  "suggestedRemedies": [
+    {
+      "remedyId": "01800000-0000-7000-8000-000000000507",
+      "type": "CULTURAL",
+      "titleBn": "[titleBn]",
+      "stepsBn": [
+        "[step 1]",
+        "[step 2]",
+        "[step 3]",
+        "[step 4]"
+      ],
+      "dosageBn": null,
+      "phiDays": null,
+      "sourceRef": "[sourceRef]"
+    },
+    {
+      "remedyId": "01800000-0000-7000-8000-000000000508",
+      "type": "ORGANIC",
+      "titleBn": "[titleBn]",
+      "stepsBn": [
+        "[step 1]",
+        "[step 2]",
+        "[step 3]"
+      ],
+      "dosageBn": "[dosageBn]",
+      "phiDays": null,
+      "sourceRef": "[sourceRef]"
+    },
+    {
+      "remedyId": "01800000-0000-7000-8000-000000000509",
+      "type": "CHEMICAL",
+      "titleBn": "[titleBn]",
+      "stepsBn": [
+        "[step 1]",
+        "[step 2]",
+        "[step 3]"
+      ],
+      "dosageBn": "[dosageBn]",
+      "phiDays": 21,
+      "sourceRef": "[sourceRef]"
+    }
+  ],
+  "claimedBy": null,
+  "claimExpiresAt": null,
+  "publishedAdvisory": null,
+  "version": 0
+}

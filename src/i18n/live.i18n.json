@@ -1,0 +1,50 @@
+{
+  "live.case.statusChanged": {
+    "bn": "কেসের অবস্থা হালনাগাদ হয়েছে",
+    "en": "Case status updated"
+  },
+  "live.case.rejected": {
+    "bn": "কেসটি ফেরত পাঠানো হয়েছে",
+    "en": "A case was returned"
+  },
+  "live.advisory.published": {
+    "bn": "পরামর্শ প্রকাশিত হয়েছে",
+    "en": "An advisory has been published"
+  },
+  "live.advisory.revised": {
+    "bn": "পরামর্শ সংশোধিত হয়েছে",
+    "en": "An advisory has been revised"
+  },
+  "live.queue.updated": {
+    "bn": "সারিতে পরিবর্তন হয়েছে",
+    "en": "The queue has changed"
+  },
+  "live.stream.resynced": {
+    "bn": "তথ্য নতুন করে আনা হচ্ছে",
+    "en": "Refreshing data"
+  },
+  "live.stream.connecting": {
+    "bn": "লাইভ সংযোগ তৈরি হচ্ছে…",
+    "en": "Connecting live updates…"
+  },
+  "live.stream.open": {
+    "bn": "লাইভ সংযোগ সচল",
+    "en": "Live updates connected"
+  },
+  "live.stream.retrying": {
+    "bn": "পুনরায় সংযোগের চেষ্টা চলছে…",
+    "en": "Reconnecting…"
+  },
+  "live.stream.closed": {
+    "bn": "লাইভ সংযোগ বন্ধ",
+    "en": "Live updates disconnected"
+  },
+  "live.stream.offline": {
+    "bn": "আপনি এখন অফলাইনে আছেন",
+    "en": "You are offline"
+  },
+  "live.draft.imageLimit": {
+    "bn": "সর্বোচ্চ {{max}}টি ছবি দেওয়া যাবে। নতুন ছবি যোগ করতে আগে একটি সরিয়ে ফেলুন।",
+    "en": "You can add at most {{max}} photos. Remove one before adding another."
+  }
+}

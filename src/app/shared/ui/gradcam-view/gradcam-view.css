@@ -1,0 +1,91 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: 0.75rem;
+  background-color: var(--color-surface-0);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-1) var(--ease-settle),
+    border-color var(--duration-1) var(--ease-settle);
+}
+
+.toggle[data-on='true'] {
+  background-color: var(--color-paddy-600);
+  border-color: var(--color-paddy-700);
+  color: var(--color-ink-invert);
+}
+
+/* A shape as well as a colour, so the on state survives a monochrome screen (WEB-UX-044). */
+.dot {
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  transition: background-color var(--duration-1) var(--ease-settle);
+}
+
+.toggle[data-on='true'] .dot {
+  background-color: currentColor;
+}
+
+.state {
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--color-ink-faint);
+}
+
+.stack {
+  position: relative;
+  display: grid;
+  border-radius: 1rem;
+  overflow: hidden;
+  background-color: var(--color-surface-2);
+}
+
+.primary {
+  grid-area: 1 / 1;
+  border-radius: 0;
+}
+
+/*
+ * multiply is the honest blend for a Grad-CAM: it darkens where the heat map is saturated and
+ * leaves the leaf untouched where it is pale, so the photograph stays readable underneath
+ * instead of being replaced by a colour wash. screen and normal both hide the very texture the
+ * officer is judging.
+ */
+.overlay {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-2) var(--ease-settle);
+}
+
+.overlay.visible {
+  opacity: 1;
+}

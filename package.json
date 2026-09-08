@@ -1,0 +1,47 @@
+{
+  "name": "foshol-doctor-ui",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "npm run i18n:build && ng serve --port 4200",
+    "build": "npm run i18n:build && ng build",
+    "test": "npm run i18n:build && ng test",
+    "api:sync": "node scripts/sync-openapi.mjs",
+    "api:gen": "npm run api:sync && ng-openapi-gen -c ng-openapi-gen.json",
+    "i18n:build": "node scripts/merge-i18n.mjs",
+    "i18n:check": "node scripts/check-i18n.mjs",
+    "check:pins": "node scripts/check-pins.mjs",
+    "check:arch": "node scripts/check-architecture.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:generated": "npm run api:gen && git diff --exit-code --stat src/app/generated openapi",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
+    "verify": "npm run i18n:check && npm run check:pins && npm run check:arch && npm run check:contrast && npm run typecheck",
+    "verify:all": "npm run verify && npm run check:generated && ng build --configuration production && ng test --no-watch"
+  },
+  "private": true,
+  "packageManager": "npm@11.12.1",
+  "dependencies": {
+    "@angular/common": "22.1.5",
+    "@angular/compiler": "22.1.5",
+    "@angular/core": "22.1.5",
+    "@angular/forms": "22.1.5",
+    "@angular/platform-browser": "22.1.5",
+    "@angular/router": "22.1.5",
+    "@ngx-translate/core": "18.0.0",
+    "rxjs": "7.8.2",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "@angular/build": "22.1.7",
+    "@angular/cli": "22.1.7",
+    "@angular/compiler-cli": "22.1.5",
+    "@tailwindcss/postcss": "4.3.3",
+    "jsdom": "28.1.0",
+    "ng-openapi-gen": "1.0.5",
+    "postcss": "8.5.28",
+    "prettier": "3.9.6",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}

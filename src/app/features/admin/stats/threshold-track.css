@@ -1,0 +1,139 @@
+/* Positions arrive as percentage strings in --tt-low / --tt-high, set on the host from
+   signals, exactly as <foshol-confidence-bar> does it. Nothing here measures geometry, so the
+   drawing is testable in jsdom and can never disagree with the numbers beside it. */
+
+:host {
+  --tt-track-h: 1.25rem;
+  --tt-line-w: 2px;
+  --tt-overshoot: 5px;
+}
+
+.tt-track {
+  position: relative;
+  display: flex;
+  height: var(--tt-track-h);
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: var(--color-slate-600);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.35);
+}
+
+.tt-band {
+  height: 100%;
+  transition: width var(--duration-2) var(--ease-settle);
+}
+
+/* Colour is reinforcement only — each band is named in text below (WEB-UX-044). */
+.tt-band[data-path='UNDETERMINED'] {
+  background-color: var(--color-slate-600);
+}
+
+.tt-band[data-path='SECONDARY'] {
+  background-color: var(--color-dawn-600);
+}
+
+.tt-band[data-path='PRIMARY'] {
+  background-color: var(--color-paddy-500);
+}
+
+/* The console's threshold line, inverted for the dark panel: a light hairline ringed in the
+   panel colour so it stays legible over every band it crosses. */
+.tt-line {
+  position: absolute;
+  inset-block: calc(var(--tt-overshoot) * -1);
+  width: var(--tt-line-w);
+  margin-inline-start: calc(var(--tt-line-w) / -2);
+  border-radius: 1px;
+  background-color: var(--color-ink-invert);
+  box-shadow: 0 0 0 1px var(--color-slate-800);
+}
+
+.tt-line[data-threshold='low'] {
+  inset-inline-start: var(--tt-low, 0%);
+}
+
+.tt-line[data-threshold='high'] {
+  inset-inline-start: var(--tt-high, 0%);
+}
+
+.tt-scale {
+  position: relative;
+  height: 1.25rem;
+  margin-top: 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-surface-3); /* 10.9:1 on slate-800 */
+}
+
+.tt-end {
+  position: absolute;
+  top: 0;
+}
+
+.tt-end[data-end='start'] {
+  inset-inline-start: 0;
+}
+
+.tt-end[data-end='finish'] {
+  inset-inline-end: 0;
+}
+
+.tt-line-label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--color-ink-invert);
+}
+
+.tt-line-label[data-threshold='low'] {
+  left: var(--tt-low, 0%);
+}
+
+.tt-line-label[data-threshold='high'] {
+  left: var(--tt-high, 0%);
+}
+
+.tt-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.tt-value dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-surface-3);
+}
+
+.tt-value dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-invert);
+}
+
+/* The responsive columns are Tailwind utilities on the element itself (WEB-UX-030): a media
+   query in a component stylesheet would sit outside the breakpoint scale everything else uses. */
+.tt-band-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  border-radius: 0.875rem;
+  background-color: var(--color-slate-700);
+  padding: 0.625rem 0.875rem;
+}
+
+.tt-band-range {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-invert); /* 4.5:1 on slate-700, gated by check:contrast */
+}

@@ -1,0 +1,47 @@
+<span class="sr-only">{{ 'badge.decisionPath.label' | translate }}</span>
+
+<svg class="dp-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  @switch (path()) {
+    @case ('PRIMARY') {
+      <!-- One answer, dead centre. -->
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <circle cx="8" cy="8" r="2.5" fill="currentColor" />
+    }
+    @case ('SECONDARY') {
+      <!-- Two candidates still in play. -->
+      <circle cx="5.75" cy="8" r="4.25" fill="none" stroke="currentColor" stroke-width="1.5" />
+      <circle
+        cx="10.25"
+        cy="8"
+        r="4.25"
+        fill="currentColor"
+        fill-opacity="0.35"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+    }
+    @case ('UNDETERMINED') {
+      <!-- Nothing settled: an open, broken ring. -->
+      <circle
+        cx="8"
+        cy="8"
+        r="6.25"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-dasharray="2.6 2.4"
+        stroke-linecap="round"
+      />
+      <path
+        d="M6.3 6.2a1.75 1.75 0 1 1 1.9 2.5v0.9"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+      <circle cx="8.2" cy="11.4" r="0.85" fill="currentColor" />
+    }
+  }
+</svg>
+
+<span class="dp-text">{{ labelKey() | translate }}</span>

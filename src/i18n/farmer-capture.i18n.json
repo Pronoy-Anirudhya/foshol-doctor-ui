@@ -1,0 +1,175 @@
+{
+  "farmer.capture.eyebrow": { "bn": "নতুন কেস", "en": "New case" },
+  "farmer.capture.title": { "bn": "ছবি ও বর্ণনা দিন", "en": "Photos and description" },
+  "farmer.capture.subtitle": {
+    "bn": "ছবি তুলুন, চাইলে কথা বলে বা লিখে সমস্যাটি জানান। একজন মাঠ কর্মকর্তা দেখে তবেই পরামর্শ পাঠাবেন।",
+    "en": "Take photos, then describe the problem by voice or in writing. A field officer checks every case before any advice is sent."
+  },
+
+  "farmer.capture.crop.title": { "bn": "কোন ফসল?", "en": "Which crop?" },
+  "farmer.capture.crop.stepTitle": { "bn": "ফসল বেছে নিন", "en": "Choose the crop" },
+  "farmer.capture.crop.subtitle": {
+    "bn": "ছবিতে চাপ দিয়ে আপনার ফসলটি বেছে নিন।",
+    "en": "Tap the picture of your crop."
+  },
+  "farmer.capture.crop.groupLabel": { "bn": "ফসলের তালিকা", "en": "Crops" },
+  "farmer.capture.crop.continue": { "bn": "এগিয়ে যান", "en": "Continue" },
+  "farmer.capture.crop.required": {
+    "bn": "এগোনোর আগে একটি ফসল বেছে নিন।",
+    "en": "Choose a crop before you continue."
+  },
+  "farmer.capture.crop.emptyTitle": { "bn": "কোনো ফসল পাওয়া যায়নি", "en": "No crops found" },
+  "farmer.capture.crop.emptyDetail": {
+    "bn": "একটু পরে আবার চেষ্টা করুন।",
+    "en": "Please try again in a moment."
+  },
+
+  "farmer.capture.images.stepTitle": { "bn": "ছবি তুলুন", "en": "Take photos" },
+  "farmer.capture.images.help": {
+    "bn": "আক্রান্ত পাতা বা গাছের কাছ থেকে তোলা পরিষ্কার ছবি সবচেয়ে ভালো কাজ করে।",
+    "en": "A close, clear photo of the affected leaf or plant works best."
+  },
+  "farmer.capture.images.takePhoto": { "bn": "ছবি তুলুন", "en": "Take a photo" },
+  "farmer.capture.images.chooseFile": { "bn": "ছবি বেছে নিন", "en": "Choose a photo" },
+  "farmer.capture.images.stripLabel": { "bn": "বেছে নেওয়া ছবি", "en": "Chosen photos" },
+  "farmer.capture.images.previewAlt": {
+    "bn": "বেছে নেওয়া ছবি {{position}}, মোট {{total}}টির মধ্যে",
+    "en": "Chosen photo {{position}} of {{total}}"
+  },
+  "farmer.capture.images.checking": { "bn": "ছবি পরীক্ষা করা হচ্ছে…", "en": "Checking the photo…" },
+  "farmer.capture.images.count": {
+    "bn": "{{chosen}}টি ছবি নেওয়া হয়েছে, সর্বোচ্চ {{max}}টি",
+    "en": "{{chosen}} of {{max}} photos"
+  },
+  "farmer.capture.images.remove": {
+    "bn": "{{position}} নম্বর ছবিটি সরিয়ে ফেলুন",
+    "en": "Remove photo {{position}}"
+  },
+  "farmer.capture.images.moveEarlier": {
+    "bn": "{{position}} নম্বর ছবিটি আগে নিন",
+    "en": "Move photo {{position}} earlier"
+  },
+  "farmer.capture.images.moveLater": {
+    "bn": "{{position}} নম্বর ছবিটি পরে নিন",
+    "en": "Move photo {{position}} later"
+  },
+
+  "farmer.capture.quality.regionLabel": { "bn": "ছবিটি নেওয়া যায়নি", "en": "Photo not accepted" },
+  "farmer.capture.quality.previewAlt": {
+    "bn": "যে ছবিটি নেওয়া যায়নি",
+    "en": "The photo that was not accepted"
+  },
+  "farmer.capture.quality.reason.BLURRY": { "bn": "ছবিটি ঝাপসা", "en": "This photo is blurry" },
+  "farmer.capture.quality.help.BLURRY": {
+    "bn": "ফোনটি স্থির রাখুন, পাতায় ফোকাস আসা পর্যন্ত অপেক্ষা করুন, তারপর আবার তুলুন।",
+    "en": "Hold the phone still, wait until the leaf is in focus, then take it again."
+  },
+  "farmer.capture.quality.reason.TOO_SMALL": {
+    "bn": "ছবিটি খুব ছোট",
+    "en": "This photo is too small"
+  },
+  "farmer.capture.quality.help.TOO_SMALL": {
+    "bn": "ছোট করা বা কেটে নেওয়া ছবির বদলে ক্যামেরা দিয়ে সরাসরি তোলা ছবি দিন।",
+    "en": "Send a photo straight from the camera rather than a resized or cropped copy."
+  },
+  "farmer.capture.quality.reason.NOT_CROP": {
+    "bn": "এটি ফসলের ছবি বলে মনে হচ্ছে না",
+    "en": "This does not look like a crop photo"
+  },
+  "farmer.capture.quality.help.NOT_CROP": {
+    "bn": "গাছ বা পাতার কাছ থেকে ছবি তুলুন। আমাদের অনুমান ভুলও হতে পারে — ঠিক মনে হলে এভাবেই পাঠান।",
+    "en": "Move closer to the plant or leaf. This check is only a guess — send it anyway if you think it is right."
+  },
+  "farmer.capture.quality.reason.TOO_LARGE": {
+    "bn": "ছবিটি খুব বড়",
+    "en": "This photo is too large"
+  },
+  "farmer.capture.quality.help.TOO_LARGE": {
+    "bn": "ছবিটি ছোট করা যায়নি। ক্যামেরায় ছোট আকারে তুলে আবার চেষ্টা করুন।",
+    "en": "The photo could not be made smaller. Try again at a smaller camera size."
+  },
+  "farmer.capture.quality.reason.UNREADABLE": {
+    "bn": "ছবিটি খোলা যায়নি",
+    "en": "This photo could not be opened"
+  },
+  "farmer.capture.quality.help.UNREADABLE": {
+    "bn": "ফাইলটি নষ্ট হয়ে থাকতে পারে। আবার একটি ছবি তুলুন।",
+    "en": "The file may be damaged. Please take the photo again."
+  },
+  "farmer.capture.quality.blurMetric": {
+    "bn": "মাপা স্পষ্টতা, সীমার তুলনায়",
+    "en": "Measured sharpness against the limit"
+  },
+  "farmer.capture.quality.sizeLimit": {
+    "bn": "একটি ছবি সর্বোচ্চ {{megabytes}} মেগাবাইট হতে পারে।",
+    "en": "A photo may be at most {{megabytes}} MB."
+  },
+  "farmer.capture.quality.retake": { "bn": "আবার তুলুন", "en": "Take it again" },
+  "farmer.capture.quality.sendAnyway": { "bn": "তবুও পাঠান", "en": "Send anyway" },
+
+  "farmer.capture.describe.stepTitle": { "bn": "সমস্যাটি জানান", "en": "Describe the problem" },
+  "farmer.capture.describe.help": {
+    "bn": "বোতাম চেপে ধরে কথা বলুন, অথবা নিচে লিখুন। দুটোর যেকোনো একটি দিলেই চলবে।",
+    "en": "Hold the button and speak, or type below. Either one is enough."
+  },
+
+  "farmer.capture.voice.holdLabel": {
+    "bn": "চেপে ধরে কথা বলুন",
+    "en": "Hold to record your voice"
+  },
+  "farmer.capture.voice.idle": { "bn": "বোতাম চেপে ধরুন", "en": "Hold the button" },
+  "farmer.capture.voice.preparing": { "bn": "মাইক্রোফোন চালু হচ্ছে…", "en": "Opening the microphone…" },
+  "farmer.capture.voice.recording": { "bn": "রেকর্ড হচ্ছে", "en": "Recording" },
+  "farmer.capture.voice.captured": { "bn": "রেকর্ডিং নেওয়া হয়েছে", "en": "Recording captured" },
+  "farmer.capture.voice.seconds": { "bn": "সেকেন্ড", "en": "seconds" },
+  "farmer.capture.voice.discard": { "bn": "মুছে ফেলুন", "en": "Discard" },
+  "farmer.capture.voice.diagnostic.DENIED": {
+    "bn": "মাইক্রোফোন ব্যবহারের অনুমতি নেই, তাই রেকর্ডার দেখানো হয়নি। নিচে লিখে জানান।",
+    "en": "Microphone access was refused, so the recorder is hidden. Please type below instead."
+  },
+  "farmer.capture.voice.diagnostic.NO_DEVICE": {
+    "bn": "কোনো মাইক্রোফোন পাওয়া যায়নি। নিচে লিখে জানান।",
+    "en": "No microphone was found. Please type below instead."
+  },
+  "farmer.capture.voice.diagnostic.INSECURE": {
+    "bn": "এই ঠিকানাটি নিরাপদ (HTTPS) নয়, তাই মাইক্রোফোন ব্যবহার করা যাচ্ছে না। নিচে লিখে জানান।",
+    "en": "This address is not secure (HTTPS), so the microphone cannot be used. Please type below instead."
+  },
+  "farmer.capture.voice.diagnostic.UNSUPPORTED": {
+    "bn": "এই ব্রাউজারে রেকর্ডিং চলে না। নিচে লিখে জানান।",
+    "en": "This browser cannot record audio. Please type below instead."
+  },
+  "farmer.capture.voice.diagnostic.NO_CONTAINER": {
+    "bn": "এই ব্রাউজারের রেকর্ডিং ফরম্যাট আমরা নিতে পারি না। নিচে লিখে জানান।",
+    "en": "This browser's recording format is not one we accept. Please type below instead."
+  },
+  "farmer.capture.voice.diagnostic.READY": {
+    "bn": "মাইক্রোফোন প্রস্তুত।",
+    "en": "The microphone is ready."
+  },
+
+  "farmer.capture.note.label": { "bn": "লিখে জানান", "en": "Write it down" },
+  "farmer.capture.note.hint": {
+    "bn": "কবে থেকে সমস্যা, কোন অংশে দেখা যাচ্ছে — যা জানেন লিখুন। এটি সবসময় খোলা থাকে।",
+    "en": "When it started, which part of the plant — write whatever you know. This box is always open."
+  },
+  "farmer.capture.note.placeholder": {
+    "bn": "যেমন: তিন দিন ধরে পাতায় দাগ দেখা যাচ্ছে।",
+    "en": "For example: spots have been on the leaves for three days."
+  },
+  "farmer.capture.note.remaining": { "bn": "লেখা অক্ষরের সংখ্যা", "en": "characters used" },
+
+  "farmer.capture.submit.hint": {
+    "bn": "কমপক্ষে {{min}}টি ছবি দরকার।",
+    "en": "At least {{min}} photo is needed."
+  },
+  "farmer.capture.submit.send": { "bn": "পাঠান", "en": "Send" },
+  "farmer.capture.submit.sending": { "bn": "পাঠানো হচ্ছে…", "en": "Sending…" },
+  "farmer.capture.submit.retry": { "bn": "আবার পাঠান", "en": "Send again" },
+
+  "farmer.capture.serverReason.BLURRY": { "bn": "ঝাপসা", "en": "Blurry" },
+  "farmer.capture.serverReason.TOO_SMALL": { "bn": "খুব ছোট", "en": "Too small" },
+  "farmer.capture.serverReason.UNDEREXPOSED": { "bn": "খুব অন্ধকার", "en": "Too dark" },
+  "farmer.capture.serverReason.OVEREXPOSED": { "bn": "খুব উজ্জ্বল", "en": "Too bright" },
+  "farmer.capture.serverReason.UNREADABLE": { "bn": "পড়া যায়নি", "en": "Could not be read" }
+}

@@ -1,0 +1,34 @@
+<div class="cb-row">
+  <div class="cb-column">
+    <div class="cb-track">
+      <div class="cb-fill" data-testid="cb-fill" [attr.data-width]="fillPercent()"></div>
+
+      <!-- WEB-FR-221 — both lines, on every bar, always. Their positions come from the
+           inputs, so they can never disagree with the routing that produced them. -->
+      <div
+        class="cb-line"
+        data-testid="cb-line"
+        data-threshold="low"
+        [attr.data-position]="lowPercent()"
+      ></div>
+      <div
+        class="cb-line"
+        data-testid="cb-line"
+        data-threshold="high"
+        [attr.data-position]="highPercent()"
+      ></div>
+    </div>
+
+    <!-- WEB-FR-222 — each line is labelled with its numeric value, as text. -->
+    <div class="cb-scale">
+      <span class="cb-line-label" data-testid="cb-line-label" data-threshold="low">{{
+        lowPercent()
+      }}</span>
+      <span class="cb-line-label" data-testid="cb-line-label" data-threshold="high">{{
+        highPercent()
+      }}</span>
+    </div>
+  </div>
+
+  <span class="cb-value" data-testid="cb-value">{{ fillPercent() }}</span>
+</div>

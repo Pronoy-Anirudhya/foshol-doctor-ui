@@ -1,0 +1,11 @@
+{
+  "page": 0,
+  "size": 20,
+  "totalElements": 3,
+  "totalPages": 1,
+  "content": [
+    { "caseId": "01a07c99-705d-7564-964f-9fb2da09c294", "cropNameBn": "[cropNameBn]", "status": "ADVISED", "decisionPath": "PRIMARY", "diseaseNameBn": "[diseaseNameBn]", "officerName": "Demo Officer", "advisoryVersion": 1, "rejectionMessageBn": null, "thumbnailImageId": "01a07c99-705d-770e-9650-cb44f37c8a1d", "submittedAt": "2026-09-07T16:00:25.598470Z", "publishedAt": "2026-09-07T18:18:40.000Z" },
+    { "caseId": "01a07caa-0000-7000-8000-00000000fffd", "cropNameBn": "[cropNameBn]", "status": "REJECTED", "decisionPath": "SECONDARY", "diseaseNameBn": null, "officerName": "Demo Officer", "advisoryVersion": null, "rejectionMessageBn": "[rejectionMessageBn]", "thumbnailImageId": null, "submittedAt": "2026-09-07T15:00:00.000000Z", "publishedAt": null },
+    { "caseId": "01a07cae-1d56-768b-8e21-25faf1753e3c", "cropNameBn": "[cropNameBn]", "status": "IN_REVIEW", "decisionPath": "PRIMARY", "diseaseNameBn": null, "officerName": null, "advisoryVersion": null, "rejectionMessageBn": null, "thumbnailImageId": null, "submittedAt": "2026-09-07T16:23:00.000000Z", "publishedAt": null }
+  ]
+}

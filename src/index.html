@@ -1,0 +1,26 @@
+<!doctype html>
+<!--
+  WEB-UX-011 / WEB-UX-045 — Bangla is the default and the language of record, so the document
+  starts in Bangla. LanguageStore rewrites documentElement.lang on every toggle, so this is the
+  initial value rather than a fixed one.
+-->
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <title>ফসল ডক্টর · Foshol Doctor</title>
+    <base href="/" />
+    <!-- viewport-fit=cover so the capture control clears the home indicator on a notched phone. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- One theme, verified once: the browser must not invert anything (see src/styles.css). -->
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#1e6f4e" />
+    <meta
+      name="description"
+      content="AI-triaged crop-disease diagnosis, with every advisory approved by a human field officer."
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  </head>
+  <body>
+    <foshol-root></foshol-root>
+  </body>
+</html>

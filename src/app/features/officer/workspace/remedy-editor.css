@@ -1,0 +1,197 @@
+/* WEB-UX-034 — no media query; the editor is one readable column at every width. */
+
+.editor-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.editor-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.editor-disease {
+  margin-block-start: 0.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.9375rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.count {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-1);
+  padding: 0.15rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-ink-muted);
+}
+
+.notice {
+  margin-block-start: 0.75rem;
+  max-inline-size: 68ch;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-paddy-200);
+  background: var(--color-paddy-50);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8125rem;
+  color: var(--color-paddy-800);
+}
+
+.empty {
+  margin-block-start: 0.9rem;
+  padding: 1rem;
+  border-radius: 0.875rem;
+  border: 1px dashed var(--color-surface-3);
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.remedies {
+  margin-block-start: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+}
+
+.remedy {
+  border: 1px solid var(--color-surface-3);
+  border-radius: 0.875rem;
+  background: var(--color-surface-0);
+  padding: 0.75rem 0.9rem;
+  transition:
+    border-color var(--duration-1) var(--ease-settle),
+    box-shadow var(--duration-2) var(--ease-settle);
+}
+
+/* WEB-UX-044 — selection is a rail plus a checked box plus a weight change, never hue alone. */
+.remedy[data-selected='true'] {
+  border-color: var(--color-paddy-500);
+  box-shadow: var(--shadow-card);
+}
+
+.remedy-pick {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.tick {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  accent-color: var(--color-paddy-600);
+  flex: 0 0 auto;
+}
+
+.tick:disabled {
+  cursor: not-allowed;
+}
+
+.remedy-title {
+  font-weight: 700;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.steps-label {
+  margin-block-start: 0.55rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.steps {
+  margin: 0.3rem 0 0;
+  padding-inline-start: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+.remedy-meta {
+  margin: 0.6rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+}
+
+.remedy-meta dt {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.remedy-meta dd {
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.source {
+  font-size: 0.75rem;
+  color: var(--color-ink-faint);
+  overflow-wrap: anywhere;
+}
+
+.note-block {
+  margin-block-start: 1.1rem;
+}
+
+.note-label {
+  display: block;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.note-hint {
+  margin-block-start: 0.15rem;
+  max-inline-size: 68ch;
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+}
+
+.note {
+  margin-block-start: 0.45rem;
+  inline-size: 100%;
+  min-block-size: 5.5rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: 0.75rem;
+  background: var(--color-surface-0);
+  resize: vertical;
+  transition: border-color var(--duration-1) var(--ease-settle);
+}
+
+.note:hover:not(:disabled) {
+  border-color: var(--color-slate-600);
+}
+
+.note:disabled {
+  background: var(--color-surface-1);
+  color: var(--color-ink-muted);
+  cursor: not-allowed;
+}

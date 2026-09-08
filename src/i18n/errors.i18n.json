@@ -1,0 +1,118 @@
+{
+  "errors.generic.title": {
+    "bn": "কিছু একটা ঠিকমতো হয়নি",
+    "en": "Something did not go through"
+  },
+  "errors.generic.detail": {
+    "bn": "আবার চেষ্টা করুন। সমস্যা থেকে গেলে নিচের রেফারেন্স নম্বরটি জানান।",
+    "en": "Please try again. If it keeps happening, share the reference number below."
+  },
+  "errors.offline.title": {
+    "bn": "ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না",
+    "en": "No internet connection"
+  },
+  "errors.offline.detail": {
+    "bn": "আপনার ছবি ও লেখা এখানেই রাখা আছে। সংযোগ ফিরে এলে আবার পাঠান।",
+    "en": "Your photos and notes are safe here. Send again once you are back online."
+  },
+  "errors.unauthorised.title": {
+    "bn": "আবার লগইন করুন",
+    "en": "Please sign in again"
+  },
+  "errors.unauthorised.detail": {
+    "bn": "নিরাপত্তার জন্য আপনার সেশনটি শেষ হয়ে গেছে। লগইন করলে যেখানে ছিলেন সেখানেই ফিরে যাবেন।",
+    "en": "Your session has ended for safety. Sign in and you will come back to where you were."
+  },
+  "errors.forbidden.title": {
+    "bn": "এই অংশে আপনার প্রবেশাধিকার নেই",
+    "en": "You do not have access to this"
+  },
+  "errors.forbidden.detail": {
+    "bn": "এই পাতাটি অন্য ধরনের ব্যবহারকারীর জন্য। নিজের পাতায় ফিরে যান।",
+    "en": "This page is for a different kind of user. Please go back to your own pages."
+  },
+  "errors.notFound.title": {
+    "bn": "এটি খুঁজে পাওয়া গেল না",
+    "en": "We could not find this"
+  },
+  "errors.notFound.detail": {
+    "bn": "জিনিসটি হয়তো সরে গেছে, অথবা এটি আপনার নয়।",
+    "en": "It may have moved, or it may not be yours."
+  },
+  "errors.conflict.title": {
+    "bn": "এটি ইতিমধ্যে বদলে গেছে",
+    "en": "This has already changed"
+  },
+  "errors.conflict.detail": {
+    "bn": "অন্য কেউ এর মধ্যে কাজটি করে ফেলেছেন। নতুন করে দেখে নিয়ে আবার চেষ্টা করুন।",
+    "en": "Someone got there first. Refresh to see the latest, then try again."
+  },
+  "errors.tooLarge.title": {
+    "bn": "ফাইলটি অনেক বড়",
+    "en": "That file is too large"
+  },
+  "errors.tooLarge.detail": {
+    "bn": "একটু ছোট ছবি বেছে নিন, অথবা আবার তুলুন।",
+    "en": "Choose a smaller photo, or take it again."
+  },
+  "errors.unsupportedType.title": {
+    "bn": "এই ধরনের ফাইল নেওয়া যাচ্ছে না",
+    "en": "That kind of file is not supported"
+  },
+  "errors.unsupportedType.detail": {
+    "bn": "ছবি বা রেকর্ডিংটি অন্য ফরম্যাটে দিন।",
+    "en": "Please send the photo or recording in another format."
+  },
+  "errors.badRequest.title": {
+    "bn": "তথ্যে কিছু একটা ঠিক নেই",
+    "en": "Something needs fixing"
+  },
+  "errors.badRequest.detail": {
+    "bn": "চিহ্নিত ঘরগুলো একবার দেখে ঠিক করে আবার পাঠান।",
+    "en": "Check the highlighted fields, then send again."
+  },
+  "errors.quality.title": {
+    "bn": "ছবিটি যথেষ্ট স্পষ্ট হয়নি",
+    "en": "The photo was not clear enough"
+  },
+  "errors.quality.detail": {
+    "bn": "কিছুই জমা হয়নি। ভালো আলোয়, একটু কাছ থেকে আবার ছবি তুলুন।",
+    "en": "Nothing was saved. Take it again in good light, a little closer."
+  },
+  "errors.rateLimited.title": {
+    "bn": "একটু অপেক্ষা করুন",
+    "en": "Please wait a moment"
+  },
+  "errors.rateLimited.detail": {
+    "bn": "অল্প সময়ে অনেকবার চেষ্টা হয়েছে। একটু পরে আবার করুন।",
+    "en": "That was tried a few too many times. Please try again shortly."
+  },
+  "errors.unavailable.title": {
+    "bn": "সেবাটি সাময়িকভাবে বন্ধ",
+    "en": "Temporarily unavailable"
+  },
+  "errors.unavailable.detail": {
+    "bn": "সার্ভার এখন ব্যস্ত। একটু পরে আবার চেষ্টা করুন।",
+    "en": "The service is busy right now. Please try again in a moment."
+  },
+  "errors.correlationId.label": {
+    "bn": "রেফারেন্স নম্বর",
+    "en": "Reference number"
+  },
+  "errors.correlationId.copy": {
+    "bn": "রেফারেন্স নম্বর কপি করুন",
+    "en": "Copy reference number"
+  },
+  "errors.correlationId.copied": {
+    "bn": "কপি হয়েছে",
+    "en": "Copied"
+  },
+  "errors.retry": {
+    "bn": "আবার চেষ্টা করুন",
+    "en": "Try again"
+  },
+  "errors.dismiss": {
+    "bn": "বন্ধ করুন",
+    "en": "Dismiss"
+  }
+}

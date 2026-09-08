@@ -1,0 +1,54 @@
+[
+  {
+    "id": "01800000-0000-7000-8000-000000000507",
+    "diseaseId": "01800000-0000-7000-8000-000000000103",
+    "type": "CULTURAL",
+    "titleBn": "[titleBn]",
+    "stepsBn": [
+      "[step 1]",
+      "[step 2]",
+      "[step 3]",
+      "[step 4]"
+    ],
+    "dosageBn": null,
+    "phiDays": null,
+    "costTier": "LOW",
+    "efficacy": "HIGH",
+    "sourceRef": "[sourceRef]",
+    "displayOrder": 1
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000508",
+    "diseaseId": "01800000-0000-7000-8000-000000000103",
+    "type": "ORGANIC",
+    "titleBn": "[titleBn]",
+    "stepsBn": [
+      "[step 1]",
+      "[step 2]",
+      "[step 3]"
+    ],
+    "dosageBn": "[dosageBn]",
+    "phiDays": null,
+    "costTier": "LOW",
+    "efficacy": "LOW",
+    "sourceRef": "[sourceRef]",
+    "displayOrder": 2
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000509",
+    "diseaseId": "01800000-0000-7000-8000-000000000103",
+    "type": "CHEMICAL",
+    "titleBn": "[titleBn]",
+    "stepsBn": [
+      "[step 1]",
+      "[step 2]",
+      "[step 3]"
+    ],
+    "dosageBn": "[dosageBn]",
+    "phiDays": 21,
+    "costTier": "HIGH",
+    "efficacy": "HIGH",
+    "sourceRef": "[sourceRef]",
+    "displayOrder": 3
+  }
+]

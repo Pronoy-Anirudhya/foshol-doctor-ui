@@ -1,0 +1,122 @@
+[
+  {
+    "id": "01800000-0000-7000-8000-000000000309",
+    "code": "concentric_rings",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000313",
+    "code": "fruit_lesions",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "FRUIT"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000308",
+    "code": "green_leafhopper",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "WHOLE"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000301",
+    "code": "leaf_brown_lesions",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000311",
+    "code": "leaf_curl",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000302",
+    "code": "leaf_diamond_blast",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000303",
+    "code": "leaf_scald_bands",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000304",
+    "code": "leaf_yellow_orange",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000306",
+    "code": "panicle_neck_rot",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "PANICLE"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000312",
+    "code": "septoria_specks",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000305",
+    "code": "sheath_lesions",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "STEM"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000307",
+    "code": "stunted_plants",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "WHOLE"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000314",
+    "code": "tuber_rot",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "TUBER"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000310",
+    "code": "water_soaked_lesions",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  },
+  {
+    "id": "01800000-0000-7000-8000-000000000315",
+    "code": "whitefly_colonies",
+    "nameBn": "[nameBn]",
+    "nameEn": "[nameEn]",
+    "nameEnFallback": false,
+    "organ": "LEAF"
+  }
+]

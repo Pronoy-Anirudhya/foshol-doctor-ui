@@ -1,0 +1,30 @@
+/* Colour is reinforcement only — the value is always present as text (WEB-UX-044). Every pair
+   below is one the contrast gate already verifies. */
+
+:host {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink);
+}
+
+:host([data-path='PRIMARY']) {
+  background-color: var(--color-paddy-100);
+  border-color: var(--color-paddy-600);
+  color: var(--color-paddy-700);
+}
+
+:host([data-path='SECONDARY']) {
+  background-color: var(--color-dawn-100);
+  border-color: var(--color-dawn-600);
+  color: var(--color-dawn-700);
+}
+
+.dp-glyph {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.dp-text {
+  line-height: 1.4;
+}

@@ -1,0 +1,594 @@
+{
+  "officer.queue.title": {
+    "bn": "পর্যালোচনার সারি",
+    "en": "Review queue"
+  },
+  "officer.queue.eyebrow": {
+    "bn": "মাঠ কর্মকর্তার কনসোল",
+    "en": "Field officer console"
+  },
+  "officer.queue.subtitle": {
+    "bn": "প্রতিটি কেস কৃষকের কাছে পৌঁছানোর আগে এখানে একজন মানুষ অনুমোদন করেন।",
+    "en": "Every case is approved by a human here before it reaches the farmer."
+  },
+  "officer.queue.orderNote": {
+    "bn": "সবচেয়ে কম আত্মবিশ্বাসের কেস আগে।",
+    "en": "Least-confident cases first."
+  },
+  "officer.queue.orderNoteDetail": {
+    "bn": "ক্রম নির্ধারণ করে সার্ভার — যেখানে মডেল সবচেয়ে কম নিশ্চিত, সেখানেই মানুষের সময় সবচেয়ে বেশি দরকার। এই তালিকা ব্রাউজারে সাজানো যায় না।",
+    "en": "The server fixes this order — human time is worth most where the model is least sure. This list cannot be re-sorted in the browser."
+  },
+  "officer.queue.refresh": {
+    "bn": "সারি নতুন করে আনুন",
+    "en": "Refresh queue"
+  },
+  "officer.queue.refreshing": {
+    "bn": "আনা হচ্ছে…",
+    "en": "Refreshing…"
+  },
+  "officer.queue.stale": {
+    "bn": "নতুন পরিবর্তন এসেছে। নতুন করে আনুন।",
+    "en": "Newer changes have arrived. Refresh to see them."
+  },
+  "officer.queue.tableLabel": {
+    "bn": "পর্যালোচনার অপেক্ষায় থাকা কেস",
+    "en": "Cases awaiting review"
+  },
+  "officer.queue.col.farmer": {
+    "bn": "কৃষক",
+    "en": "Farmer"
+  },
+  "officer.queue.col.crop": {
+    "bn": "ফসল",
+    "en": "Crop"
+  },
+  "officer.queue.col.candidate": {
+    "bn": "শীর্ষ সম্ভাবনা",
+    "en": "Top candidate"
+  },
+  "officer.queue.col.confidence": {
+    "bn": "আত্মবিশ্বাস",
+    "en": "Confidence"
+  },
+  "officer.queue.col.path": {
+    "bn": "সিদ্ধান্তের পথ",
+    "en": "Decision path"
+  },
+  "officer.queue.col.media": {
+    "bn": "ছবি ও কণ্ঠ",
+    "en": "Media"
+  },
+  "officer.queue.col.submitted": {
+    "bn": "জমা",
+    "en": "Submitted"
+  },
+  "officer.queue.col.sla": {
+    "bn": "সময়সীমা",
+    "en": "SLA due"
+  },
+  "officer.queue.col.state": {
+    "bn": "অবস্থা",
+    "en": "State"
+  },
+  "officer.queue.images": {
+    "bn": "{{count}} ছবি",
+    "en": "{{count}} image(s)"
+  },
+  "officer.queue.audioYes": {
+    "bn": "কণ্ঠ আছে",
+    "en": "Audio"
+  },
+  "officer.queue.audioNo": {
+    "bn": "কণ্ঠ নেই",
+    "en": "No audio"
+  },
+  "officer.queue.resubmission": {
+    "bn": "পুনঃজমা",
+    "en": "Re-submission"
+  },
+  "officer.queue.resubmissionHint": {
+    "bn": "কৃষক আগের কেসটি সংশোধন করে আবার পাঠিয়েছেন।",
+    "en": "The farmer resubmitted after an earlier case."
+  },
+  "officer.queue.liveStatus": {
+    "bn": "সরাসরি অবস্থা",
+    "en": "Live status"
+  },
+  "officer.queue.openAria": {
+    "bn": "{{farmer}}-এর কেস খুলুন",
+    "en": "Open the case from {{farmer}}"
+  },
+  "officer.queue.empty.title": {
+    "bn": "সারি খালি",
+    "en": "The queue is empty"
+  },
+  "officer.queue.empty.detail": {
+    "bn": "এই মুহূর্তে পর্যালোচনার অপেক্ষায় কোনো কেস নেই।",
+    "en": "No cases are waiting for review right now."
+  },
+  "officer.queue.state.PENDING": {
+    "bn": "অপেক্ষমাণ",
+    "en": "Pending"
+  },
+  "officer.queue.state.CLAIMED": {
+    "bn": "নেওয়া হয়েছে",
+    "en": "Claimed"
+  },
+  "officer.queue.state.DONE": {
+    "bn": "সম্পন্ন",
+    "en": "Done"
+  },
+  "officer.queue.state.REJECTED": {
+    "bn": "প্রত্যাখ্যাত",
+    "en": "Rejected"
+  },
+  "officer.case.back": {
+    "bn": "সারিতে ফিরুন",
+    "en": "Back to queue"
+  },
+  "officer.case.eyebrow": {
+    "bn": "কেস পর্যালোচনা",
+    "en": "Case review"
+  },
+  "officer.case.loading": {
+    "bn": "কেস আনা হচ্ছে…",
+    "en": "Loading the case…"
+  },
+  "officer.case.farmer": {
+    "bn": "কৃষক",
+    "en": "Farmer"
+  },
+  "officer.case.status": {
+    "bn": "কেসের অবস্থা",
+    "en": "Case status"
+  },
+  "officer.case.submitted": {
+    "bn": "জমা দেওয়া হয়েছে",
+    "en": "Submitted"
+  },
+  "officer.case.sla": {
+    "bn": "সময়সীমা",
+    "en": "SLA due"
+  },
+  "officer.case.caseId": {
+    "bn": "কেস আইডি",
+    "en": "Case id"
+  },
+  "officer.case.note": {
+    "bn": "কৃষকের লেখা",
+    "en": "Farmer's note"
+  },
+  "officer.case.noteEmpty": {
+    "bn": "কৃষক কিছু লেখেননি।",
+    "en": "The farmer wrote nothing."
+  },
+  "officer.case.section.images": {
+    "bn": "ছবি",
+    "en": "Images"
+  },
+  "officer.case.section.candidates": {
+    "bn": "সম্ভাব্য রোগ",
+    "en": "Candidates"
+  },
+  "officer.case.section.symptoms": {
+    "bn": "লক্ষণ",
+    "en": "Symptoms"
+  },
+  "officer.case.section.audio": {
+    "bn": "কণ্ঠ ও প্রতিলিপি",
+    "en": "Audio and transcript"
+  },
+  "officer.case.section.model": {
+    "bn": "মডেলের তথ্য",
+    "en": "Model detail"
+  },
+  "officer.case.section.decision": {
+    "bn": "সিদ্ধান্ত",
+    "en": "Decision"
+  },
+  "officer.case.imageAlt": {
+    "bn": "কৃষকের পাঠানো {{position}} নম্বর ছবি",
+    "en": "Farmer's image {{position}}"
+  },
+  "officer.case.imagePick": {
+    "bn": "{{position}} নম্বর ছবি দেখান",
+    "en": "Show image {{position}}"
+  },
+  "officer.case.imagesEmpty": {
+    "bn": "কোনো ছবি নেই।",
+    "en": "No images."
+  },
+  "officer.case.symptomsEmpty": {
+    "bn": "কোনো লক্ষণ শনাক্ত হয়নি।",
+    "en": "No symptoms were extracted."
+  },
+  "officer.case.candidatesEmpty": {
+    "bn": "মডেল কোনো সম্ভাব্য রোগ দিতে পারেনি।",
+    "en": "The model returned no candidates."
+  },
+  "officer.case.thresholdCaption": {
+    "bn": "দুটি খাড়া রেখা দুটি রাউটিং সীমা — প্রতিটি প্রার্থীর উপর একই জায়গায়, সার্ভারের পাঠানো মান অনুযায়ী।",
+    "en": "The two vertical rules are the two routing thresholds, at the same place on every candidate, from the values the server sent."
+  },
+  "officer.case.thresholdLow": {
+    "bn": "নিচের সীমা {{value}}",
+    "en": "Low threshold {{value}}"
+  },
+  "officer.case.thresholdHigh": {
+    "bn": "উপরের সীমা {{value}}",
+    "en": "High threshold {{value}}"
+  },
+  "officer.case.model.id": {
+    "bn": "মডেল",
+    "en": "Model"
+  },
+  "officer.case.model.version": {
+    "bn": "সংস্করণ",
+    "en": "Version"
+  },
+  "officer.case.model.latency": {
+    "bn": "সময় লেগেছে",
+    "en": "Latency"
+  },
+  "officer.case.model.latencyValue": {
+    "bn": "{{ms}} মিলিসেকেন্ড",
+    "en": "{{ms}} ms"
+  },
+  "officer.case.model.margin": {
+    "bn": "ব্যবধান",
+    "en": "Margin"
+  },
+  "officer.case.model.unmapped": {
+    "bn": "অচিহ্নিত আউটপুট",
+    "en": "Unmapped outputs"
+  },
+  "officer.case.model.unmappedValue": {
+    "bn": "{{count}} টি",
+    "en": "{{count}}"
+  },
+  "officer.case.model.unmappedHint": {
+    "bn": "মডেল এমন লেবেল দিয়েছে যা জ্ঞানভাণ্ডারে মেলানো যায়নি। সেগুলো ফেলে দেওয়া হয়নি, গোনা হয়েছে।",
+    "en": "The model returned labels the knowledge base could not map. They were counted, not dropped."
+  },
+  "officer.case.model.none": {
+    "bn": "নেই",
+    "en": "None"
+  },
+  "officer.case.degraded.title": {
+    "bn": "বিশ্লেষণ অসম্পূর্ণ",
+    "en": "Degraded analysis"
+  },
+  "officer.case.degraded.detail": {
+    "bn": "বিশ্লেষণ সেবা সাড়া দেয়নি ({{code}})। কেসটি তবু আপনার কাছে এসেছে এবং চারটি সিদ্ধান্তই খোলা আছে।",
+    "en": "The analysis service did not answer ({{code}}). The case still reached you and all four actions remain open."
+  },
+  "officer.case.transcriptNotice": {
+    "bn": "প্রতিলিপি কৃষকের নিজের কথায়, হুবহু দেখানো হয়েছে — অনুবাদ করা হয়নি।",
+    "en": "The transcript is the farmer's own words, shown verbatim and never translated."
+  },
+  "officer.case.asrConfidence": {
+    "bn": "কণ্ঠ শনাক্তির আত্মবিশ্বাস",
+    "en": "ASR confidence"
+  },
+  "officer.case.notFound.title": {
+    "bn": "কেস পাওয়া যায়নি",
+    "en": "Case not found"
+  },
+  "officer.case.notFound.detail": {
+    "bn": "এই কেসটি আর সারিতে নেই অথবা আপনার জন্য নয়।",
+    "en": "This case is no longer in the queue, or is not yours to open."
+  },
+  "officer.claim.legend": {
+    "bn": "দখল",
+    "en": "Claim"
+  },
+  "officer.claim.state.NONE": {
+    "bn": "কেউ নেয়নি",
+    "en": "Unclaimed"
+  },
+  "officer.claim.state.HELD_BY_ME": {
+    "bn": "আপনি নিয়েছেন",
+    "en": "Held by you"
+  },
+  "officer.claim.state.HELD_BY_OTHER": {
+    "bn": "অন্য কর্মকর্তা নিয়েছেন",
+    "en": "Held by another officer"
+  },
+  "officer.claim.state.EXPIRED": {
+    "bn": "সময় শেষ",
+    "en": "Claim expired"
+  },
+  "officer.claim.take": {
+    "bn": "কেসটি নিন",
+    "en": "Claim case"
+  },
+  "officer.claim.taking": {
+    "bn": "নেওয়া হচ্ছে…",
+    "en": "Claiming…"
+  },
+  "officer.claim.release": {
+    "bn": "ছেড়ে দিন",
+    "en": "Release"
+  },
+  "officer.claim.releasing": {
+    "bn": "ছাড়া হচ্ছে…",
+    "en": "Releasing…"
+  },
+  "officer.claim.reclaim": {
+    "bn": "আবার নিন",
+    "en": "Re-claim"
+  },
+  "officer.claim.required": {
+    "bn": "সিদ্ধান্ত নিতে হলে আগে কেসটি নিতে হবে।",
+    "en": "Claim the case before you can decide it."
+  },
+  "officer.claim.remaining": {
+    "bn": "বাকি {{time}}",
+    "en": "{{time}} left"
+  },
+  "officer.claim.timerAria": {
+    "bn": "দখলের সময় বাকি {{time}}",
+    "en": "{{time}} of claim time remaining"
+  },
+  "officer.claim.tone.normal": {
+    "bn": "সময় আছে",
+    "en": "Plenty of time"
+  },
+  "officer.claim.tone.warn": {
+    "bn": "সময় ফুরিয়ে আসছে",
+    "en": "Time running low"
+  },
+  "officer.claim.tone.critical": {
+    "bn": "এক মিনিটের কম বাকি",
+    "en": "Under a minute left"
+  },
+  "officer.claim.tone.expired": {
+    "bn": "সময় শেষ",
+    "en": "Time is up"
+  },
+  "officer.claim.expired.title": {
+    "bn": "দখলের সময় শেষ",
+    "en": "Your claim expired"
+  },
+  "officer.claim.expired.detail": {
+    "bn": "আপনার লেখা কিছুই মোছা হয়নি — নিচে ঠিক যেমন ছিল তেমনই আছে। আবার নিলেই জমা দিতে পারবেন।",
+    "en": "Nothing you typed was discarded — it is still below exactly as you left it. Re-claim the case and you can submit it."
+  },
+  "officer.claim.other.title": {
+    "bn": "কেসটি এখন অন্য কারও কাছে",
+    "en": "Another officer holds this case"
+  },
+  "officer.claim.other.detail": {
+    "bn": "আপনার লেখা দেখা যাচ্ছে, কিন্তু এখন আর জমা দেওয়া যাবে না। কেসটি ছাড়া পেলে আবার নেওয়া যাবে।",
+    "en": "Your text is still visible, but it can no longer be submitted. You may re-claim it once they release the case."
+  },
+  "officer.claim.warnGlyph": {
+    "bn": "সতর্কতা",
+    "en": "Warning"
+  },
+  "officer.remedy.title": {
+    "bn": "প্রতিকার সম্পাদনা",
+    "en": "Remedy editor"
+  },
+  "officer.remedy.disease": {
+    "bn": "নির্বাচিত রোগ",
+    "en": "Selected disease"
+  },
+  "officer.remedy.diseaseNone": {
+    "bn": "কোনো রোগ নির্বাচন করা হয়নি",
+    "en": "No disease selected"
+  },
+  "officer.remedy.prefillNote": {
+    "bn": "প্রতিকারের লেখা, মাত্রা ও অপেক্ষাকাল মানুষের লেখা এবং সার্ভার থেকে হুবহু আসে। আপনি কোনটি পাঠাবেন তা বাছতে পারেন, আর নিজের নোট যোগ করতে পারেন।",
+    "en": "Remedy text, dosage and pre-harvest intervals are human-written and come from the server verbatim. You choose which ones go out, and add your own note."
+  },
+  "officer.remedy.include": {
+    "bn": "এই প্রতিকারটি পাঠান",
+    "en": "Send this remedy"
+  },
+  "officer.remedy.steps": {
+    "bn": "ধাপ",
+    "en": "Steps"
+  },
+  "officer.remedy.dosage": {
+    "bn": "মাত্রা",
+    "en": "Dosage"
+  },
+  "officer.remedy.phi": {
+    "bn": "ফসল তোলার আগে অপেক্ষা",
+    "en": "Pre-harvest interval"
+  },
+  "officer.remedy.phiValue": {
+    "bn": "{{days}} দিন",
+    "en": "{{days}} days"
+  },
+  "officer.remedy.source": {
+    "bn": "সূত্র",
+    "en": "Source"
+  },
+  "officer.remedy.selected": {
+    "bn": "{{count}} টি প্রতিকার বাছাই করা",
+    "en": "{{count}} remedy(ies) selected"
+  },
+  "officer.remedy.none": {
+    "bn": "এই রোগের জন্য কোনো সক্রিয় প্রতিকার নেই।",
+    "en": "This disease has no active remedies."
+  },
+  "officer.remedy.loading": {
+    "bn": "প্রতিকার আনা হচ্ছে…",
+    "en": "Loading remedies…"
+  },
+  "officer.remedy.note": {
+    "bn": "কর্মকর্তার নোট (বাংলা)",
+    "en": "Officer note (Bangla)"
+  },
+  "officer.remedy.noteHint": {
+    "bn": "ধাপের লেখায় কিছু বদলাতে চাইলে সেটি এখানে লিখুন — কৃষক এই নোটটি প্রতিকারের সঙ্গে পাবেন।",
+    "en": "Anything you would change in the steps goes here — the farmer receives this note alongside the remedies."
+  },
+  "officer.remedy.needDisease": {
+    "bn": "জমা দেওয়ার আগে একটি রোগ নির্বাচন করুন।",
+    "en": "Select a disease before submitting."
+  },
+  "officer.remedy.needRemedy": {
+    "bn": "অন্তত একটি প্রতিকার বাছুন।",
+    "en": "Select at least one remedy."
+  },
+  "officer.replace.title": {
+    "bn": "অন্য রোগ বসান",
+    "en": "Replace the disease"
+  },
+  "officer.replace.pick": {
+    "bn": "ফসলের তালিকা থেকে বাছুন",
+    "en": "Pick from the crop's diseases"
+  },
+  "officer.replace.hint": {
+    "bn": "নতুন রোগ বাছলে সেই রোগের প্রতিকারগুলো আবার ভরা হবে।",
+    "en": "Choosing a different disease refills the editor from that disease's remedies."
+  },
+  "officer.replace.loading": {
+    "bn": "রোগের তালিকা আনা হচ্ছে…",
+    "en": "Loading diseases…"
+  },
+  "officer.replace.close": {
+    "bn": "বন্ধ করুন",
+    "en": "Close"
+  },
+  "officer.replace.current": {
+    "bn": "এখন নির্বাচিত",
+    "en": "Currently selected"
+  },
+  "officer.action.legend": {
+    "bn": "চারটি সিদ্ধান্ত",
+    "en": "The four actions"
+  },
+  "officer.action.approve": {
+    "bn": "অনুমোদন",
+    "en": "Approve"
+  },
+  "officer.action.edit": {
+    "bn": "সম্পাদনা করে অনুমোদন",
+    "en": "Edit and approve"
+  },
+  "officer.action.replace": {
+    "bn": "রোগ বদলান",
+    "en": "Replace"
+  },
+  "officer.action.reject": {
+    "bn": "প্রত্যাখ্যান",
+    "en": "Reject"
+  },
+  "officer.action.submitting": {
+    "bn": "পাঠানো হচ্ছে…",
+    "en": "Submitting…"
+  },
+  "officer.action.approveHint": {
+    "bn": "মডেলের প্রস্তাব যেমন আছে তেমনই কৃষকের কাছে পাঠান।",
+    "en": "Send the suggestion to the farmer as it stands."
+  },
+  "officer.action.editHint": {
+    "bn": "আপনার বাছাই ও নোটসহ পাঠান।",
+    "en": "Send it with your selection and your note."
+  },
+  "officer.action.replaceHint": {
+    "bn": "অন্য রোগ বেছে প্রতিকার আবার ভরুন।",
+    "en": "Choose a different disease and refill the remedies."
+  },
+  "officer.action.rejectHint": {
+    "bn": "কারণসহ কৃষককে ফেরত পাঠান।",
+    "en": "Send it back to the farmer with a reason."
+  },
+  "officer.action.published": {
+    "bn": "কেস {{case}} — পরামর্শ প্রকাশিত হয়েছে ({{action}})।",
+    "en": "Case {{case}} — advisory published ({{action}})."
+  },
+  "officer.action.rejected": {
+    "bn": "কেস {{case}} প্রত্যাখ্যান করা হয়েছে।",
+    "en": "Case {{case}} was rejected."
+  },
+  "officer.action.serverDerived": {
+    "bn": "সার্ভার নিজেই ঠিক করেছে এটি কোন ধরনের সিদ্ধান্ত।",
+    "en": "The server decided which kind of action this was."
+  },
+  "officer.action.conflict.title": {
+    "bn": "কেসটির অবস্থা বদলে গেছে",
+    "en": "This case moved on"
+  },
+  "officer.action.conflict.detail": {
+    "bn": "সার্ভারে কেসটির অবস্থা এর মধ্যে বদলেছে, তাই জমা নেওয়া যায়নি। আপনার লেখা রাখা হয়েছে; নতুন অবস্থা দেখে আবার চেষ্টা করুন।",
+    "en": "The case changed on the server, so the submission was not accepted. Your text has been kept; check the refreshed state and try again."
+  },
+  "officer.action.retryManual": {
+    "bn": "নিজে থেকে আবার পাঠানো হবে না — আপনিই সিদ্ধান্ত নেবেন।",
+    "en": "Nothing is retried automatically — the decision stays yours."
+  },
+  "officer.reject.title": {
+    "bn": "কেস প্রত্যাখ্যান",
+    "en": "Reject this case"
+  },
+  "officer.reject.reason": {
+    "bn": "কারণ",
+    "en": "Reason"
+  },
+  "officer.reject.reasonPlaceholder": {
+    "bn": "একটি কারণ বাছুন",
+    "en": "Choose a reason"
+  },
+  "officer.reject.reasonRequired": {
+    "bn": "একটি কারণ বাছতে হবে।",
+    "en": "A reason is required."
+  },
+  "officer.reject.reason.BLURRY_IMAGE": {
+    "bn": "ছবি ঝাপসা",
+    "en": "Blurry image"
+  },
+  "officer.reject.reason.NOT_A_CROP": {
+    "bn": "ছবিতে ফসল নেই",
+    "en": "Not a crop"
+  },
+  "officer.reject.reason.WRONG_CROP": {
+    "bn": "ভুল ফসল",
+    "en": "Wrong crop"
+  },
+  "officer.reject.reason.INSUFFICIENT_DETAIL": {
+    "bn": "যথেষ্ট তথ্য নেই",
+    "en": "Insufficient detail"
+  },
+  "officer.reject.reason.INAUDIBLE_AUDIO": {
+    "bn": "কণ্ঠ বোঝা যাচ্ছে না",
+    "en": "Inaudible audio"
+  },
+  "officer.reject.reason.OTHER": {
+    "bn": "অন্যান্য",
+    "en": "Other"
+  },
+  "officer.reject.message": {
+    "bn": "কৃষকের জন্য বার্তা (বাংলা)",
+    "en": "Message to the farmer (Bangla)"
+  },
+  "officer.reject.messageHint": {
+    "bn": "কৃষক এই বার্তাটিই পড়বেন, তাই কী করলে ভালো হয় তা স্পষ্ট করে লিখুন।",
+    "en": "The farmer reads this message, so say plainly what would help."
+  },
+  "officer.reject.messageRequired": {
+    "bn": "একটি বাংলা বার্তা লিখুন।",
+    "en": "A Bangla message is required."
+  },
+  "officer.reject.submit": {
+    "bn": "প্রত্যাখ্যান নিশ্চিত করুন",
+    "en": "Confirm rejection"
+  },
+  "officer.reject.cancel": {
+    "bn": "বাতিল",
+    "en": "Cancel"
+  },
+  "officer.live.claimed": {
+    "bn": "কেসটি আপনি নিয়েছেন।",
+    "en": "You claimed the case."
+  },
+  "officer.live.released": {
+    "bn": "কেসটি ছেড়ে দেওয়া হয়েছে।",
+    "en": "The case was released."
+  }
+}

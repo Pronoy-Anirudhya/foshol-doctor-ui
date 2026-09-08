@@ -1,0 +1,58 @@
+/* Only what Tailwind utilities cannot express — a counter, a gradient ground, a few
+   token-driven colours. Every responsive decision is a Tailwind breakpoint class in the
+   template: WEB-UX-034 forbids an ad-hoc media query in a component stylesheet. */
+
+.ad-card {
+  background:
+    radial-gradient(120% 90% at 100% 0%, var(--color-paddy-50) 0%, transparent 55%),
+    var(--color-surface-0);
+}
+
+.ad-revised {
+  border-color: var(--color-dawn-300);
+  background: var(--color-dawn-100);
+  color: var(--color-dawn-700);
+}
+
+.ad-note-body {
+  border-inline-start: 4px solid var(--color-paddy-300);
+}
+
+/* WEB-FR-156 — one step per line, numbered in the order received. The number is drawn by a
+   CSS counter, so the markup stays a plain <ol> and the sequence cannot drift from the DOM. */
+.ad-steps {
+  counter-reset: ad-step;
+}
+
+.ad-step {
+  counter-increment: ad-step;
+}
+
+.ad-step::before {
+  content: counter(ad-step);
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0.15rem;
+  display: grid;
+  place-items: center;
+  inline-size: 1.8rem;
+  block-size: 1.8rem;
+  border-radius: 999px;
+  background: var(--color-paddy-600);
+  color: var(--color-ink-invert);
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A pre-harvest interval is a safety instruction, so it is marked as one rather than left to
+   look like any other row (WEB-FR-157, WEB-UX-044 — the label carries it, not the hue). */
+.ad-meta-phi {
+  border: 1px solid var(--color-dawn-300);
+  background: var(--color-dawn-100);
+}
+
+.ad-meta-phi dt,
+.ad-meta-phi dd {
+  color: var(--color-dawn-700);
+}

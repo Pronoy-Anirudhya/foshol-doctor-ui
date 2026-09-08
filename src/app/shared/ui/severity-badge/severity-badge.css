@@ -1,0 +1,45 @@
+/* The escalation is carried three ways at once: shape, colour and text (WEB-UX-044). Only the
+   colour pairs the contrast gate already verifies are used. */
+
+:host {
+  background-color: var(--color-surface-2);
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink);
+}
+
+:host([data-severity='LOW']) {
+  background-color: var(--color-paddy-100);
+  border-color: var(--color-paddy-600);
+  color: var(--color-paddy-700);
+}
+
+:host([data-severity='MODERATE']) {
+  background-color: var(--color-dawn-100);
+  border-color: var(--color-dawn-600);
+  color: var(--color-dawn-700);
+}
+
+:host([data-severity='HIGH']) {
+  background-color: var(--color-clay-100);
+  border-color: var(--color-clay-600);
+  color: var(--color-clay-700);
+}
+
+/* CRITICAL is the one severity that inverts, so it separates from HIGH at a glance and not
+   only on inspection. */
+:host([data-severity='CRITICAL']) {
+  background-color: var(--color-clay-600);
+  border-color: var(--color-clay-700);
+  color: var(--color-ink-invert);
+  box-shadow: var(--shadow-stamp);
+}
+
+.sv-glyph {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.sv-text {
+  line-height: 1.4;
+}

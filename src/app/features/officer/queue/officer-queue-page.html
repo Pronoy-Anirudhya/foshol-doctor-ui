@@ -1,0 +1,250 @@
+<div [class]="gridClass()">
+  <!-- WEB-UX-030 — at xl this is the left pane; below xl an open case takes the whole screen,
+       because two panes on a phone is one pane too many. -->
+  <section
+    class="min-w-0 xl:block"
+    [class.hidden]="detailOpen()"
+    [attr.aria-label]="'officer.queue.title' | translate"
+  >
+    <foshol-page-heading
+      eyebrowKey="officer.queue.eyebrow"
+      titleKey="officer.queue.title"
+      subtitleKey="officer.queue.subtitle"
+    />
+
+    <!-- WEB-FR-202 — the sentence the queue exists to make visible, adjacent to the table and
+         in the reading path. Not a footnote, not a tooltip. -->
+    <p class="order-note" data-testid="queue-order-note">
+      <span class="order-note-lead">{{ 'officer.queue.orderNote' | translate }}</span>
+      <span class="order-note-detail">{{ 'officer.queue.orderNoteDetail' | translate }}</span>
+    </p>
+
+    <div class="queue-bar">
+      <!-- WEB-FR-205 — present at all times. The degraded path when SSE is down; explicitly
+           NOT a polling timer (WEB-FR-356). -->
+      <button
+        type="button"
+        [class]="refreshClass"
+        data-testid="queue-refresh"
+        [disabled]="facade.queue.loading()"
+        (click)="refresh()"
+      >
+        <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
+          <path
+            d="M13.5 8a5.5 5.5 0 1 1-1.7-3.97M13.5 2.5V5H11"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        {{
+          (facade.queue.loading() ? 'officer.queue.refreshing' : 'officer.queue.refresh')
+            | translate
+        }}
+      </button>
+
+      @if (facade.queue.needsReload()) {
+        <p class="stale" data-testid="queue-stale">
+          <span aria-hidden="true">↻</span>
+          {{ 'officer.queue.stale' | translate }}
+        </p>
+      }
+    </div>
+
+    @if (facade.queueProblem(); as problem) {
+      <foshol-error-panel class="mt-4 block" [problem]="problem" (retry)="refresh()" />
+    }
+
+    @if (facade.queue.loading() && facade.queue.isEmpty()) {
+      <foshol-skeleton class="mt-4" variant="block" [count]="4" />
+    } @else if (facade.queue.isEmpty()) {
+      <foshol-empty-state
+        class="mt-4"
+        titleKey="officer.queue.empty.title"
+        detailKey="officer.queue.empty.detail"
+      />
+    } @else {
+      <!-- WEB-UX-032 — stacked cards below md. -->
+      <ul class="cards md:hidden" data-testid="queue-cards">
+        @for (view of rows(); track view.row.reviewTaskId) {
+          <li
+            class="card queue-card"
+            data-testid="queue-card"
+            [attr.data-case-id]="view.row.caseId"
+          >
+            <div class="card-top">
+              <a
+                class="card-link"
+                [routerLink]="taskLink(view)"
+                [attr.aria-label]="
+                  'officer.queue.openAria' | translate: { farmer: view.row.farmerName }
+                "
+              >
+                {{ view.row.farmerName }}
+              </a>
+              <span class="state" [attr.data-state]="view.row.state">
+                {{ stateKey(view) | translate }}
+              </span>
+            </div>
+
+            <p class="card-crop">
+              {{ view.row.cropNameBn }}
+              @if (view.row.isResubmission) {
+                <span class="resub" [title]="'officer.queue.resubmissionHint' | translate">
+                  <span aria-hidden="true">↩</span>
+                  {{ 'officer.queue.resubmission' | translate }}
+                </span>
+              }
+            </p>
+
+            <p class="card-candidate">{{ view.row.topDiseaseNameBn }}</p>
+
+            <!-- WEB-NFR-011 — the queue row carries no `thresholds`, so it shows the number and
+                 never a bar. The bar with its two threshold lines belongs on the case detail,
+                 where the analysis payload supplies both values. -->
+            <p class="confidence tabular" data-testid="queue-confidence">
+              {{ view.row.topConfidence | percent1 }}%
+            </p>
+
+            <div class="card-badges">
+              @if (view.row.decisionPath; as path) {
+                <foshol-decision-path-badge [path]="path" />
+              }
+              @if (view.row.analysisMode; as mode) {
+                <foshol-analysis-mode-badge [mode]="mode" />
+              }
+            </div>
+
+            <dl class="card-meta">
+              <div>
+                <dt>{{ 'officer.queue.col.media' | translate }}</dt>
+                <dd>
+                  {{ 'officer.queue.images' | translate: { count: view.row.imageCount ?? 0 } }} ·
+                  {{
+                    (view.row.hasAudio ? 'officer.queue.audioYes' : 'officer.queue.audioNo')
+                      | translate
+                  }}
+                </dd>
+              </div>
+              <div>
+                <dt>{{ 'officer.queue.col.submitted' | translate }}</dt>
+                <dd class="tabular">{{ view.row.submittedAt | dhakaTime }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'officer.queue.col.sla' | translate }}</dt>
+                <dd class="tabular">{{ view.row.slaDueAt | dhakaTime }}</dd>
+              </div>
+              @if (view.liveStatus) {
+                <div>
+                  <dt>{{ 'officer.queue.liveStatus' | translate }}</dt>
+                  <dd>{{ statusKey(view) | translate }}</dd>
+                </div>
+              }
+            </dl>
+          </li>
+        }
+      </ul>
+
+      <!-- WEB-UX-031 — the wide content scrolls inside its own container, never the page. -->
+      <div class="table-wrap hidden md:block">
+        <table class="queue-table" data-testid="queue-table">
+          <caption class="sr-only">
+            {{
+              'officer.queue.tableLabel' | translate
+            }}
+          </caption>
+          <thead>
+            <!-- WEB-FR-200 / AC-11 — plain header cells. No button, no link, no click handler,
+                 no aria-sort: the sort control does not exist, because the server's order is
+                 the one detail this screen exists to demonstrate. -->
+            <tr>
+              <th scope="col">{{ 'officer.queue.col.farmer' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.crop' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.candidate' | translate }}</th>
+              <th scope="col" class="num">{{ 'officer.queue.col.confidence' | translate }}</th>
+              <th scope="col">{{ 'officer.queue.col.path' | translate }}</th>
+              <th scope="col" class="hidden xl:table-cell">
+                {{ 'officer.queue.col.media' | translate }}
+              </th>
+              <th scope="col">{{ 'officer.queue.col.submitted' | translate }}</th>
+              <th scope="col" class="hidden xl:table-cell">
+                {{ 'officer.queue.col.sla' | translate }}
+              </th>
+              <th scope="col" class="hidden xl:table-cell">
+                {{ 'officer.queue.col.state' | translate }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (view of rows(); track view.row.reviewTaskId) {
+              <tr data-testid="queue-row" [attr.data-case-id]="view.row.caseId">
+                <td>
+                  <a
+                    class="row-link"
+                    [routerLink]="taskLink(view)"
+                    [attr.aria-label]="
+                      'officer.queue.openAria' | translate: { farmer: view.row.farmerName }
+                    "
+                  >
+                    {{ view.row.farmerName }}
+                  </a>
+                  @if (view.row.isResubmission) {
+                    <span class="resub" [title]="'officer.queue.resubmissionHint' | translate">
+                      <span aria-hidden="true">↩</span>
+                      {{ 'officer.queue.resubmission' | translate }}
+                    </span>
+                  }
+                </td>
+                <td>{{ view.row.cropNameBn }}</td>
+                <td>{{ view.row.topDiseaseNameBn }}</td>
+                <td class="num tabular" data-testid="queue-confidence">
+                  {{ view.row.topConfidence | percent1 }}%
+                </td>
+                <td>
+                  @if (view.row.decisionPath; as path) {
+                    <foshol-decision-path-badge [path]="path" />
+                  }
+                </td>
+                <td class="hidden xl:table-cell">
+                  <span class="media">
+                    {{ 'officer.queue.images' | translate: { count: view.row.imageCount ?? 0 } }}
+                  </span>
+                  <span class="media">
+                    {{
+                      (view.row.hasAudio ? 'officer.queue.audioYes' : 'officer.queue.audioNo')
+                        | translate
+                    }}
+                  </span>
+                </td>
+                <td class="tabular">{{ view.row.submittedAt | dhakaTime }}</td>
+                <td class="hidden tabular xl:table-cell">{{ view.row.slaDueAt | dhakaTime }}</td>
+                <td class="hidden xl:table-cell">
+                  <span class="state" [attr.data-state]="view.row.state">
+                    {{ stateKey(view) | translate }}
+                  </span>
+                  @if (view.liveStatus) {
+                    <span class="live-status">{{ statusKey(view) | translate }}</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <foshol-paginator
+        class="mt-4"
+        [page]="facade.queue.page()"
+        [size]="facade.queue.size()"
+        [totalElements]="facade.queue.totalElements()"
+        [totalPages]="facade.queue.totalPages()"
+        (pageChange)="goToPage($event)"
+      />
+    }
+  </section>
+
+  <section class="min-w-0" [class.hidden]="!detailOpen()">
+    <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
+  </section>
+</div>

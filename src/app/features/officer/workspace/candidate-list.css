@@ -1,0 +1,140 @@
+/* The threshold columns.
+   WEB-UX-034 — no media query here; the layout is one column at every width on purpose, so
+   the rules line up identically at 360 px and at 1280 px with no breakpoint to get wrong. */
+
+.candidates {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+
+  /* ── The one coupling in this file, stated openly ──────────────────────────────────────
+     `<foshol-confidence-bar>` lays its row out as [track, flexible] + [value, min 3.25rem]
+     with a 0.75rem gap. The full-height rules have to end where the track ends, so those
+     two measurements are mirrored here as named values rather than as magic numbers buried
+     in a calc(). If the bar's geometry ever changes, these change with it — and
+     `candidate-list.spec.ts` asserts the rules exist and carry the same percentage strings
+     the bars do, which is the part a wrong number would break. */
+  --cb-value-w: 3.25rem;
+  --cb-gap: 0.75rem;
+}
+
+/* Percentages resolve against this box, which is exactly the track band. */
+.rules {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inset-inline-end: calc(var(--cb-value-w) + var(--cb-gap));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.rule {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 2px;
+  margin-inline-start: -1px;
+  border-radius: 1px;
+  /* Low alpha on purpose: the SOLID segment across each track is drawn by the bar itself
+     (WEB-FR-221). This rule is the continuation between bars, so it must read as one column
+     without repainting over the fill it crosses. */
+  background-color: color-mix(in oklab, var(--color-slate-700) 26%, transparent);
+}
+
+.rule[data-threshold='low'] {
+  inset-inline-start: var(--cl-low, 0%);
+}
+
+.rule[data-threshold='high'] {
+  inset-inline-start: var(--cl-high, 0%);
+}
+
+.scale-head {
+  position: relative;
+  block-size: 1.1rem;
+  margin: 0;
+  /* Same band as the rules, so a head sits exactly over the column it names. */
+  margin-inline-end: calc(var(--cb-value-w) + var(--cb-gap));
+}
+
+.scale-label {
+  position: absolute;
+  inset-block-start: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--color-slate-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.scale-label[data-threshold='low'] {
+  inset-inline-start: var(--cl-low, 0%);
+}
+
+.scale-label[data-threshold='high'] {
+  inset-inline-start: var(--cl-high, 0%);
+}
+
+.cand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cand[data-selected='true'] {
+  /* The officer's choice, marked with a rail and a weight — never with hue alone. */
+  border-inline-start: 3px solid var(--color-paddy-600);
+  padding-inline-start: 0.6rem;
+  margin-inline-start: -0.75rem;
+}
+
+.cand-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  min-inline-size: 0;
+}
+
+.rank {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.35rem;
+  block-size: 1.35rem;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-ink-muted);
+}
+
+.cand-name {
+  font-weight: 700;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.cand[data-selected='true'] .cand-name {
+  color: var(--color-paddy-700);
+}
+
+.caption {
+  margin-block-start: 0.9rem;
+  max-inline-size: 62ch;
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+}
+
+.empty {
+  padding: 1rem;
+  border-radius: 0.875rem;
+  border: 1px dashed var(--color-surface-3);
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}

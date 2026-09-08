@@ -1,0 +1,23 @@
+<!-- WEB-UX-040 — first tab stop on every route. `sr-only-focusable` keeps it invisible
+     until it is focused, at which point it must be unmistakable. -->
+<a
+  href="#main"
+  class="sr-only-focusable fixed start-3 top-3 z-50 inline-flex items-center rounded-xl bg-paddy-600 px-4 py-3 text-sm font-semibold text-ink-invert shadow-lift"
+>
+  {{ 'shared.skipToContent' | translate }}
+</a>
+
+<foshol-app-header [tone]="headerTone()" />
+
+<!-- WEB-FR-402 — directly under the header so it is seen, above the content so it never
+     covers a control. -->
+<foshol-offline-banner />
+
+<main id="main" tabindex="-1" class="flex-1" [attr.aria-label]="'shared.mainLandmark' | translate">
+  <div [class]="mainClass()">
+    <router-outlet />
+  </div>
+</main>
+
+<foshol-toast-host />
+<foshol-live-region />

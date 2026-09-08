@@ -1,0 +1,97 @@
+{
+  "admin.stats.eyebrow": { "bn": "প্রশাসক", "en": "Administrator" },
+  "admin.stats.title": { "bn": "সিস্টেমের পরিসংখ্যান", "en": "System statistics" },
+  "admin.stats.subtitle": {
+    "bn": "শুধু পড়ার জন্য। এই পাতা থেকে সার্ভারের কিছুই বদলানো যায় না।",
+    "en": "Read-only. Nothing on this page changes anything on the server."
+  },
+  "admin.stats.readOnly": { "bn": "শুধু পড়ার জন্য", "en": "Read-only" },
+
+  "admin.stats.refresh": { "bn": "হালনাগাদ করুন", "en": "Refresh" },
+  "admin.stats.refreshAria": {
+    "bn": "পরিসংখ্যান সার্ভার থেকে আবার আনুন",
+    "en": "Fetch the statistics from the server again"
+  },
+  "admin.stats.updatedAt": { "bn": "তথ্য নেওয়া হয়েছে {{time}}", "en": "Data as of {{time}}" },
+  "admin.stats.neverLoaded": { "bn": "এখনও কোনো তথ্য আসেনি", "en": "No data loaded yet" },
+
+  "admin.stats.stale.title": { "bn": "পুরোনো তথ্য দেখানো হচ্ছে", "en": "Showing stale values" },
+  "admin.stats.stale.detail": {
+    "bn": "শেষ চেষ্টাটি ব্যর্থ হয়েছে। নিচের সংখ্যাগুলো সবশেষ সফলভাবে আনা তথ্য, এখনকার নয়।",
+    "en": "The last attempt failed. The numbers below are the last values that loaded successfully, not the current ones."
+  },
+  "admin.stats.stale.marker": { "bn": "পুরোনো", "en": "Stale" },
+  "admin.stats.empty.title": { "bn": "এখনও কোনো পরিসংখ্যান আসেনি", "en": "No statistics loaded" },
+  "admin.stats.empty.detail": {
+    "bn": "সার্ভার থেকে তথ্য আনতে হালনাগাদ চাপুন।",
+    "en": "Press refresh to fetch the values from the server."
+  },
+
+  "admin.stats.noData": { "bn": "যথেষ্ট তথ্য এখনও নেই", "en": "Not enough data yet" },
+  "admin.stats.percentValue": { "bn": "{{value}}%", "en": "{{value}}%" },
+  "admin.stats.minutesValue": { "bn": "{{value}} মিনিট", "en": "{{value}} min" },
+
+  "admin.stats.casesToday.label": { "bn": "আজকের কেস", "en": "Cases today" },
+  "admin.stats.casesToday.hint": {
+    "bn": "আজ জমা পড়া কেসের সংখ্যা",
+    "en": "Cases submitted today"
+  },
+  "admin.stats.approvalRate.label": { "bn": "অনুমোদনের হার", "en": "Approval rate" },
+  "admin.stats.approvalRate.hint": {
+    "bn": "প্রকাশিত পরামর্শের মধ্যে যেগুলো অফিসার অদলবদল ছাড়াই অনুমোদন করেছেন",
+    "en": "Share of published advisories the officer approved unedited"
+  },
+  "admin.stats.medianReview.label": { "bn": "পর্যালোচনার মধ্যক সময়", "en": "Median review time" },
+  "admin.stats.medianReview.hint": {
+    "bn": "পর্যালোচনার কাজ তৈরি হওয়া থেকে শেষ হওয়া পর্যন্ত",
+    "en": "From review task created to completed"
+  },
+  "admin.stats.agreement.label": {
+    "bn": "মডেল ও অফিসারের মিল",
+    "en": "Model–officer agreement"
+  },
+  "admin.stats.agreement.hint": {
+    "bn": "প্রকাশিত পরামর্শের মধ্যে যেগুলোয় অফিসার মডেলের শীর্ষ রোগই রেখেছেন",
+    "en": "Published advisories that kept the model's top-ranked disease"
+  },
+  "admin.stats.agreement.sample": {
+    "bn": "{{count}}টি প্রকাশিত পরামর্শের ভিত্তিতে হিসাব",
+    "en": "Computed from {{count}} published advisories"
+  },
+  "admin.stats.agreement.noSample": {
+    "bn": "এখনও কোনো প্রকাশিত পরামর্শ নেই, তাই কোনো হার নেই",
+    "en": "No published advisories yet, so there is no rate"
+  },
+
+  "admin.stats.thresholds.title": { "bn": "রাউটিং সীমা", "en": "Routing thresholds" },
+  "admin.stats.thresholds.subtitle": {
+    "bn": "সার্ভারের নির্ধারিত দুটি মান। মডেলের আত্মবিশ্বাস এই দুই সীমার কোথায় পড়ে, তা-ই কেসের পথ ঠিক করে।",
+    "en": "Two values set on the server. Where the model's confidence falls between them decides the case's path."
+  },
+  "admin.stats.thresholds.low": { "bn": "নিম্ন সীমা", "en": "Low threshold" },
+  "admin.stats.thresholds.high": { "bn": "উচ্চ সীমা", "en": "High threshold" },
+  "admin.stats.thresholds.aria": {
+    "bn": "রাউটিং সীমা: নিম্ন {{low}}, উচ্চ {{high}}।",
+    "en": "Routing thresholds: low {{low}}, high {{high}}."
+  },
+  "admin.stats.thresholds.humanGate": {
+    "bn": "যে পথেই যাক, প্রতিটি কেস মাঠ কর্মকর্তার অনুমোদনের পরেই কৃষকের কাছে যায়।",
+    "en": "Whichever path a case takes, a field officer approves it before any advice reaches the farmer."
+  },
+  "admin.stats.thresholds.unavailable": {
+    "bn": "সার্ভার এখন সীমা দুটি পাঠায়নি",
+    "en": "The server did not report the thresholds"
+  },
+
+  "admin.stats.band.UNDETERMINED.range": { "bn": "{{low}} এর নিচে", "en": "Below {{low}}" },
+  "admin.stats.band.SECONDARY.range": {
+    "bn": "{{low}} থেকে {{high}}",
+    "en": "{{low}} to {{high}}"
+  },
+  "admin.stats.band.PRIMARY.range": { "bn": "{{high}} বা তার বেশি", "en": "{{high}} and above" },
+
+  "admin.stats.omitted": {
+    "bn": "সার্ভার যা পাঠায়নি তা এখানে দেখানো হয়নি — শূন্য বসিয়ে দেওয়া হয়নি।",
+    "en": "What the server does not report is left out rather than shown as zero."
+  }
+}
