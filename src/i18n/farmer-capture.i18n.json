@@ -1,4 +1,8 @@
 {
+  "farmer.capture.backToCrop": {
+    "bn": "ফসল বাছাইয়ে ফিরুন",
+    "en": "Back to crop selection"
+  },
   "farmer.capture.camera.cancel": {
     "bn": "বাতিল করুন",
     "en": "Cancel"
@@ -71,13 +75,45 @@
     "bn": "সমস্যাটি জানান",
     "en": "Describe the problem"
   },
-  "farmer.capture.backToCrop": {
-    "bn": "ফসল বাছাইয়ে ফিরুন",
-    "en": "Back to crop selection"
-  },
   "farmer.capture.eyebrow": {
     "bn": "নতুন কেস",
     "en": "New case"
+  },
+  "farmer.capture.field.areaLabel": {
+    "bn": "জমির পরিমাণ",
+    "en": "Field area"
+  },
+  "farmer.capture.field.areaRequired": {
+    "bn": "জমির পরিমাণ লিখুন — এটি ছাড়া কেসটি পাঠানো যাবে না।",
+    "en": "Enter the field area — the case cannot be sent without it."
+  },
+  "farmer.capture.field.areaUnitLabel": {
+    "bn": "একক",
+    "en": "Unit"
+  },
+  "farmer.capture.field.help": {
+    "bn": "জমির পরিমাণ লিখুন। মাঠ কর্মকর্তা এই মাপ দেখেই ওষুধের মাত্রা ঠিক করেন। আপনি কথায়ও বলতে পারেন, তবে এখানে লিখলে মাপটি নিশ্চিত থাকে।",
+    "en": "Enter how much land this is. The field officer works out the remedy amount from this measurement. You may also say it in your voice note, but writing it here makes the figure certain."
+  },
+  "farmer.capture.field.quantityLabel": {
+    "bn": "ফসলের পরিমাণ",
+    "en": "Crop quantity"
+  },
+  "farmer.capture.field.quantityLegend": {
+    "bn": "ফসলের পরিমাণ জানা থাকলে দিন (না দিলেও চলবে)",
+    "en": "Crop quantity, if you know it (optional)"
+  },
+  "farmer.capture.field.quantityUnitLabel": {
+    "bn": "একক",
+    "en": "Unit"
+  },
+  "farmer.capture.field.quantityUnitNone": {
+    "bn": "— বাছাই করুন —",
+    "en": "— choose —"
+  },
+  "farmer.capture.field.stepTitle": {
+    "bn": "আপনার জমি",
+    "en": "Your field"
   },
   "farmer.capture.images.checking": {
     "bn": "ছবি পরীক্ষা করা হচ্ছে…",
@@ -148,8 +184,8 @@
     "en": "Hold the phone still, wait until the leaf is in focus, then take it again."
   },
   "farmer.capture.quality.help.NOT_CROP": {
-    "bn": "গাছ বা পাতার কাছ থেকে ছবি তুলুন। আমাদের অনুমান ভুলও হতে পারে — ঠিক মনে হলে এভাবেই পাঠান।",
-    "en": "Move closer to the plant or leaf. This check is only a guess — send it anyway if you think it is right."
+    "bn": "গাছ বা পাতার কাছ থেকে ছবি তুলুন। আমাদের এই যাচাই ভুলও হতে পারে, তাই আপনি চাইলে এভাবেই পাঠাতে পারেন।",
+    "en": "Move closer to the plant or leaf. This check can be wrong, so you may still send it as it is."
   },
   "farmer.capture.quality.help.TOO_LARGE": {
     "bn": "ছবিটি ছোট করা যায়নি। ক্যামেরায় ছোট আকারে তুলে আবার চেষ্টা করুন।",
@@ -199,6 +235,10 @@
     "bn": "তবুও পাঠান",
     "en": "Send anyway"
   },
+  "farmer.capture.quality.sendAnywayWarning": {
+    "bn": "মনে রাখুন: ছবিতে সত্যিই ফসল না থাকলে সার্ভার সেটি নেবে না, আর কিছুই জমা থাকবে না।",
+    "en": "Note: if there really is no crop in the photo the server will refuse it, and nothing will be stored."
+  },
   "farmer.capture.quality.sizeLimit": {
     "bn": "একটি ছবি সর্বোচ্চ {{megabytes}} মেগাবাইট হতে পারে।",
     "en": "A photo may be at most {{megabytes}} MB."
@@ -206,6 +246,10 @@
   "farmer.capture.serverReason.BLURRY": {
     "bn": "ঝাপসা",
     "en": "Blurry"
+  },
+  "farmer.capture.serverReason.NOT_A_CROP": {
+    "bn": "ছবিতে ফসল নেই",
+    "en": "No crop in the photo"
   },
   "farmer.capture.serverReason.OVEREXPOSED": {
     "bn": "খুব উজ্জ্বল",
@@ -226,6 +270,10 @@
   "farmer.capture.submit.hint": {
     "bn": "কমপক্ষে {{min}}টি ছবি দরকার।",
     "en": "At least {{min}} photo is needed."
+  },
+  "farmer.capture.submit.needArea": {
+    "bn": "পাঠানোর আগে জমির পরিমাণ লিখুন।",
+    "en": "Enter the field area before sending."
   },
   "farmer.capture.submit.retry": {
     "bn": "আবার পাঠান",
