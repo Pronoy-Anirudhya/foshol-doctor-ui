@@ -7,6 +7,7 @@ import { SessionStore } from '../../../core/auth/session-store';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { LangToggle } from '../lang-toggle/lang-toggle';
 import { NotificationBell } from '../notification-bell/notification-bell';
+import { RegionChip } from '../region-chip/region-chip';
 import { SseIndicator } from '../sse-indicator/sse-indicator';
 
 /**
@@ -28,7 +29,7 @@ import { SseIndicator } from '../sse-indicator/sse-indicator';
 @Component({
   selector: 'foshol-app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, RouterLink],
+  imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, RegionChip, RouterLink],
   templateUrl: './app-header.html',
   host: { class: 'block' },
 })
