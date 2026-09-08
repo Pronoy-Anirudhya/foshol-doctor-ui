@@ -79,6 +79,16 @@ const BAR_CEILING = 1;
           </p>
         }
 
+        @if (verdict().overridable) {
+          <!-- The server's own gate now hard-rejects a photo with no crop in it (422
+               NOT_A_CROP, nothing stored). The override still exists, because the local
+               heuristic is weak and must never permanently block a farmer (WEB-FR-124) — but
+               it stops being an invitation and says what is likely to happen. -->
+          <p class="reject-warning" data-testid="quality-override-warning">
+            {{ 'farmer.capture.quality.sendAnywayWarning' | translate }}
+          </p>
+        }
+
         <div class="reject-actions">
           <button
             type="button"
@@ -202,6 +212,17 @@ const BAR_CEILING = 1;
       margin-block-start: 0.35rem;
       font-size: 0.9375rem;
       color: var(--color-ink);
+    }
+
+    .reject-warning {
+      margin-block-start: 0.85rem;
+      padding: 0.55rem 0.75rem;
+      border-inline-start: 3px solid var(--color-dawn-600);
+      border-radius: 0.3rem;
+      background: var(--color-dawn-100);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-dawn-700);
     }
 
     .reject-metric {

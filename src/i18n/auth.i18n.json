@@ -1,4 +1,8 @@
 {
+  "auth.brand.consoleNote": {
+    "bn": "মাঠ কর্মকর্তা কনসোল",
+    "en": "Field officer console"
+  },
   "auth.brand.eyebrow": {
     "bn": "মানুষ-যাচাই করা ফসল পরামর্শ",
     "en": "Human-verified crop advice"
@@ -15,38 +19,53 @@
     "bn": "একজন মাঠ কর্মকর্তা প্রতিটি পরামর্শ অনুমোদন করেন",
     "en": "A field officer approves every advisory"
   },
-  "auth.brand.consoleNote": {
-    "bn": "মাঠ কর্মকর্তা কনসোল",
-    "en": "Field officer console"
+  "auth.demo.adminLabel": {
+    "bn": "প্রশাসক",
+    "en": "Admin"
   },
-
-  "auth.farmer.title": { "bn": "কৃষক লগইন", "en": "Farmer sign in" },
-  "auth.farmer.subtitle": {
-    "bn": "আপনার মোবাইল নম্বর দিয়ে শুরু করুন",
-    "en": "Start with your mobile number"
+  "auth.demo.dismiss": {
+    "bn": "লুকান",
+    "en": "Hide"
   },
-  "auth.farmer.phoneLabel": { "bn": "মোবাইল নম্বর", "en": "Mobile number" },
-  "auth.farmer.phoneHint": {
-    "bn": "বাংলাদেশি মোবাইল নম্বর, দেশের কোডসহ",
-    "en": "Bangladeshi mobile number, with the country code"
+  "auth.demo.farmerLabel": {
+    "bn": "কৃষক",
+    "en": "Farmer"
   },
-  "auth.farmer.phoneRequired": { "bn": "মোবাইল নম্বর দিন", "en": "Enter your mobile number" },
-  "auth.farmer.phoneInvalid": {
-    "bn": "সঠিক বাংলাদেশি মোবাইল নম্বর দিন",
-    "en": "Enter a valid Bangladeshi mobile number"
+  "auth.demo.officerLabel": {
+    "bn": "মাঠ কর্মকর্তা",
+    "en": "Officer"
   },
-  "auth.farmer.requestOtp": { "bn": "কোড পাঠান", "en": "Send code" },
-  "auth.farmer.requesting": { "bn": "পাঠানো হচ্ছে…", "en": "Sending…" },
-  "auth.farmer.codeTitle": { "bn": "কোড লিখুন", "en": "Enter the code" },
-  "auth.farmer.codeSentTo": {
-    "bn": "{{phone}} নম্বরে {{length}} অঙ্কের একটি কোড পাঠানো হয়েছে",
-    "en": "We sent a {{length}}-digit code to {{phone}}"
+  "auth.demo.title": {
+    "bn": "ডেমো লগইন তথ্য",
+    "en": "Demo credentials"
   },
-  "auth.farmer.codeSentAnnounce": { "bn": "কোড পাঠানো হয়েছে", "en": "Code sent" },
-  "auth.farmer.codeGroupLabel": { "bn": "একবার ব্যবহারের কোড", "en": "One-time code" },
+  "auth.demo.use": {
+    "bn": "বসিয়ে দিন",
+    "en": "Fill in"
+  },
+  "auth.error.copied": {
+    "bn": "কপি হয়েছে",
+    "en": "Copied"
+  },
+  "auth.error.copyReference": {
+    "bn": "রেফারেন্স কপি করুন",
+    "en": "Copy reference"
+  },
+  "auth.error.reference": {
+    "bn": "রেফারেন্স",
+    "en": "Reference"
+  },
+  "auth.farmer.changeNumber": {
+    "bn": "অন্য নম্বর ব্যবহার করুন",
+    "en": "Use a different number"
+  },
   "auth.farmer.codeDigitLabel": {
     "bn": "{{total}}টির মধ্যে {{index}} নম্বর অঙ্ক",
     "en": "Digit {{index}} of {{total}}"
+  },
+  "auth.farmer.codeGroupLabel": {
+    "bn": "একবার ব্যবহারের কোড",
+    "en": "One-time code"
   },
   "auth.farmer.codeHint": {
     "bn": "টাইপ করুন বা পেস্ট করুন — ঘরগুলো নিজেই এগিয়ে যাবে",
@@ -56,81 +75,160 @@
     "bn": "{{length}} অঙ্কের কোড লিখুন",
     "en": "Enter the {{length}}-digit code"
   },
-  "auth.farmer.verify": { "bn": "প্রবেশ করুন", "en": "Sign in" },
-  "auth.farmer.verifying": { "bn": "যাচাই করা হচ্ছে…", "en": "Verifying…" },
-  "auth.farmer.expiresIn": { "bn": "কোডের মেয়াদ আর {{time}}", "en": "Code expires in {{time}}" },
+  "auth.farmer.codeSentAnnounce": {
+    "bn": "কোড পাঠানো হয়েছে",
+    "en": "Code sent"
+  },
+  "auth.farmer.codeSentTo": {
+    "bn": "{{phone}} নম্বরে {{length}} অঙ্কের একটি কোড পাঠানো হয়েছে",
+    "en": "We sent a {{length}}-digit code to {{phone}}"
+  },
+  "auth.farmer.codeTitle": {
+    "bn": "কোড লিখুন",
+    "en": "Enter the code"
+  },
+  "auth.farmer.devFixedNotice": {
+    "bn": "এই সেশনে একটি নির্ধারিত যাচাইকরণ কোড ব্যবহার হচ্ছে",
+    "en": "This session is using a fixed verification code"
+  },
   "auth.farmer.expired": {
     "bn": "কোডের মেয়াদ শেষ। নতুন একটি কোড নিন।",
     "en": "That code has expired. Request a new one."
   },
-  "auth.farmer.resend": { "bn": "নতুন কোড পাঠান", "en": "Send a new code" },
-  "auth.farmer.changeNumber": { "bn": "অন্য নম্বর ব্যবহার করুন", "en": "Use a different number" },
-  "auth.farmer.rateLimited": {
-    "bn": "অনেকবার চেষ্টা হয়েছে। {{time}} পরে আবার চেষ্টা করুন।",
-    "en": "Too many requests. Try again in {{time}}."
-  },
-  "auth.farmer.devFixedNotice": {
-    "bn": "ডেমো মোড — নির্ধারিত কোডটি ব্যবহার করুন",
-    "en": "Demo mode — use the fixed code"
+  "auth.farmer.expiresIn": {
+    "bn": "কোডের মেয়াদ আর {{time}}",
+    "en": "Code expires in {{time}}"
   },
   "auth.farmer.officerLink": {
     "bn": "মাঠ কর্মকর্তা বা প্রশাসক? এখানে প্রবেশ করুন",
     "en": "Field officer or admin? Sign in here"
   },
-
-  "auth.officer.title": { "bn": "কনসোলে প্রবেশ", "en": "Console sign in" },
-  "auth.officer.subtitle": {
-    "bn": "মাঠ কর্মকর্তা ও প্রশাসকের জন্য",
-    "en": "For field officers and administrators"
+  "auth.farmer.phoneHint": {
+    "bn": "বাংলাদেশি মোবাইল নম্বর, দেশের কোডসহ",
+    "en": "Bangladeshi mobile number, with the country code"
   },
-  "auth.officer.usernameLabel": { "bn": "ব্যবহারকারীর নাম", "en": "Username" },
-  "auth.officer.usernameRequired": {
-    "bn": "ব্যবহারকারীর নাম দিন",
-    "en": "Enter your username"
+  "auth.farmer.phoneInvalid": {
+    "bn": "সঠিক বাংলাদেশি মোবাইল নম্বর দিন",
+    "en": "Enter a valid Bangladeshi mobile number"
   },
-  "auth.officer.passwordLabel": { "bn": "পাসওয়ার্ড", "en": "Password" },
-  "auth.officer.passwordRequired": { "bn": "পাসওয়ার্ড দিন", "en": "Enter your password" },
-  "auth.officer.submit": { "bn": "প্রবেশ করুন", "en": "Sign in" },
-  "auth.officer.submitting": { "bn": "প্রবেশ করা হচ্ছে…", "en": "Signing in…" },
-  "auth.officer.showPassword": { "bn": "পাসওয়ার্ড দেখান", "en": "Show password" },
-  "auth.officer.hidePassword": { "bn": "পাসওয়ার্ড লুকান", "en": "Hide password" },
-  "auth.officer.farmerLink": {
-    "bn": "কৃষক? মোবাইল নম্বর দিয়ে প্রবেশ করুন",
-    "en": "A farmer? Sign in with your mobile number"
+  "auth.farmer.phoneLabel": {
+    "bn": "মোবাইল নম্বর",
+    "en": "Mobile number"
   },
-
-  "auth.error.reference": { "bn": "রেফারেন্স", "en": "Reference" },
-  "auth.error.copyReference": { "bn": "রেফারেন্স কপি করুন", "en": "Copy reference" },
-  "auth.error.copied": { "bn": "কপি হয়েছে", "en": "Copied" },
-
-  "auth.demo.title": { "bn": "ডেমো লগইন তথ্য", "en": "Demo credentials" },
-  "auth.demo.dismiss": { "bn": "লুকান", "en": "Hide" },
-  "auth.demo.use": { "bn": "বসিয়ে দিন", "en": "Fill in" },
-  "auth.demo.farmerLabel": { "bn": "কৃষক", "en": "Farmer" },
-  "auth.demo.officerLabel": { "bn": "মাঠ কর্মকর্তা", "en": "Officer" },
-  "auth.demo.adminLabel": { "bn": "প্রশাসক", "en": "Admin" },
-  "auth.demo.farmerPhone": { "bn": "+8801711111111", "en": "+8801711111111" },
-  "auth.demo.farmerOtp": { "bn": "123456", "en": "123456" },
-  "auth.demo.officerUsername": { "bn": "officer", "en": "officer" },
-  "auth.demo.officerPassword": { "bn": "password", "en": "password" },
-  "auth.demo.adminUsername": { "bn": "admin", "en": "admin" },
-  "auth.demo.adminPassword": { "bn": "password", "en": "password" },
-
-  "auth.notPermitted.title": {
-    "bn": "এই অংশটি আপনার ভূমিকার জন্য নয়",
-    "en": "That area is not part of your role"
+  "auth.farmer.phoneRequired": {
+    "bn": "মোবাইল নম্বর দিন",
+    "en": "Enter your mobile number"
+  },
+  "auth.farmer.rateLimited": {
+    "bn": "অনেকবার চেষ্টা হয়েছে। {{time}} পরে আবার চেষ্টা করুন।",
+    "en": "Too many requests. Try again in {{time}}."
+  },
+  "auth.farmer.requestOtp": {
+    "bn": "কোড পাঠান",
+    "en": "Send code"
+  },
+  "auth.farmer.requesting": {
+    "bn": "পাঠানো হচ্ছে…",
+    "en": "Sending…"
+  },
+  "auth.farmer.resend": {
+    "bn": "নতুন কোড পাঠান",
+    "en": "Send a new code"
+  },
+  "auth.farmer.subtitle": {
+    "bn": "আপনার মোবাইল নম্বর দিয়ে শুরু করুন",
+    "en": "Start with your mobile number"
+  },
+  "auth.farmer.title": {
+    "bn": "কৃষক লগইন",
+    "en": "Farmer sign in"
+  },
+  "auth.farmer.verify": {
+    "bn": "প্রবেশ করুন",
+    "en": "Sign in"
+  },
+  "auth.farmer.verifying": {
+    "bn": "যাচাই করা হচ্ছে…",
+    "en": "Verifying…"
   },
   "auth.notPermitted.body": {
     "bn": "কোনো ভুল হয়নি। পাতাটি অন্য একটি ভূমিকার জন্য তৈরি, তাই আপনাকে দেখানো হচ্ছে না।",
     "en": "Nothing has gone wrong. That page belongs to a different role, so it is not shown to you."
   },
-  "auth.notPermitted.signedInAs": { "bn": "প্রবেশ করেছেন: {{role}}", "en": "Signed in as {{role}}" },
-  "auth.notPermitted.home": { "bn": "নিজের পাতায় ফিরে যান", "en": "Back to your home page" },
-  "auth.notPermitted.signIn": { "bn": "লগইন পাতায় যান", "en": "Go to sign in" },
-
-  "auth.role.FARMER": { "bn": "কৃষক", "en": "Farmer" },
-  "auth.role.OFFICER": { "bn": "মাঠ কর্মকর্তা", "en": "Field officer" },
-  "auth.role.ADMIN": { "bn": "প্রশাসক", "en": "Administrator" },
-
-  "auth.signOut": { "bn": "লগআউট", "en": "Sign out" }
+  "auth.notPermitted.home": {
+    "bn": "নিজের পাতায় ফিরে যান",
+    "en": "Back to your home page"
+  },
+  "auth.notPermitted.signIn": {
+    "bn": "লগইন পাতায় যান",
+    "en": "Go to sign in"
+  },
+  "auth.notPermitted.signedInAs": {
+    "bn": "প্রবেশ করেছেন: {{role}}",
+    "en": "Signed in as {{role}}"
+  },
+  "auth.notPermitted.title": {
+    "bn": "এই অংশটি আপনার ভূমিকার জন্য নয়",
+    "en": "That area is not part of your role"
+  },
+  "auth.officer.farmerLink": {
+    "bn": "কৃষক? মোবাইল নম্বর দিয়ে প্রবেশ করুন",
+    "en": "A farmer? Sign in with your mobile number"
+  },
+  "auth.officer.hidePassword": {
+    "bn": "পাসওয়ার্ড লুকান",
+    "en": "Hide password"
+  },
+  "auth.officer.passwordLabel": {
+    "bn": "পাসওয়ার্ড",
+    "en": "Password"
+  },
+  "auth.officer.passwordRequired": {
+    "bn": "পাসওয়ার্ড দিন",
+    "en": "Enter your password"
+  },
+  "auth.officer.showPassword": {
+    "bn": "পাসওয়ার্ড দেখান",
+    "en": "Show password"
+  },
+  "auth.officer.submit": {
+    "bn": "প্রবেশ করুন",
+    "en": "Sign in"
+  },
+  "auth.officer.submitting": {
+    "bn": "প্রবেশ করা হচ্ছে…",
+    "en": "Signing in…"
+  },
+  "auth.officer.subtitle": {
+    "bn": "মাঠ কর্মকর্তা ও প্রশাসকের জন্য",
+    "en": "For field officers and administrators"
+  },
+  "auth.officer.title": {
+    "bn": "কনসোলে প্রবেশ",
+    "en": "Console sign in"
+  },
+  "auth.officer.usernameLabel": {
+    "bn": "ব্যবহারকারীর নাম",
+    "en": "Username"
+  },
+  "auth.officer.usernameRequired": {
+    "bn": "ব্যবহারকারীর নাম দিন",
+    "en": "Enter your username"
+  },
+  "auth.role.ADMIN": {
+    "bn": "প্রশাসক",
+    "en": "Administrator"
+  },
+  "auth.role.FARMER": {
+    "bn": "কৃষক",
+    "en": "Farmer"
+  },
+  "auth.role.OFFICER": {
+    "bn": "মাঠ কর্মকর্তা",
+    "en": "Field officer"
+  },
+  "auth.signOut": {
+    "bn": "লগআউট",
+    "en": "Sign out"
+  }
 }

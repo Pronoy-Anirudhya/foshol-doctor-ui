@@ -240,3 +240,74 @@ want. Fixing three casts in the backend restores the whole admin beat.
 
 `src/testing/fixtures/admin-stats-live-shape.json` holds the **correct** all-null body, not the
 500 that was briefly captured there.
+
+### CORRECTION — B2 is fixed, re-probed 2026-09-08
+
+The blocker above no longer reproduces. `admin`/`password` against the running stack returns
+**200 with every rate non-null** — the exact case that used to throw:
+
+```json
+{"casesToday":14,"approvalRate":0,"medianReviewMinutes":255.48561141666664,
+ "agreementRate":1,"agreementSampleSize":7,"confidenceHigh":0.75,"confidenceLow":0.45}
+```
+
+The whole admin beat works. `BACKEND-BLOCKERS.md` B2 is updated to match.
+
+Also verified in the same pass: **`GET /api/v1/review/queue` returns 200 for an ADMIN token** —
+6 rows, all 19 fields including `topConfidence` and `decisionPath`. That is what the rebuilt
+dashboard widgets are built on, since `/admin/stats` returns six scalars and the contract has no
+time-series endpoint anywhere. Note the demo data is thin and clustered: 5 of 6 rows carry a
+confidence and they all sit at 0.91–0.93, so a distribution drawn from it is one tall bar unless
+a few mid- and low-confidence cases are seeded first.
+
+---
+
+## Field metrics and `computedDose` — verified 2026-09-08
+
+Probed against `local,demo` on `:8080` with the seeded farmer and officer.
+
+**`fieldArea` / `fieldAreaUnit` are genuinely required.** The body the previous client sent —
+`cropId` + `images`, nothing else — now comes back:
+
+```
+POST /api/v1/cases  (no fieldArea)  → 400 ERR_BAD_REQUEST "The request could not be read."
+```
+
+Note the shape: it is a **plain `400`**, not a field-level `errors[]` array naming `fieldArea`.
+Nothing in the response tells a client which part was missing, so the UI cannot render a useful
+message from it. That is why the capture screen refuses to send without an area rather than
+letting the server explain — there is nothing to explain with.
+
+The same request with the two new parts:
+
+```
+POST /api/v1/cases  (fieldArea=2, fieldAreaUnit=DECIMAL, cropQuantity=40, cropQuantityUnit=KG)
+  → 202 {"caseId":"…","status":"SUBMITTED","submittedAt":"…"}
+GET  /api/v1/cases/{caseId}
+  → {"fieldArea":2,"fieldAreaUnit":"DECIMAL","cropQuantity":40,"cropQuantityUnit":"KG",
+     "metricsSource":"FORM", …}
+```
+
+So `CaseDetail` matches the contract, and `metricsSource` is `FORM` for a typed submission.
+`SPEECH` / `FORM_AND_SPEECH` have not been observed yet — they need an audio case whose
+transcript carries an area.
+
+**`computedDose` is absent everywhere on the live stack today.** Across all six queued cases:
+
+| decisionPath | suggestedRemedies | with `rateAmount` | with `computedDose` |
+|---|---|---|---|
+| UNDETERMINED | 0 | 0 | 0 |
+| PRIMARY (×4) | 3 | 0 | 0 |
+| PRIMARY | 0 | 0 | 0 |
+
+The human-owned rate columns are null in the seed data, exactly as
+`docs/frontend-demo-api.md` §8.2 warns ("often null until content-owner C15"), and with no rate
+there is no dose. The officer console therefore renders **nothing** in the dose slot on the
+current stack — not a zero and not a placeholder — and the populated case is covered by
+`review-task-live-shape.json` instead. When C15 lands, the dose row appears with no code change.
+
+**The flat review-task body still has no `case` object.** `docs/frontend-demo-api.md` §8.2 says
+the task payload's `case` carries the field metrics. The live body's top-level keys are still the
+flat list recorded under Divergence 1 — no `case`, and no `fieldArea` / `metricsSource` anywhere
+on it. The console reads the metrics from `GET /cases/{caseId}` instead, which is how D-05
+already composes the workspace, so nothing new is needed.

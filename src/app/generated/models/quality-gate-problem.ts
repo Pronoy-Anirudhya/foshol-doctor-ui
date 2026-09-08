@@ -5,7 +5,7 @@ import { Problem } from '../models/problem';
 export type QualityGateProblem = Problem & {
 'rejectedImages'?: Array<{
 'position'?: number;
-'reason'?: 'BLURRY' | 'UNDEREXPOSED' | 'OVEREXPOSED' | 'TOO_SMALL' | 'UNREADABLE';
+'reason'?: 'BLURRY' | 'UNDEREXPOSED' | 'OVEREXPOSED' | 'TOO_SMALL' | 'UNREADABLE' | 'NOT_A_CROP';
 'messageBn'?: string;
 }>;
 };

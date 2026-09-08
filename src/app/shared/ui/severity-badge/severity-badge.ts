@@ -10,8 +10,17 @@ export type Severity = Disease['severity'];
 
 /**
  * WEB-FR-156 / WEB-UX-044 — a severity indicator carries a colour AND a text label AND a
- * shape. The shapes escalate on their own (dash → disc → triangle → diamond → octagon), so the
- * ordering survives greyscale, a projector with a broken colour channel, and colour blindness.
+ * shape. The shapes escalate on their own (struck circle → ring and dot → rounded square →
+ * triangle → octagon), so the ordering survives greyscale, a projector with a broken colour
+ * channel, and colour blindness.
+ *
+ * The ladder is shared with `pictogram/severity-glyph.ts`, which draws the same five levels
+ * filled at 24 px where this draws them stroked at 16 px — a fill reads as a blob that small,
+ * a stroke reads as a hole that large, so the rendering differs on purpose but the SHAPES may
+ * not. They disagreed once, with the triangle meaning MODERATE here and HIGH there: the same
+ * mark carrying two different levels on two surfaces of the same case, which is precisely the
+ * failure WEB-UX-044 exists to prevent. The triangle is the warning shape — `icon.ts` spends it
+ * on `warning` as well — so it is HIGH in both, and MODERATE took the rounded square.
  */
 @Component({
   selector: 'foshol-severity-badge',

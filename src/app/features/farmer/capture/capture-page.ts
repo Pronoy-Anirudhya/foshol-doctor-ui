@@ -16,7 +16,9 @@ import { CaseDraftStore, IMAGE_LIMIT_KEY } from '../../../core/stores/case-draft
 import { newUuid } from '../../../core/util/uuid';
 import { CasesService } from '../../../generated/services/cases.service';
 import { KnowledgeService } from '../../../generated/services/knowledge.service';
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
@@ -32,6 +34,8 @@ import {
 import { NoteBox } from './note-box';
 import { QualityReject } from './quality-reject';
 import { QUALITY_ACCEPTED, unreadableVerdict, type QualityVerdict } from './quality-gate';
+import { CameraPanel } from './camera-panel';
+import { FieldMetricsPanel } from './field-metrics-panel';
 import { VoicePanel } from './voice-panel';
 import { VoiceRecorder } from './voice-recorder';
 
@@ -71,8 +75,11 @@ const SKELETON_TILES = 3;
   providers: [VoiceRecorder],
   host: { class: 'block' },
   imports: [
+    CameraPanel,
     CropGrid,
     ErrorPanel,
+    FieldMetricsPanel,
+    Icon,
     ImageStrip,
     NoteBox,
     PageHeading,
@@ -81,9 +88,16 @@ const SKELETON_TILES = 3;
     Spinner,
     TranslatePipe,
     VoicePanel,
+    BackLink,
   ],
   template: `
-    <div class="mx-auto w-full max-w-2xl px-4 pt-6 pb-28 sm:px-6 md:pt-10">
+    <div class="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 md:pt-10 xl:max-w-4xl">
+      <foshol-back-link
+        class="mb-4 block"
+        [to]="newCasePath"
+        labelKey="farmer.capture.backToCrop"
+      />
+
       <foshol-page-heading
         eyebrowKey="farmer.capture.eyebrow"
         titleKey="farmer.capture.title"
@@ -128,21 +142,11 @@ const SKELETON_TILES = 3;
         }
 
         <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <!-- WEB-FR-110 — camera and file selection, restricted to the allowed types. -->
-          <label class="pick pick-primary touch-target">
-            <input
-              class="sr-only"
-              type="file"
-              data-testid="capture-camera-input"
-              capture="environment"
-              [attr.accept]="acceptTypes"
-              [attr.multiple]="canPickMany() ? true : null"
-              [disabled]="!canAddMore()"
-              (change)="onFilesChosen($event)"
-            />
-            <span aria-hidden="true">📷</span>
-            {{ 'farmer.capture.images.takePhoto' | translate }}
-          </label>
+          <!-- WEB-FR-110 — a live camera where the browser can open one (camera-panel.ts
+               requests getUserMedia directly, since a laptop browser never honours the
+               capture attribute below and would otherwise just show a file browser), the
+               mobile capture hint as its own fallback where it cannot. -->
+          <foshol-camera-panel [disabled]="!canAddMore()" (captured)="onLivePhoto($event)" />
 
           <label class="pick touch-target">
             <input
@@ -154,7 +158,7 @@ const SKELETON_TILES = 3;
               [disabled]="!canAddMore()"
               (change)="onFilesChosen($event)"
             />
-            <span aria-hidden="true">🖼️</span>
+            <foshol-icon class="shrink-0" name="gallery" />
             {{ 'farmer.capture.images.chooseFile' | translate }}
           </label>
         </div>
@@ -205,6 +209,30 @@ const SKELETON_TILES = 3;
         </div>
       </section>
 
+      <!-- Step 4 — the field. Required by the multipart contract, because the officer's remedy
+           dose is reckoned from it. -->
+      <section class="step" aria-labelledby="step-field">
+        <h2 class="step-title" id="step-field">
+          <span class="step-number" aria-hidden="true">৪</span>
+          {{ 'farmer.capture.field.stepTitle' | translate }}
+        </h2>
+        <p class="step-help">{{ 'farmer.capture.field.help' | translate }}</p>
+
+        <div class="mt-3">
+          <foshol-field-metrics-panel
+            [fieldArea]="draft.fieldArea()"
+            [fieldAreaUnit]="draft.fieldAreaUnit()"
+            [cropQuantity]="draft.cropQuantity()"
+            [cropQuantityUnit]="draft.cropQuantityUnit()"
+            [showAreaError]="areaMissing()"
+            (areaChanged)="draft.setFieldArea($event)"
+            (areaUnitChanged)="draft.setFieldAreaUnit($event)"
+            (quantityChanged)="draft.setCropQuantity($event)"
+            (quantityUnitChanged)="draft.setCropQuantityUnit($event)"
+          />
+        </div>
+      </section>
+
       @if (problem(); as failure) {
         <div class="mt-6">
           <!-- WEB-FR-403 / AC-28 — the retry reuses the SAME Idempotency-Key. -->
@@ -215,9 +243,16 @@ const SKELETON_TILES = 3;
 
     <!-- Within thumb reach at 360 px, and out of the way of the note box's own keyboard. -->
     <div class="submit-bar">
-      <div class="mx-auto flex w-full max-w-2xl items-center gap-3 px-4 sm:px-6">
-        <p class="min-w-0 flex-1 text-sm text-ink-muted">
-          {{ 'farmer.capture.submit.hint' | translate: { min: minImages } }}
+      <div class="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 sm:px-6 xl:max-w-4xl">
+        <p class="min-w-0 flex-1 text-sm text-ink-muted" data-testid="capture-submit-hint">
+          @if (areaMissing()) {
+            <!-- A disabled button that says why beats a disabled button that does not. -->
+            <span class="font-semibold text-clay-700">{{
+              'farmer.capture.submit.needArea' | translate
+            }}</span>
+          } @else {
+            {{ 'farmer.capture.submit.hint' | translate: { min: minImages } }}
+          }
         </p>
         <button
           type="button"
@@ -348,12 +383,17 @@ const SKELETON_TILES = 3;
       box-shadow: var(--shadow-card);
       transition:
         background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
+        box-shadow var(--duration-2) var(--ease-settle),
+        transform var(--duration-1) var(--ease-settle);
     }
 
     .submit:hover:not(:disabled) {
       background: var(--color-paddy-700);
       box-shadow: var(--shadow-lift);
+    }
+
+    .submit:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .submit:disabled {
@@ -373,6 +413,7 @@ export class CapturePage {
 
   protected readonly draft = inject(CaseDraftStore);
 
+  protected readonly newCasePath = FARMER_PATHS.newCase;
   protected readonly acceptTypes = APP_CONFIG.intake.allowedImageTypes.join(',');
   protected readonly maxImages = APP_CONFIG.intake.maxImages;
   protected readonly minImages = APP_CONFIG.intake.minImages;
@@ -453,6 +494,16 @@ export class CapturePage {
   /** WEB-FR-101 — no crop, no submission; and nothing goes out while a pick is being judged. */
   protected readonly canSubmit = computed(() => this.draft.canSubmit() && !this.analysing());
 
+  /**
+   * The area is called out once the farmer has a photograph in the draft, not on arrival: at
+   * that point it is the one thing standing between them and a submission, so naming it is help
+   * rather than a scold. It cannot wait for a submit attempt — the button is already disabled,
+   * so the attempt that would explain the disabled button can never happen.
+   */
+  protected readonly areaMissing = computed(
+    () => this.draft.imageCount() > NO_SLOTS && !this.draft.hasFieldArea(),
+  );
+
   protected onFilesChosen(event: Event): void {
     const input = event.target as HTMLInputElement;
     const chosen = Array.from(input.files ?? []);
@@ -471,6 +522,18 @@ export class CapturePage {
       }
       void this.ingest(file);
     }
+  }
+
+  /** A frame from the live camera, or the fallback file input — either way, one photo. */
+  protected onLivePhoto(source: Blob): void {
+    if (this.slotsFree() <= NO_SLOTS) {
+      // WEB-DATA-004 — refused in place, never by silently dropping an existing photograph.
+      this.overflow.set(IMAGE_LIMIT_KEY);
+      return;
+    }
+    this.overflow.set(null);
+    this.draft.dismissRefusal();
+    void this.ingest(source);
   }
 
   protected removeImage(id: string): void {
@@ -528,6 +591,10 @@ export class CapturePage {
     const audio = this.draft.audio();
     const note = this.draft.noteBn().trim();
     const parentCaseId = this.draft.parentCaseId();
+    const fieldArea = this.draft.fieldArea();
+    if (fieldArea === null) return;
+    const cropQuantity = this.draft.cropQuantity();
+    const cropQuantityUnit = this.draft.cropQuantityUnit();
 
     try {
       const accepted = await this.cases.submitCase({
@@ -535,7 +602,12 @@ export class CapturePage {
         'Idempotency-Key': this.draft.keyForAttempt(),
         body: {
           cropId,
+          fieldArea,
+          fieldAreaUnit: this.draft.fieldAreaUnit(),
           images: this.draft.images().map((image) => image.blob),
+          ...(cropQuantity === null || cropQuantityUnit === null
+            ? {}
+            : { cropQuantity, cropQuantityUnit }),
           ...(audio === null ? {} : { audio: audio.blob }),
           ...(note.length === NO_SLOTS ? {} : { noteBn: note }),
           ...(parentCaseId === null ? {} : { parentCaseId }),

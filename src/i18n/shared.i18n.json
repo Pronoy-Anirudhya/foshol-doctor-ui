@@ -8,7 +8,7 @@
   "shared.header.role.FARMER": { "bn": "কৃষক", "en": "Farmer" },
   "shared.header.role.OFFICER": { "bn": "মাঠ কর্মকর্তা", "en": "Field officer" },
   "shared.header.role.ADMIN": { "bn": "প্রশাসক", "en": "Administrator" },
-  "shared.brand.alt": { "bn": "ফসল ডক্টর প্রতীক", "en": "Foshol Doctor mark" },
+  "shared.brand.homeAria": { "bn": "হোমে যান — ফসল ডক্টর", "en": "Go to home — Foshol Doctor" },
 
   "shared.sse.OPEN": { "bn": "সরাসরি", "en": "Live" },
   "shared.sse.CONNECTING": { "bn": "সংযোগ হচ্ছে…", "en": "Connecting…" },
@@ -33,6 +33,39 @@
 
   "shared.toast.region": { "bn": "বিজ্ঞপ্তি", "en": "Notifications" },
   "shared.toast.dismiss": { "bn": "বন্ধ করুন", "en": "Dismiss" },
+
+  "shared.notifications.title": { "bn": "বিজ্ঞপ্তি", "en": "Notifications" },
+  "shared.notifications.aria.none": {
+    "bn": "বিজ্ঞপ্তি — নতুন কিছু নেই",
+    "en": "Notifications — nothing new"
+  },
+  "shared.notifications.aria.unread": {
+    "bn": "বিজ্ঞপ্তি — {{count}}টি নতুন",
+    "en": "Notifications — {{count}} unread"
+  },
+  "shared.notifications.announce.opened": {
+    "bn": "বিজ্ঞপ্তির তালিকা খোলা হয়েছে",
+    "en": "Notification list opened"
+  },
+  "shared.notifications.announce.allRead": {
+    "bn": "সব বিজ্ঞপ্তি পড়া হয়েছে বলে চিহ্নিত হলো",
+    "en": "All notifications marked as read"
+  },
+  "shared.notifications.markAllRead": { "bn": "সব পড়া হয়েছে", "en": "Mark all read" },
+  "shared.notifications.close": { "bn": "বিজ্ঞপ্তির তালিকা বন্ধ করুন", "en": "Close notifications" },
+  "shared.notifications.dismiss": { "bn": "এই বিজ্ঞপ্তিটি সরান", "en": "Dismiss this notification" },
+  "shared.notifications.unreadMark": { "bn": "নতুন", "en": "New" },
+  "shared.notifications.openCase": { "bn": "কেসটি খুলুন", "en": "Open the case" },
+  "shared.notifications.receivedAt": { "bn": "এসেছে {{time}}", "en": "Arrived {{time}}" },
+  "shared.notifications.empty": { "bn": "এখনো কোনো বিজ্ঞপ্তি নেই", "en": "No notifications yet" },
+  "shared.notifications.emptyHint": {
+    "bn": "কেসের অবস্থা বদলালে বা পরামর্শ এলে সেটি এখানে জমা থাকবে।",
+    "en": "Case updates and advisories are kept here as they arrive."
+  },
+  "shared.notifications.kind.STATUS": { "bn": "অবস্থার পরিবর্তন", "en": "Status change" },
+  "shared.notifications.kind.ADVISORY": { "bn": "পরামর্শ", "en": "Advisory" },
+  "shared.notifications.kind.REVISION": { "bn": "সংশোধিত পরামর্শ", "en": "Revised advisory" },
+  "shared.notifications.kind.REJECTION": { "bn": "ফেরত পাঠানো হয়েছে", "en": "Returned" },
 
   "shared.offline.title": { "bn": "আপনি এখন অফলাইন", "en": "You are offline" },
   "shared.offline.detail": {
@@ -68,6 +101,10 @@
     "bn": "পাতা {{page}} / {{totalPages}} · মোট {{totalElements}}",
     "en": "Page {{page}} of {{totalPages}} · {{totalElements}} in total"
   },
+  "shared.paginator.goToPage": {
+    "bn": "{{page}} নম্বর পাতায় যান",
+    "en": "Go to page {{page}}"
+  },
 
   "shared.bnFallback.marker": { "bn": "(bn)", "en": "(bn)" },
   "shared.bnFallback.description": {
@@ -83,5 +120,28 @@
     "bn": "প্রতিকারের ধরন: {{type}}",
     "en": "Remedy type: {{type}}"
   },
-  "shared.pictogram.severity": { "bn": "তীব্রতা: {{severity}}", "en": "Severity: {{severity}}" }
+  "shared.pictogram.severity": { "bn": "তীব্রতা: {{severity}}", "en": "Severity: {{severity}}" },
+
+  "shared.unit.area.DECIMAL": { "bn": "শতক", "en": "Decimals" },
+  "shared.unit.area.SQ_M": { "bn": "বর্গমিটার", "en": "Square metres" },
+  "shared.unit.area.SQ_FT": { "bn": "বর্গফুট", "en": "Square feet" },
+  "shared.unit.area.HECTARE": { "bn": "হেক্টর", "en": "Hectares" },
+  "shared.unit.area.ACRE": { "bn": "একর", "en": "Acres" },
+
+  "shared.unit.quantity.KG": { "bn": "কেজি", "en": "Kilograms" },
+  "shared.unit.quantity.TON": { "bn": "টন", "en": "Tonnes" },
+  "shared.unit.quantity.PLANTS": { "bn": "গাছ", "en": "Plants" },
+  "shared.unit.quantity.BIGHAS_EQUIV": { "bn": "বিঘা সমতুল্য", "en": "Bigha equivalent" },
+
+  "shared.unit.dose.ML": { "bn": "মিলিলিটার", "en": "Millilitres" },
+  "shared.unit.dose.G": { "bn": "গ্রাম", "en": "Grams" },
+  "shared.unit.dose.KG": { "bn": "কেজি", "en": "Kilograms" },
+  "shared.unit.dose.L": { "bn": "লিটার", "en": "Litres" },
+
+  "shared.unit.basis.PER_DECIMAL": { "bn": "প্রতি শতক", "en": "Per decimal" },
+  "shared.unit.basis.PER_SQ_M": { "bn": "প্রতি বর্গমিটার", "en": "Per square metre" },
+  "shared.unit.basis.PER_HECTARE": { "bn": "প্রতি হেক্টর", "en": "Per hectare" },
+  "shared.unit.basis.PER_ACRE": { "bn": "প্রতি একর", "en": "Per acre" },
+  "shared.unit.basis.PER_SQ_FT": { "bn": "প্রতি বর্গফুট", "en": "Per square foot" },
+  "shared.unit.basis.FIXED": { "bn": "নির্দিষ্ট পরিমাণ", "en": "Fixed amount" }
 }

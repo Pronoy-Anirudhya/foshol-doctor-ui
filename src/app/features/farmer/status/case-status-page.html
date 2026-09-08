@@ -140,6 +140,33 @@
         }
       </ul>
 
+      <div class="mt-4">
+        <h4 class="m-0 text-sm font-bold text-ink-muted">
+          {{ 'farmer.status.yourField' | translate }}
+        </h4>
+        <!-- The numbers the officer's dose is reckoned from, back to the farmer unchanged. -->
+        <dl class="mt-1.5 mb-0 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm text-ink-muted">{{ 'farmer.status.fieldArea' | translate }}</dt>
+            <dd class="m-0 font-semibold" data-testid="status-field-area">
+              <span class="tabular font-latin">{{ loaded.fieldArea }}</span>
+              {{ 'shared.unit.area.' + loaded.fieldAreaUnit | translate }}
+            </dd>
+          </div>
+          @if (loaded.cropQuantity && loaded.cropQuantityUnit) {
+            <div>
+              <dt class="text-sm text-ink-muted">
+                {{ 'farmer.status.cropQuantity' | translate }}
+              </dt>
+              <dd class="m-0 font-semibold" data-testid="status-crop-quantity">
+                <span class="tabular font-latin">{{ loaded.cropQuantity }}</span>
+                {{ 'shared.unit.quantity.' + loaded.cropQuantityUnit | translate }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </div>
+
       @if (loaded.noteBn) {
         <div class="mt-4">
           <h4 class="m-0 text-sm font-bold text-ink-muted">

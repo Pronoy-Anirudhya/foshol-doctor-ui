@@ -1,0 +1,75 @@
+<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+  <h2 class="text-base font-semibold text-ink">{{ 'admin.sla.title' | translate }}</h2>
+  @if (asOf(); as at) {
+    <!-- WEB-FR-356 — sampled once, at load. There is no timer, so the time is stated. -->
+    <p class="text-xs text-ink-faint" data-testid="sla-as-of">
+      {{ 'admin.sla.asOf' | translate: { time: (at | dhakaDateTime) } }}
+    </p>
+  }
+</div>
+<p class="mt-1 max-w-prose text-sm text-ink-muted">{{ 'admin.sla.subtitle' | translate }}</p>
+
+@if (hasRows()) {
+  <div class="sla-meter" role="img" [attr.aria-label]="ariaLabel()">
+    @for (band of bands(); track band.key) {
+      @if (band.count > 0) {
+        <div class="sla-seg" [attr.data-band]="band.key" [style.width]="band.width"></div>
+      }
+    }
+  </div>
+
+  <ul class="sla-legend sm:grid-cols-2 xl:grid-cols-4">
+    @for (band of bands(); track band.key) {
+      <li class="sla-item" [attr.data-band]="band.key" data-testid="sla-band">
+        <span class="sla-glyph" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none">
+            @switch (band.key) {
+              @case ('overdue') {
+                <path
+                  d="M10 3.5 18 17H2L10 3.5Zm0 4.8v3.4m0 2.6h.01"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              }
+              @case ('dueSoon') {
+                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6" />
+                <path
+                  d="M10 6v4.3l2.8 1.7"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              }
+              @case ('onTime') {
+                <path
+                  d="m4.5 10.5 3.6 3.6L15.5 6.7"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              }
+              @default {
+                <path
+                  d="M5 10h10"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              }
+            }
+          </svg>
+        </span>
+
+        <span class="sla-label">{{ 'admin.sla.band.' + band.key | translate }}</span>
+        <span class="sla-count" data-testid="sla-count">{{ band.count }}</span>
+        <span class="sla-share">{{ band.share }}</span>
+      </li>
+    }
+  </ul>
+} @else {
+  <p class="sla-empty" data-testid="sla-empty">{{ 'admin.sla.noRows' | translate }}</p>
+}

@@ -37,6 +37,9 @@ const caseDetail: CaseDetail = {
   cropId: 'crop-1',
   status: 'IN_REVIEW',
   images: [],
+  fieldArea: 2,
+  fieldAreaUnit: 'DECIMAL',
+  metricsSource: 'FORM',
   submittedAt: '2026-09-07T15:00:00.000Z',
 };
 

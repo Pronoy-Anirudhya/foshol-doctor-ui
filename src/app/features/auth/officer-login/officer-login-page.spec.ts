@@ -49,25 +49,43 @@ describe('OfficerLoginPage (WEB-FR-012)', () => {
     expect(el().querySelector('#password-error')).not.toBeNull();
   });
 
-  it('prefills the demo officer and exchanges the credentials for a token', async () => {
-    el().querySelector<HTMLButtonElement>('foshol-demo-hint .fill')!.click();
-    await fixture.whenStable();
+  it('hides the seeded-credential card in production (APP_CONFIG.demo.showLoginHints is false)', () => {
+    expect(el().querySelector('foshol-demo-hint')).toBeNull();
+  });
 
-    el().querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+  describe('with the hackathon-demo affordance enabled', () => {
+    const demoFlag = APP_CONFIG.demo as { showLoginHints: boolean };
 
-    const request = http.expectOne(`${APP_CONFIG.api.origin}${AuthService.OfficerLoginPath}`);
-    expect(request.request.body).toEqual({ username: 'officer', password: 'password' });
-    // WEB-SEC-002 — no credential ever reaches a URL.
-    expect(request.request.urlWithParams).toBe(request.request.url);
-
-    request.flush({ code: 'ERR_BAD_CREDENTIALS', correlationId: 'c-2', status: 401, title: 'x' }, {
-      status: 401,
-      statusText: 'Unauthorized',
+    beforeEach(async () => {
+      demoFlag.showLoginHints = true;
+      fixture = TestBed.createComponent(OfficerLoginPage);
+      await fixture.whenStable();
     });
-    await fixture.whenStable();
 
-    // WEB-FR-005 — the failure is a problem notice with a copyable correlation id.
-    expect(el().querySelector('foshol-problem-notice [role="alert"]')).not.toBeNull();
-    expect(el().textContent).toContain('c-2');
+    afterEach(() => {
+      demoFlag.showLoginHints = false;
+    });
+
+    it('prefills the demo officer and exchanges the credentials for a token', async () => {
+      el().querySelector<HTMLButtonElement>('foshol-demo-hint .fill')!.click();
+      await fixture.whenStable();
+
+      el().querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+
+      const request = http.expectOne(`${APP_CONFIG.api.origin}${AuthService.OfficerLoginPath}`);
+      expect(request.request.body).toEqual({ username: 'officer', password: 'password' });
+      // WEB-SEC-002 — no credential ever reaches a URL.
+      expect(request.request.urlWithParams).toBe(request.request.url);
+
+      request.flush({ code: 'ERR_BAD_CREDENTIALS', correlationId: 'c-2', status: 401, title: 'x' }, {
+        status: 401,
+        statusText: 'Unauthorized',
+      });
+      await fixture.whenStable();
+
+      // WEB-FR-005 — the failure is a problem notice with a copyable correlation id.
+      expect(el().querySelector('foshol-problem-notice [role="alert"]')).not.toBeNull();
+      expect(el().textContent).toContain('c-2');
+    });
   });
 });

@@ -47,7 +47,7 @@ const ROVING_SKIPPED = -1;
   template: `
     <div
       role="radiogroup"
-      class="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
+      class="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:gap-6"
       [attr.aria-label]="'farmer.capture.crop.groupLabel' | translate"
       (keydown)="onKeydown($event)"
     >

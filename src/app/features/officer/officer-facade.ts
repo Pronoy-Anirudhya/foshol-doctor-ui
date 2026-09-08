@@ -7,6 +7,7 @@ import { LiveAnnouncer } from '../../core/stores/live-announcer';
 import { QueueStore } from '../../core/stores/queue-store';
 import { TOAST_SUCCESS, ToastStore } from '../../core/stores/toast-store';
 import type { CaseDetail } from '../../generated/models/case-detail';
+import type { ComputedDose } from '../../generated/models/computed-dose';
 import type { Disease } from '../../generated/models/disease';
 import type { OfficerQueueRow } from '../../generated/models/officer-queue-row';
 import type { PublishAdvisoryRequest } from '../../generated/models/publish-advisory-request';
@@ -42,6 +43,11 @@ import { adaptReviewTask, remedyId, type ReviewTaskSummary } from './review-task
  * `WEB-FR-244` — nothing here retries. A failed action surfaces the server's problem and waits
  * for the officer, because a silent retry of "publish this advisory" is a second advisory.
  */
+const FIRST_PAGE = 0;
+
+/** Shared empty result, so a case with no computed dose does not churn a new Map each read. */
+const EMPTY_DOSES: ReadonlyMap<string, ComputedDose> = new Map();
+
 export type PublishAction = PublishAdvisoryRequest['action'];
 
 export const ACTION_APPROVED: PublishAction = 'APPROVED';
@@ -118,11 +124,44 @@ export class OfficerFacade {
     () => this.openRow()?.isResubmission ?? this._summary()?.isResubmission ?? false,
   );
 
+  /**
+   * The server's own dose arithmetic, keyed by remedy id.
+   *
+   * `computedDose` rides only on the review task's `suggestedRemedies`, which the server computes
+   * for the **rank-1** disease from the case's `fieldArea`. The editor renders the knowledge
+   * catalogue instead (`listRemedies`), and by contract that response never carries a dose — so
+   * the two are joined here rather than in the template.
+   *
+   * The join is gated on the officer still having the rank-1 disease selected. Once they replace
+   * it, the dose belongs to a diagnosis that is no longer on screen, and a dose shown against the
+   * wrong disease is not a stale number, it is a wrong instruction (`COMMON-CON-003`). Nothing
+   * here recomputes anything: `WEB-NFR-001` — area x rate is the server's sum, not ours.
+   */
+  readonly computedDoseById = computed<ReadonlyMap<string, ComputedDose>>(() => {
+    const summary = this._summary();
+    const selected = this.workspace.remedyDraft().diseaseId;
+    if (summary === null || selected === null || selected !== summary.topDiseaseId) {
+      return EMPTY_DOSES;
+    }
+    const doses = new Map<string, ComputedDose>();
+    for (const remedy of summary.suggestedRemedies) {
+      if (remedy.computedDose === undefined || remedy.computedDose === null) continue;
+      doses.set(remedyId(remedy), remedy.computedDose);
+    }
+    return doses;
+  });
+
   // ── Queue ────────────────────────────────────────────────────────────────────────────────
 
   /**
    * `WEB-FR-205` — the manual refresh control calls this, and so does `WEB-FR-358` when the
    * stream reconnects after a gap. There is no timer anywhere in this class (`WEB-FR-356`).
+   *
+   * `GetReviewQueue$Params.state` is a real, generated query parameter — filtering by it is
+   * the server doing the filtering, not a client-side approximation of it. `QueueStore` holds
+   * which one is active (WEB-SEC-004: it already clears on sign-out with the rest of the queue
+   * state), so every caller here — this one included — keeps whatever filter is active without
+   * having to pass it through explicitly.
    */
   async loadQueue(page: number = this.queue.page()): Promise<void> {
     this.queue.beginLoad();
@@ -131,6 +170,7 @@ export class OfficerFacade {
       const result = await this.reviewApi.getReviewQueue({
         page,
         size: APP_CONFIG.page.defaultSize,
+        state: this.queue.stateFilter() ?? undefined,
       });
       // WEB-FR-200 — adopted whole, in the server's order. Nothing here sorts.
       this.queue.applyPage(result);
@@ -139,6 +179,13 @@ export class OfficerFacade {
       this.queue.failLoad(problem);
       this._queueProblem.set(problem);
     }
+  }
+
+  /** Changing the filter starts over at the first page — a page index from one filter means
+      nothing under another. */
+  async setStateFilter(state: OfficerQueueRow['state'] | null): Promise<void> {
+    this.queue.setStateFilter(state);
+    await this.loadQueue(FIRST_PAGE);
   }
 
   // ── Workspace ────────────────────────────────────────────────────────────────────────────

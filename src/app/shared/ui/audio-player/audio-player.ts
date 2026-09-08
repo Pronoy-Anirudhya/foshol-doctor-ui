@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { audioRef, SecureMediaService } from '../../../core/media/secure-media.service';
+import { Icon } from '../icon/icon';
 
 /**
  * WEB-FR-213 — the case audio player, with the Bangla transcript alongside it.
@@ -56,7 +57,7 @@ function formatClock(totalSeconds: number): string {
 @Component({
   selector: 'foshol-audio-player',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [Icon, TranslatePipe],
   templateUrl: './audio-player.html',
   styleUrl: './audio-player.css',
 })

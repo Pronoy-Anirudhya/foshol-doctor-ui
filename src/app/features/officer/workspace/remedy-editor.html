@@ -61,6 +61,27 @@
               <dd>{{ remedy.dosageBn }}</dd>
             </div>
           }
+          @if (doseFor(remedy); as dose) {
+            <!-- WEB-NFR-001 — the server's own sum, rendered as received. Nothing here
+                 multiplies an area by a rate; an invented dosage is harm, not a bug. -->
+            <div class="dose" data-testid="computed-dose">
+              <dt>{{ 'officer.remedy.dose' | translate }}</dt>
+              <dd>
+                <span class="dose-amount tabular font-latin">{{ dose.amount }}</span>
+                <span class="dose-unit">{{ 'shared.unit.dose.' + dose.unit | translate }}</span>
+                <span class="dose-basis">{{ 'shared.unit.basis.' + dose.basis | translate }}</span>
+                @if (dose.fromArea !== null && dose.fromAreaUnit !== null) {
+                  <span class="dose-from">
+                    {{
+                      'officer.remedy.doseFrom'
+                        | translate: { area: dose.fromArea }
+                    }}
+                    {{ 'shared.unit.area.' + dose.fromAreaUnit | translate }}
+                  </span>
+                }
+              </dd>
+            </div>
+          }
           @if (remedy.phiDays !== null && remedy.phiDays !== undefined) {
             <div>
               <dt>{{ 'officer.remedy.phi' | translate }}</dt>

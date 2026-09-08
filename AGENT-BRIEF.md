@@ -127,12 +127,43 @@ breakpoints; never write a media query in a component stylesheet.
 
 ## The design system — "Field Light"
 
-Tokens live in `src/styles.css` and are available as Tailwind utilities:
-`bg-surface-0/1/2/3`, `text-ink`, `text-ink-muted`, `text-ink-faint`, `text-ink-invert`,
-`bg-paddy-600` (primary), `bg-dawn-600` (warning), `bg-clay-600` (destructive),
-`bg-slate-800` (officer console chrome), `outline-focus`, plus `shadow-card` / `shadow-lift` /
-`shadow-stamp`, `ease-settle`, `duration-1/2/3`, and the `card`, `touch-target`,
-`touch-target-lg`, `font-latin`, `sr-only-focusable` utilities.
+Tokens live in `src/styles.css` in **two layers**, which is the shape Material 3, Radix,
+shadcn/ui and the W3C Design Tokens WG all converge on:
+
+**Layer 1 — primitives.** The ramps. `surface-0/1/2/3`, `ink`, `ink-muted`, `ink-faint`,
+`ink-invert`, `paddy-50…900` (jewel emerald, the primary), `teal-100…700` (the accent),
+`sage-100/400/600` (the muted neutral, and the fourth categorical fill), `dawn-100/300/600/700`
+(warning), `clay-100/300/600/700` (destructive), `slate-200…900` (console chrome), `focus`,
+`focus-invert`.
+
+**Layer 2 — semantics. Write these, not the ramp stops.** `bg-primary`, `bg-primary-hover`,
+`text-on-primary`, `bg-accent`, `bg-accent-soft`, `text-on-accent`, `bg-warning`,
+`text-on-warning`, `bg-danger`, `text-on-danger`, `bg-console`, `bg-console-deep`,
+`text-on-console`, `text-on-console-muted`, `outline-ring`, `outline-ring-invert`. Re-theming is
+then a change to the alias block rather than a hunt through seventeen stylesheets, and
+`scripts/check-contrast.mjs` resolves aliases to their hex so the gate checks the names components
+actually type. Surfaces and ink get no alias on purpose — `surface-0` is already a role name, and
+a second name for one thing is a synonym, not a layer.
+
+Radius is tokenised too: `rounded-control` (0.75rem), `rounded-chip` (0.875rem), `rounded-card`
+(1rem), `rounded-panel` (1.25rem), `rounded-pill`, plus `--radius-hair` for a 1px cap. Spacing
+deliberately is **not** — Tailwind's numeric scale is used consistently and a parallel system
+would be two systems where one works. Chart geometry belongs in component-local `:host` custom
+properties (see `--cb-*` in `confidence-bar`), never in a global scale.
+
+Also available: `shadow-card` / `shadow-lift` / `shadow-stamp`, `ease-settle`, `ease-exit`,
+`duration-1/2/3`, and the `card`, `touch-target`, `touch-target-lg`, `font-latin`,
+`sr-only-focusable` utilities.
+
+Icons are hand-authored inline SVG — `shared/ui/icon/icon.ts` for interface glyphs and
+`shared/ui/pictogram/*` for the agricultural ones. There is no icon pack and no emoji: an emoji
+renders in the platform's own colours at the platform's own weight, which is why it never matches
+the surface it sits on.
+
+**Two colours at the same lightness are not two colours.** `paddy-300`, `teal-300` and `dawn-300`
+sit at 1.18–1.26:1 against *each other* — a deuteranope and a washed-out projector see one shade.
+Any multi-series graphic must separate its series by **lightness**, plus a text label, plus a
+shape difference.
 
 Warm, agricultural, confident. Generous whitespace, large type, rounded corners (`rounded-2xl`
 on cards), soft shadows. Motion **settles, never bounces**. The palette is contrast-gated by

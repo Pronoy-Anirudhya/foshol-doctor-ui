@@ -8,16 +8,18 @@ import {
   inject,
   Injector,
   signal,
+  viewChild,
   viewChildren,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { AuthShell } from '../shared/auth-shell';
-import { DemoHint, demoValue, type DemoAccount } from '../shared/demo-hint';
+import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
 import { ProblemNotice } from '../shared/problem-notice';
 import { Countdown } from './otp-countdown';
 
@@ -46,7 +48,15 @@ const DEV_FIXED = 'DEV_FIXED';
 @Component({
   selector: 'foshol-farmer-login-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AuthShell, DemoHint, ProblemNotice, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [
+    AuthShell,
+    DemoHint,
+    Icon,
+    ProblemNotice,
+    ReactiveFormsModule,
+    RouterLink,
+    TranslatePipe,
+  ],
   template: `
     <foshol-auth-shell variant="farmer">
       <div class="card p-6 sm:p-8">
@@ -80,6 +90,7 @@ const DEV_FIXED = 'DEV_FIXED';
                 {{ 'auth.farmer.phoneLabel' | translate }}
               </label>
               <input
+                #phoneInput
                 id="phone"
                 type="tel"
                 inputmode="tel"
@@ -106,7 +117,7 @@ const DEV_FIXED = 'DEV_FIXED';
 
             @if (cooldown.active()) {
               <p class="wait" role="status">
-                <span aria-hidden="true">⏳</span>
+                <foshol-icon class="shrink-0" name="hourglass" size="sm" />
                 {{ 'auth.farmer.rateLimited' | translate: { time: cooldown.display() } }}
               </p>
             }
@@ -172,7 +183,7 @@ const DEV_FIXED = 'DEV_FIXED';
 
             @if (cooldown.active()) {
               <p class="wait" role="status">
-                <span aria-hidden="true">⏳</span>
+                <foshol-icon class="shrink-0" name="hourglass" size="sm" />
                 {{ 'auth.farmer.rateLimited' | translate: { time: cooldown.display() } }}
               </p>
             }
@@ -203,9 +214,11 @@ const DEV_FIXED = 'DEV_FIXED';
           </form>
         }
 
-        <div class="mt-6">
-          <foshol-demo-hint variant="farmer" (use)="fillDemo($event)" />
-        </div>
+        @if (showDemoHints) {
+          <div class="mt-6">
+            <foshol-demo-hint variant="farmer" (use)="fillDemo($event)" />
+          </div>
+        }
 
         <p class="mt-5 border-t border-surface-2 pt-4 text-sm">
           <a class="link" [routerLink]="officerLoginPath">
@@ -275,12 +288,17 @@ const DEV_FIXED = 'DEV_FIXED';
       box-shadow: var(--shadow-card);
       transition:
         background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
+        box-shadow var(--duration-2) var(--ease-settle),
+        transform var(--duration-1) var(--ease-settle);
     }
 
     .btn-primary:hover:not(:disabled) {
       background: var(--color-paddy-700);
       box-shadow: var(--shadow-lift);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .btn-primary:disabled {
@@ -310,6 +328,7 @@ const DEV_FIXED = 'DEV_FIXED';
     /* WEB-UX-044 — the hourglass and the wording carry the meaning, not the amber alone. */
     .wait {
       display: flex;
+      align-items: flex-start;
       gap: 0.5rem;
       padding: 0.6rem 0.8rem;
       border: 1px solid var(--color-dawn-300);
@@ -318,6 +337,11 @@ const DEV_FIXED = 'DEV_FIXED';
       color: var(--color-dawn-700);
       font-size: 0.875rem;
       font-weight: 600;
+    }
+
+    /* Optically centres the 16 px glyph on the first line of 14 px/1.5 text. */
+    .wait foshol-icon {
+      margin-block-start: 0.15rem;
     }
 
     .notice-soft {
@@ -332,8 +356,10 @@ const DEV_FIXED = 'DEV_FIXED';
 })
 export class FarmerLoginPage {
   protected readonly facade = inject(AuthFacade);
-  private readonly translate = inject(TranslateService);
   private readonly injector = inject(Injector);
+
+  /** Hackathon-only — `false` in production; see `APP_CONFIG.demo`. */
+  protected readonly showDemoHints = APP_CONFIG.demo.showLoginHints;
 
   protected readonly otpLength = APP_CONFIG.auth.otpLength;
   protected readonly positions = Array.from({ length: APP_CONFIG.auth.otpLength }, (_, i) => i);
@@ -381,6 +407,8 @@ export class FarmerLoginPage {
     () => this.phoneTouched() && this.phoneForm.controls.phone.invalid,
   );
 
+  private readonly phoneInputRef = viewChild<ElementRef<HTMLInputElement>>('phoneInput');
+
   /** One notice at a time: the verification failure on step two, otherwise the send failure. */
   protected readonly activeProblem = computed(() =>
     this.onCodeStep()
@@ -399,7 +427,11 @@ export class FarmerLoginPage {
   protected async sendCode(): Promise<void> {
     this.phoneTouched.set(true);
     this.phoneForm.controls.phone.markAsTouched();
-    if (this.phoneForm.invalid || this.facade.requestPending() || this.cooldown.active()) return;
+    if (this.phoneForm.invalid) {
+      this.phoneInputRef()?.nativeElement.focus();
+      return;
+    }
+    if (this.facade.requestPending() || this.cooldown.active()) return;
 
     const phone = this.phoneForm.controls.phone.value.trim();
     if (!(await this.facade.requestOtp(phone))) return;
@@ -428,7 +460,12 @@ export class FarmerLoginPage {
   }
 
   protected async submitCode(): Promise<void> {
-    if (!this.codeComplete() || this.facade.verifyPending()) return;
+    if (!this.codeComplete()) {
+      this.codeTouched.set(true);
+      this.focusBox(this.digits().findIndex((digit) => digit === ''));
+      return;
+    }
+    if (this.facade.verifyPending()) return;
 
     if (!(await this.facade.verifyOtp(this._phone(), this.code()))) {
       // WEB-SEC-006 — a rejected code is cleared rather than left on screen to be re-read.
@@ -500,10 +537,10 @@ export class FarmerLoginPage {
     if (account !== 'farmer') return;
 
     if (this.onCodeStep()) {
-      this.writeDigits(overlay(emptyDigits(this.otpLength), 0, demoOtp(this.translate)));
+      this.writeDigits(overlay(emptyDigits(this.otpLength), 0, DEMO_ACCOUNTS.farmer.otp));
       return;
     }
-    this.phoneForm.controls.phone.setValue(demoPhone(this.translate));
+    this.phoneForm.controls.phone.setValue(DEMO_ACCOUNTS.farmer.phone);
   }
 
   /**
@@ -553,10 +590,3 @@ function overlay(digits: readonly string[], position: number, incoming: string):
   });
 }
 
-function demoPhone(translate: TranslateService): string {
-  return demoValue(translate, 'auth.demo.farmerPhone');
-}
-
-function demoOtp(translate: TranslateService): string {
-  return demoValue(translate, 'auth.demo.farmerOtp');
-}

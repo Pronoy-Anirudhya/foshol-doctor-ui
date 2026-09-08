@@ -4,9 +4,11 @@ import {
   computed,
   DestroyRef,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -23,6 +25,7 @@ import { AudioPlayer } from '../../../shared/ui/audio-player/audio-player';
 import { DecisionPathBadge } from '../../../shared/ui/decision-path-badge/decision-path-badge';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { GradcamView } from '../../../shared/ui/gradcam-view/gradcam-view';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { ImageZoom } from '../../../shared/ui/image-zoom/image-zoom';
 import { MatcherChip } from '../../../shared/ui/matcher-chip/matcher-chip';
 import { SecureImage } from '../../../shared/ui/secure-image/secure-image';
@@ -90,6 +93,7 @@ const BUTTON_BASE =
     DhakaDateTimePipe,
     ErrorPanel,
     GradcamView,
+    Icon,
     ImageZoom,
     MatcherChip,
     Percent1Pipe,
@@ -136,6 +140,10 @@ export class CaseWorkspacePage {
   protected readonly rejectReason = signal<RejectionReason | null>(null);
   protected readonly rejectMessage = signal('');
   protected readonly rejectAttempted = signal(false);
+  private readonly rejectReasonInputRef =
+    viewChild<ElementRef<HTMLSelectElement>>('rejectReasonInput');
+  private readonly rejectMessageInputRef =
+    viewChild<ElementRef<HTMLTextAreaElement>>('rejectMessageInput');
 
   protected readonly claimState = this.store.claimState;
   protected readonly canAct = this.store.canAct;
@@ -259,7 +267,13 @@ export class CaseWorkspacePage {
   protected submitReject(): void {
     this.rejectAttempted.set(true);
     const reason = this.rejectReason();
-    if (reason === null || !this.rejectValid()) return;
+    if (reason === null || !this.rejectValid()) {
+      // The reason select precedes the message textarea on screen, so it wins the focus first.
+      const target =
+        reason === null ? this.rejectReasonInputRef() : this.rejectMessageInputRef();
+      target?.nativeElement.focus();
+      return;
+    }
     void this.facade.reject(reason, this.rejectMessage().trim());
   }
 

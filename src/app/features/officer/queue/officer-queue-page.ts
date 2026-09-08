@@ -10,12 +10,14 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SseStore } from '../../../core/sse/sse-store';
 import type { QueueRowView } from '../../../core/stores/queue-store';
+import type { OfficerQueueRow } from '../../../generated/models/officer-queue-row';
 import { DhakaTimePipe } from '../../../shared/pipes/dhaka-time.pipe';
 import { Percent1Pipe } from '../../../shared/pipes/percent1.pipe';
 import { AnalysisModeBadge } from '../../../shared/ui/analysis-mode-badge/analysis-mode-badge';
 import { DecisionPathBadge } from '../../../shared/ui/decision-path-badge/decision-path-badge';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
+import { Icon } from '../../../shared/ui/icon/icon';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
@@ -45,6 +47,14 @@ import { taskPath } from '../officer-paths';
  */
 const FIRST_PAGE = 0;
 
+/** `officer.queue.state.*` already carries a label per value; this is just the value set. */
+const STATE_FILTER_OPTIONS: readonly OfficerQueueRow['state'][] = [
+  'PENDING',
+  'CLAIMED',
+  'DONE',
+  'REJECTED',
+];
+
 @Component({
   selector: 'foshol-officer-queue-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,6 +64,7 @@ const FIRST_PAGE = 0;
     DhakaTimePipe,
     EmptyState,
     ErrorPanel,
+    Icon,
     PageHeading,
     Paginator,
     Percent1Pipe,
@@ -78,6 +89,31 @@ export class OfficerQueuePage {
   protected readonly detailOpen = signal(false);
 
   protected readonly rows = computed<readonly QueueRowView[]>(() => this.facade.queue.view());
+
+  /**
+   * The state filter (`stateFilter`) is the server's own `GetReviewQueue$Params.state` doing
+   * the filtering — see `OfficerFacade.loadQueue`. Free-text search has no server parameter to
+   * ride on, so it runs client-side over whichever page is currently loaded, the same trade-off
+   * `CaseHistoryPage` makes for the farmer's case list.
+   */
+  protected readonly searchText = signal('');
+  protected readonly stateFilterOptions = STATE_FILTER_OPTIONS;
+  protected readonly stateFilter = computed(() => this.facade.queue.stateFilter());
+
+  protected readonly filteredRows = computed<readonly QueueRowView[]>(() => {
+    const term = this.searchText().trim().toLowerCase();
+    if (term === '') return this.rows();
+    return this.rows().filter((view) => {
+      const farmer = (view.row.farmerName ?? '').toLowerCase();
+      const crop = (view.row.cropNameBn ?? '').toLowerCase();
+      const disease = (view.row.topDiseaseNameBn ?? '').toLowerCase();
+      return farmer.includes(term) || crop.includes(term) || disease.includes(term);
+    });
+  });
+
+  protected readonly noMatches = computed(
+    () => !this.facade.queue.isEmpty() && this.filteredRows().length === 0,
+  );
 
   /**
    * Utility classes, not component CSS, so this screen's stylesheet stays inside the 4 kB
@@ -141,6 +177,14 @@ export class OfficerQueuePage {
 
   protected goToPage(page: number): void {
     void this.facade.loadQueue(page);
+  }
+
+  protected setSearchText(value: string): void {
+    this.searchText.set(value);
+  }
+
+  protected setStateFilter(value: string): void {
+    void this.facade.setStateFilter(value === '' ? null : (value as OfficerQueueRow['state']));
   }
 
   /** Dynamic key rather than a switch: the four states come from the generated union. */

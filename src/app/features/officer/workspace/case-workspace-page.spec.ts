@@ -4,6 +4,7 @@ import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { SessionStore } from '../../../core/auth/session-store';
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { BN_CATALOGUE } from '../../../core/i18n/bn-catalogue';
 import { provideI18n } from '../../../core/i18n/i18n.providers';
 import { CaseReviewStore } from '../../../core/stores/case-review-store';
 import { ApiConfiguration } from '../../../generated/api-configuration';
@@ -30,6 +31,7 @@ const TASK_ID = '01a07ca3-bbd0-73b6-b530-dfa384487234';
 const CASE_ID = '01a07ca3-bb8a-7a62-9b8f-ba7a7c281b70';
 const CROP_ID = '01800000-0000-7000-8000-000000000001';
 const DISEASE_ID = '01800000-0000-7000-8000-000000000103';
+const OTHER_DISEASE_ID = '01800000-0000-7000-8000-000000000101';
 const ORIGIN = APP_CONFIG.api.origin;
 const OFFICER = principalOfficer as unknown as Principal;
 
@@ -327,5 +329,53 @@ describe('CaseWorkspacePage (WEB-FR-210…244)', () => {
     await openCase(analysisUndetermined);
 
     expect(el().querySelector('foshol-gradcam-view .toggle')).toBeNull();
+  });
+
+  // The farmer-reported metrics the server reckons a dose from, and where they came from.
+  it('shows the field metrics and their source', async () => {
+    await openCase();
+
+    expect(byId('metrics-field-area')?.textContent).toContain('2');
+    expect(byId('metrics-field-area')?.textContent).toContain(
+      BN_CATALOGUE['shared.unit.area.DECIMAL'],
+    );
+    expect(byId('metrics-source')?.textContent?.trim()).toBe(
+      BN_CATALOGUE['officer.case.metrics.source.FORM'],
+    );
+    // The fixture carries no crop quantity, and an absent optional metric renders as nothing.
+    expect(byId('metrics-crop-quantity')).toBeNull();
+  });
+
+  /**
+   * The dose is computed by the server for the RANK-1 disease from the case's field area. It is
+   * joined onto the knowledge-catalogue remedies for display, and must vanish the moment the
+   * officer moves to a different disease — a dose shown against the wrong diagnosis is not a
+   * stale number, it is a wrong instruction (`COMMON-CON-003`).
+   */
+  it('shows the computed dose on the rank-1 remedy and drops it when the disease is replaced', async () => {
+    await openCase();
+    await claim();
+
+    const dose = byId('computed-dose');
+    expect(dose).not.toBeNull();
+    expect(dose?.textContent).toContain('5');
+    expect(dose?.textContent).toContain(BN_CATALOGUE['shared.unit.dose.ML']);
+    expect(dose?.textContent).toContain(BN_CATALOGUE['shared.unit.basis.PER_DECIMAL']);
+    // Provenance: the area the server reckoned from, so the officer can check the sum's input.
+    expect(dose?.textContent).toContain(BN_CATALOGUE['shared.unit.area.DECIMAL']);
+    // Only the one remedy the server could compute for; the others carry no rates yet.
+    expect(el().querySelectorAll('[data-testid="computed-dose"]').length).toBe(1);
+
+    byId<HTMLButtonElement>('action-replace')!.click();
+    await settle();
+    const other = el().querySelector<HTMLInputElement>(
+      `input[name="replace-disease"][value="${OTHER_DISEASE_ID}"]`,
+    )!;
+    other.click();
+    await settle();
+    http.expectOne(url(`/api/v1/diseases/${OTHER_DISEASE_ID}/remedies`)).flush(remediesBlast);
+    await settle();
+
+    expect(byId('computed-dose')).toBeNull();
   });
 });

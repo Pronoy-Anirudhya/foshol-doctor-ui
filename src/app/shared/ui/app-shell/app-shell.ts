@@ -36,7 +36,13 @@ const CONSOLE_ROLES: readonly string[] = ['OFFICER', 'ADMIN'];
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, TranslatePipe, AppHeader, OfflineBanner, ToastHost, LiveRegion],
   templateUrl: './app-shell.html',
-  host: { class: 'flex min-h-dvh flex-col bg-surface-1' },
+  host: {
+    class: 'flex min-h-dvh flex-col bg-surface-1',
+    // The default focus ring is only 2.69:1 on the console's slate — below the 3:1 UI floor. One
+    // base-layer rule in styles.css keys off this attribute to swap in the inverted ring, so a
+    // control inside the dark chrome cannot lose its focus indicator by being forgotten about.
+    '[attr.data-chrome]': "isConsole() ? 'console' : null",
+  },
 })
 export class AppShell {
   private readonly session = inject(SessionStore);

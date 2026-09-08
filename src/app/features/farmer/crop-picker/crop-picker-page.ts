@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { CaseDraftStore } from '../../../core/stores/case-draft-store';
 import { toProblemView } from '../../../core/errors/problem';
 import { KnowledgeService } from '../../../generated/services/knowledge.service';
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
@@ -24,16 +25,25 @@ import { CropGrid } from './crop-grid';
 @Component({
   selector: 'foshol-crop-picker-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CropGrid, EmptyState, ErrorPanel, PageHeading, Skeleton, TranslatePipe],
+  imports: [BackLink, CropGrid, EmptyState, ErrorPanel, PageHeading, Skeleton, TranslatePipe],
   template: `
-    <div class="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 md:py-10">
+    <div class="w-full px-4 py-6 sm:px-6 md:py-10">
+      <foshol-back-link
+        class="mb-4 block"
+        [to]="casesListPath"
+        labelKey="farmer.capture.crop.backToCases"
+      />
+
       <foshol-page-heading
         eyebrowKey="farmer.capture.eyebrow"
         titleKey="farmer.capture.crop.title"
         subtitleKey="farmer.capture.crop.subtitle"
       />
 
-      <div class="mt-6">
+      <!-- Only 3 crops are seeded, so the grid itself stays capped and centred even though the
+           page around it now uses the shell's full width — stretching a 3-tile grid edge to
+           edge would look sparse, not spacious. -->
+      <div class="mx-auto mt-6 max-w-xl xl:max-w-2xl">
         @if (crops.isLoading()) {
           <foshol-skeleton variant="media" [count]="cropSkeletonCount" />
         } @else if (problem(); as failure) {
@@ -52,7 +62,7 @@ import { CropGrid } from './crop-grid';
         }
       </div>
 
-      <div class="mt-8">
+      <div class="mx-auto mt-8 max-w-xl xl:max-w-2xl">
         <button
           type="button"
           class="continue touch-target"
@@ -82,12 +92,17 @@ import { CropGrid } from './crop-grid';
       box-shadow: var(--shadow-card);
       transition:
         background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
+        box-shadow var(--duration-2) var(--ease-settle),
+        transform var(--duration-1) var(--ease-settle);
     }
 
     .continue:hover:not(:disabled) {
       background: var(--color-paddy-700);
       box-shadow: var(--shadow-lift);
+    }
+
+    .continue:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .continue:disabled {
@@ -103,6 +118,8 @@ export class CropPickerPage {
   private readonly router = inject(Router);
 
   protected readonly draft = inject(CaseDraftStore);
+
+  protected readonly casesListPath = FARMER_PATHS.casesList;
 
   /** The skeleton's shape, not a limit on crops — the grid renders whatever the API returns. */
   protected readonly cropSkeletonCount = SKELETON_TILES;

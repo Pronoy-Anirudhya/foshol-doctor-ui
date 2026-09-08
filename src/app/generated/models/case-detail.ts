@@ -13,8 +13,13 @@ export interface CaseDetail {
   caseId: string;
   cropId: string;
   cropNameBn?: string;
+  cropQuantity?: number | null;
+  cropQuantityUnit?: ('KG' | 'TON' | 'PLANTS' | 'BIGHAS_EQUIV') | null;
   decisionPath?: DecisionPath;
+  fieldArea: number;
+  fieldAreaUnit: 'DECIMAL' | 'SQ_M' | 'SQ_FT' | 'HECTARE' | 'ACRE';
   images: Array<CaseImage>;
+  metricsSource: 'FORM' | 'SPEECH' | 'FORM_AND_SPEECH';
   noteBn?: string | null;
   parentCaseId?: string | null;
   status: CaseStatus;

@@ -186,11 +186,20 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required: [cropId, images]
+              required: [cropId, images, fieldArea, fieldAreaUnit]
               properties:
                 cropId: { type: string, format: uuid }
                 noteBn: { type: string, maxLength: 2000 }
                 parentCaseId: { type: string, format: uuid, description: Set when resubmitting after a rejection }
+                fieldArea: { type: number, description: Farmer-reported field area (required for FO dose context) }
+                fieldAreaUnit:
+                  type: string
+                  enum: [DECIMAL, SQ_M, SQ_FT, HECTARE, ACRE]
+                cropQuantity: { type: number, nullable: true }
+                cropQuantityUnit:
+                  type: string
+                  nullable: true
+                  enum: [KG, TON, PLANTS, BIGHAS_EQUIV]
                 images:
                   type: array
                   minItems: 1
@@ -606,7 +615,7 @@ components:
                   position: { type: integer }
                   reason:
                     type: string
-                    enum: [BLURRY, UNDEREXPOSED, OVEREXPOSED, TOO_SMALL, UNREADABLE]
+                    enum: [BLURRY, UNDEREXPOSED, OVEREXPOSED, TOO_SMALL, UNREADABLE, NOT_A_CROP]
                   messageBn: { type: string }
 
     OtpRequest:
@@ -686,6 +695,31 @@ components:
         costTier:  { type: string, enum: [LOW, MEDIUM, HIGH] }
         efficacy:  { type: string, enum: [LOW, MEDIUM, HIGH] }
         sourceRef: { type: string }
+        rateAmount: { type: number, nullable: true, description: Human-owned rate; null until content-owner C15 }
+        rateUnit:   { type: string, nullable: true, enum: [ML, G, KG, L] }
+        rateBasis:
+          type: string
+          nullable: true
+          enum: [PER_DECIMAL, PER_SQ_M, PER_HECTARE, PER_ACRE, PER_SQ_FT, FIXED]
+        rateNotesBn: { type: string, nullable: true }
+        computedDose:
+          $ref: '#/components/schemas/ComputedDose'
+          nullable: true
+          description: >
+            Present on FO suggestedRemedies when rate columns and case field area allow a calculation.
+            Absent on knowledge catalogue responses and on published advisory remedy refs without case context.
+
+    ComputedDose:
+      type: object
+      required: [amount, unit, basis, fromArea, fromAreaUnit]
+      properties:
+        amount:       { type: number }
+        unit:         { type: string, enum: [ML, G, KG, L] }
+        basis:
+          type: string
+          enum: [PER_DECIMAL, PER_SQ_M, PER_HECTARE, PER_ACRE, PER_SQ_FT, FIXED]
+        fromArea:     { type: number, nullable: true }
+        fromAreaUnit: { type: string, nullable: true, enum: [DECIMAL, SQ_M, SQ_FT, HECTARE, ACRE] }
 
     SymptomRef:
       type: object
@@ -729,7 +763,7 @@ components:
 
     CaseDetail:
       type: object
-      required: [caseId, cropId, status, images, submittedAt]
+      required: [caseId, cropId, status, images, submittedAt, fieldArea, fieldAreaUnit, metricsSource]
       properties:
         caseId:       { type: string, format: uuid }
         cropId:       { type: string, format: uuid }
@@ -738,6 +772,18 @@ components:
         decisionPath: { $ref: '#/components/schemas/DecisionPath' }
         noteBn:       { type: string, nullable: true }
         parentCaseId: { type: string, format: uuid, nullable: true }
+        fieldArea:    { type: number }
+        fieldAreaUnit:
+          type: string
+          enum: [DECIMAL, SQ_M, SQ_FT, HECTARE, ACRE]
+        cropQuantity: { type: number, nullable: true }
+        cropQuantityUnit:
+          type: string
+          nullable: true
+          enum: [KG, TON, PLANTS, BIGHAS_EQUIV]
+        metricsSource:
+          type: string
+          enum: [FORM, SPEECH, FORM_AND_SPEECH]
         images:       { type: array, items: { $ref: '#/components/schemas/CaseImage' } }
         audio:
           type: object
@@ -746,6 +792,29 @@ components:
             audioId:       { type: string, format: uuid }
             durationMs:    { type: integer }
             transcriptBn:  { type: string, nullable: true }
+        submittedAt:  { type: string, format: date-time }
+
+    CaseSummary:
+      type: object
+      description: Internal published intake summary shape mirrored for FO/analysis consumers
+      required: [caseId, cropId, status, fieldArea, fieldAreaUnit, metricsSource, submittedAt]
+      properties:
+        caseId:       { type: string, format: uuid }
+        cropId:       { type: string, format: uuid }
+        cropCode:     { type: string }
+        status:       { $ref: '#/components/schemas/CaseStatus' }
+        fieldArea:    { type: number }
+        fieldAreaUnit:
+          type: string
+          enum: [DECIMAL, SQ_M, SQ_FT, HECTARE, ACRE]
+        cropQuantity: { type: number, nullable: true }
+        cropQuantityUnit:
+          type: string
+          nullable: true
+          enum: [KG, TON, PLANTS, BIGHAS_EQUIV]
+        metricsSource:
+          type: string
+          enum: [FORM, SPEECH, FORM_AND_SPEECH]
         submittedAt:  { type: string, format: date-time }
 
     FarmerCaseRow:

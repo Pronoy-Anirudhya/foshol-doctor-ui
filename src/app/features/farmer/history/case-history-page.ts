@@ -17,6 +17,7 @@ import type { CaseStatus } from '../../../generated/models/case-status';
 import type { FarmerCaseRow } from '../../../generated/models/farmer-case-row';
 import { CasesService } from '../../../generated/services/cases.service';
 import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
+import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
@@ -47,6 +48,17 @@ interface HistoryRow {
   readonly status: CaseStatus;
 }
 
+/** `WEB-FR-153`'s statuses, in the order the status stepper already uses them elsewhere. */
+const STATUS_FILTER_OPTIONS: readonly CaseStatus[] = [
+  'SUBMITTED',
+  'ANALYSING',
+  'ANALYSED',
+  'IN_REVIEW',
+  'ADVISED',
+  'REJECTED',
+  'FAILED',
+];
+
 @Component({
   selector: 'foshol-case-history-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +67,7 @@ interface HistoryRow {
     RouterLinkActive,
     RouterOutlet,
     TranslatePipe,
+    BackLink,
     DhakaDateTimePipe,
     EmptyState,
     ErrorPanel,
@@ -79,8 +92,26 @@ export class CaseHistoryPage {
   /** The capture surface owns its own URLs; this page links to them rather than re-typing. */
   protected readonly newCasePath = FARMER_PATHS.newCase;
 
+  /**
+   * Filtering and search happen client-side, over whatever page is loaded: `listMyCases` takes
+   * only `page`/`size` (the OpenAPI contract is frozen — `WEB-API-001` forbids inventing a
+   * `q=` or `status=` parameter it does not define). A filter widens the fetch to the server's
+   * own maximum page size instead, so a search covers far more than the default 20 rows
+   * without asking the server for anything it does not already support.
+   */
+  protected readonly searchText = signal('');
+  protected readonly statusFilter = signal<CaseStatus | ''>('');
+  protected readonly statusFilterOptions = STATUS_FILTER_OPTIONS;
+
+  protected readonly filterActive = computed(
+    () => this.searchText().trim().length > 0 || this.statusFilter() !== '',
+  );
+
   private readonly casesResource = resource({
-    params: () => ({ page: this._page(), size: APP_CONFIG.page.defaultSize }),
+    params: () => ({
+      page: this._page(),
+      size: this.filterActive() ? APP_CONFIG.page.maxSize : APP_CONFIG.page.defaultSize,
+    }),
     loader: async ({ params }) => {
       const page = await this.cases.listMyCases({ page: params.page, size: params.size });
       this._loadedAt.set(Date.now());
@@ -114,12 +145,57 @@ export class CaseHistoryPage {
   protected readonly isEmpty = computed(
     () => this.pageValue() !== null && this.rows().length === 0,
   );
+
+  /**
+   * `WEB-NFR-001` — filtering only ever hides rows, never reorders them: `rows()` above still
+   * maps the server array in place, and this is a plain `.filter` over that same order.
+   */
+  protected readonly filteredRows = computed<readonly HistoryRow[]>(() => {
+    const term = this.searchText().trim().toLowerCase();
+    const status = this.statusFilter();
+    return this.rows().filter((entry) => {
+      if (status !== '' && entry.status !== status) return false;
+      if (term === '') return true;
+      const crop = entry.row.cropNameBn.toLowerCase();
+      const disease = (entry.row.diseaseNameBn ?? '').toLowerCase();
+      return crop.includes(term) || disease.includes(term);
+    });
+  });
+
+  /** Cases exist, but none of them satisfy the current search/filter — distinct from "no cases
+      submitted yet", which `isEmpty` above already covers with its own empty state. */
+  protected readonly noMatches = computed(
+    () => !this.isEmpty() && this.filterActive() && this.filteredRows().length === 0,
+  );
   protected readonly pageIndex = computed(() => this.pageValue()?.page ?? FIRST_PAGE);
   protected readonly pageSize = computed(
     () => this.pageValue()?.size ?? APP_CONFIG.page.defaultSize,
   );
   protected readonly totalElements = computed(() => this.pageValue()?.totalElements ?? FIRST_PAGE);
   protected readonly totalPages = computed(() => this.pageValue()?.totalPages ?? FIRST_PAGE);
+
+  /**
+   * With no case open, the list gets the whole page to itself and grows into a card grid; the
+   * instant a case opens, both computeds swap to a narrow list beside the detail pane, because
+   * a 3-up grid squeezed into a 26rem column would be nonsensical (`WEB-UX-030`).
+   */
+  protected readonly gridClass = computed(() =>
+    this.detailOpen()
+      ? 'grid gap-6 xl:grid-cols-[26rem_minmax(0,1fr)] xl:items-start xl:gap-8'
+      : 'grid gap-6',
+  );
+  protected readonly listClass = computed(() =>
+    this.detailOpen()
+      ? 'm-0 grid list-none gap-3 p-0'
+      : 'm-0 grid list-none gap-4 p-0 sm:grid-cols-2 xl:grid-cols-3',
+  );
+
+  /** WEB-UX-044 — colour is never the only carrier of meaning; the status text stays in the pill. */
+  protected statusPillClass(status: CaseStatus): string {
+    if (status === 'ADVISED') return 'bg-paddy-100 text-paddy-700';
+    if (status === 'REJECTED' || status === 'FAILED') return 'bg-clay-100 text-clay-700';
+    return 'bg-dawn-100 text-dawn-700';
+  }
 
   #seenResyncTick = this.sse.resyncTick();
 
@@ -135,6 +211,16 @@ export class CaseHistoryPage {
 
   protected goToPage(page: number): void {
     this._page.set(page);
+  }
+
+  protected setSearchText(value: string): void {
+    this.searchText.set(value);
+    this._page.set(FIRST_PAGE);
+  }
+
+  protected setStatusFilter(value: string): void {
+    this.statusFilter.set(value as CaseStatus | '');
+    this._page.set(FIRST_PAGE);
   }
 
   protected reload(): void {

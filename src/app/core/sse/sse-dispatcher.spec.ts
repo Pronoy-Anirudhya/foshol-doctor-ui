@@ -3,6 +3,7 @@ import type { OfficerQueueRow } from '../../generated/models/officer-queue-row';
 import type { PageOfOfficerQueueRow } from '../../generated/models/page-of-officer-queue-row';
 import { CaseStatusStore } from '../stores/case-status-store';
 import { LiveAnnouncer } from '../stores/live-announcer';
+import { NotificationStore } from '../stores/notification-store';
 import { QueueStore } from '../stores/queue-store';
 import { ToastStore } from '../stores/toast-store';
 import { SseDispatcher } from './sse-dispatcher';
@@ -30,6 +31,7 @@ describe('SseDispatcher', () => {
   let queue: QueueStore;
   let toasts: ToastStore;
   let announcer: LiveAnnouncer;
+  let notifications: NotificationStore;
   let sse: SseStore;
 
   beforeEach(() => {
@@ -39,6 +41,7 @@ describe('SseDispatcher', () => {
     queue = TestBed.inject(QueueStore);
     toasts = TestBed.inject(ToastStore);
     announcer = TestBed.inject(LiveAnnouncer);
+    notifications = TestBed.inject(NotificationStore);
     sse = TestBed.inject(SseStore);
   });
 
@@ -139,6 +142,44 @@ describe('SseDispatcher', () => {
 
     expect(caseStatus.statusOf('c-1')).toBeNull();
     expect(toasts.toasts()).toHaveLength(0);
+    expect(notifications.items()).toHaveLength(0);
+  });
+
+  it('keeps an advisory in the notification centre after the toast expires (WEB-FR-354)', () => {
+    dispatcher.dispatch(
+      'advisory',
+      '{"notificationId":"n-1","caseId":"c-1","type":"ADVISORY_PUBLISHED","titleBn":"পরামর্শ প্রস্তুত","bodyBn":"বিস্তারিত দেখুন"}',
+    );
+
+    const entry = notifications.items()[0];
+    expect(entry.kind).toBe('ADVISORY');
+    expect(entry.title).toBe('পরামর্শ প্রস্তুত');
+    expect(entry.caseId).toBe('c-1');
+    expect(entry.notificationId).toBe('n-1');
+    expect(notifications.unreadCount()).toBe(1);
+  });
+
+  // WEB-FR-358 — a resync replays frames that were already delivered.
+  it('does not duplicate a replayed frame that carries the same notificationId', () => {
+    const frame = '{"notificationId":"n-7","caseId":"c-1","type":"ADVISORY_REVISED"}';
+    dispatcher.dispatch('advisory', frame);
+    dispatcher.dispatch('advisory', frame);
+
+    expect(notifications.items()).toHaveLength(1);
+    expect(notifications.items()[0].kind).toBe('REVISION');
+  });
+
+  it('records a case transition with the status label the badges already use', () => {
+    dispatcher.dispatch(
+      'case-status',
+      '{"notificationId":"n-2","caseId":"c-4","toStatus":"IN_REVIEW"}',
+    );
+
+    const entry = notifications.items()[0];
+    expect(entry.kind).toBe('STATUS');
+    expect(entry.titleKey).toBe('live.case.statusChanged');
+    expect(entry.bodyKey).toBe('badge.status.IN_REVIEW');
+    expect(entry.caseId).toBe('c-4');
   });
 
   it('counts an unknown event and leaves everything else alone (WEB-FR-352)', () => {

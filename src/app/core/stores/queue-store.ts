@@ -43,6 +43,8 @@ export class QueueStore {
   private readonly _loadedAt = signal<number | null>(null);
   /** Epoch millis at which this page became known to be out of date; `null` while fresh. */
   private readonly _staleSince = signal<number | null>(null);
+  /** `null` means every state — the server's own filter, `GetReviewQueue$Params.state`. */
+  private readonly _stateFilter = signal<OfficerQueueRow['state'] | null>(null);
 
   readonly rows = this._rows.asReadonly();
   readonly page = this._page.asReadonly();
@@ -53,6 +55,7 @@ export class QueueStore {
   readonly error = this._error.asReadonly();
   readonly loadedAt = this._loadedAt.asReadonly();
   readonly staleSince = this._staleSince.asReadonly();
+  readonly stateFilter = this._stateFilter.asReadonly();
 
   readonly needsReload = computed(() => this._staleSince() !== null);
   readonly isEmpty = computed(() => this._rows().length === 0);
@@ -90,6 +93,10 @@ export class QueueStore {
   failLoad(error: unknown): void {
     this._loading.set(false);
     this._error.set(error);
+  }
+
+  setStateFilter(state: OfficerQueueRow['state'] | null): void {
+    this._stateFilter.set(state);
   }
 
   /**
@@ -132,5 +139,6 @@ export class QueueStore {
     this._error.set(null);
     this._loadedAt.set(null);
     this._staleSince.set(null);
+    this._stateFilter.set(null);
   }
 }

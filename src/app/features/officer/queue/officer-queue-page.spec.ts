@@ -123,6 +123,33 @@ describe('OfficerQueuePage (WEB-FR-200…205)', () => {
     expect(cards[resubmitted].querySelector('.resub')).not.toBeNull();
   });
 
+  it('filters the loaded rows by farmer, crop or disease name, client-side', async () => {
+    const search = el().querySelector<HTMLInputElement>('[data-testid="queue-search-input"]')!;
+    search.value = 'no such farmer, crop or disease exists';
+    search.dispatchEvent(new Event('input'));
+    await settle();
+
+    expect(caseIdsIn('[data-testid="queue-row"]')).toEqual([]);
+    // Distinct from the true "queue is empty" state — the server's rows are still there.
+    expect(el().querySelector('foshol-empty-state')).not.toBeNull();
+    expect(el().querySelector('[data-testid="queue-order-note"]')).not.toBeNull();
+  });
+
+  it('asks the server to filter by state (a real GetReviewQueue$Params.state)', async () => {
+    const select = el().querySelector<HTMLSelectElement>('[data-testid="queue-state-filter"]')!;
+    select.value = 'CLAIMED';
+    select.dispatchEvent(new Event('change'));
+    await settle();
+
+    const request = http.expectOne(
+      (r) => r.url === QUEUE_URL && r.params.get('state') === 'CLAIMED',
+    );
+    request.flush({ ...page, content: [] });
+    await settle();
+
+    expect(caseIdsIn('[data-testid="queue-row"]')).toEqual([]);
+  });
+
   it('refreshes on demand rather than on a timer (WEB-FR-205, WEB-FR-356)', async () => {
     el().querySelector<HTMLButtonElement>('[data-testid="queue-refresh"]')!.click();
     await settle();

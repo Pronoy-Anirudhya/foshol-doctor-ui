@@ -11,6 +11,23 @@
       <circle cx="8" cy="8" r="2.6" fill="currentColor" />
     }
     @case ('MODERATE') {
+      <!-- A corner appears. Attention is being asked for, but nothing is being warned about. -->
+      <rect
+        x="1.9"
+        y="1.9"
+        width="12.2"
+        height="12.2"
+        rx="3.2"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      />
+      <path d="M8 5v3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      <circle cx="8" cy="11.4" r="0.85" fill="currentColor" />
+    }
+    @case ('HIGH') {
+      <!-- The triangle is THE warning shape, and `icon.ts` spends it on `warning` too. It has to
+           mean one level app-wide, so it is HIGH here as it is in `pictogram/severity-glyph`. -->
       <path
         d="M8 1.9 15 14H1z"
         fill="none"
@@ -20,17 +37,6 @@
       />
       <path d="M8 6.1v3.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
       <circle cx="8" cy="11.6" r="0.85" fill="currentColor" />
-    }
-    @case ('HIGH') {
-      <path
-        d="M8 1.4 14.6 8 8 14.6 1.4 8z"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linejoin="round"
-      />
-      <path d="M8 4.7v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-      <circle cx="8" cy="11.2" r="0.9" fill="currentColor" />
     }
     @case ('CRITICAL') {
       <path

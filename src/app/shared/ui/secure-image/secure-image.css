@@ -67,8 +67,5 @@
   background-color: var(--color-surface-2);
 }
 
-.fallback [aria-hidden='true'] {
-  font-size: 1.5rem;
-  line-height: 1;
-  color: var(--color-surface-3);
-}
+/* The torn-frame mark is a stroked glyph now, so it takes the fallback's own muted ink rather
+   than a fill tint — a surface-3 stroke on a surface-2 ground would be all but invisible. */

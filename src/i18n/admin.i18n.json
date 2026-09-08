@@ -70,10 +70,6 @@
   },
   "admin.stats.thresholds.low": { "bn": "নিম্ন সীমা", "en": "Low threshold" },
   "admin.stats.thresholds.high": { "bn": "উচ্চ সীমা", "en": "High threshold" },
-  "admin.stats.thresholds.aria": {
-    "bn": "রাউটিং সীমা: নিম্ন {{low}}, উচ্চ {{high}}।",
-    "en": "Routing thresholds: low {{low}}, high {{high}}."
-  },
   "admin.stats.thresholds.humanGate": {
     "bn": "যে পথেই যাক, প্রতিটি কেস মাঠ কর্মকর্তার অনুমোদনের পরেই কৃষকের কাছে যায়।",
     "en": "Whichever path a case takes, a field officer approves it before any advice reaches the farmer."
@@ -93,5 +89,115 @@
   "admin.stats.omitted": {
     "bn": "সার্ভার যা পাঠায়নি তা এখানে দেখানো হয়নি — শূন্য বসিয়ে দেওয়া হয়নি।",
     "en": "What the server does not report is left out rather than shown as zero."
+  },
+
+  "admin.queue.unavailable": {
+    "bn": "পর্যালোচনার সারি আনা যায়নি। উপরের পরিসংখ্যান এতে বদলায় না; নিচের অংশগুলো ফাঁকা থাকবে।",
+    "en": "The review queue could not be loaded. The statistics above are unaffected; the widgets below stay empty."
+  },
+
+  "admin.landscape.aria": {
+    "bn": "রাউটিং সীমা: নিম্ন {{low}}, উচ্চ {{high}}। আনা {{rows}}টি সারির মধ্যে {{scored}}টিতে মডেলের আত্মবিশ্বাসের মান আছে।",
+    "en": "Routing thresholds: low {{low}}, high {{high}}. Of {{rows}} rows loaded, {{scored}} carry a model confidence."
+  },
+  "admin.landscape.sample": {
+    "bn": "{{total}}টির মধ্যে {{rows}}টি সারি আনা হয়েছে",
+    "en": "{{rows}} of {{total}} rows loaded"
+  },
+  "admin.landscape.peak": {
+    "bn": "সবচেয়ে ঘন ভাগ {{from}}–{{to}}, {{count}}টি কেস",
+    "en": "Fullest bin {{from}}–{{to}}, {{count}} cases"
+  },
+  "admin.landscape.unscored": {
+    "bn": "{{count}}টি সারিতে কোনো আত্মবিশ্বাসের মান নেই",
+    "en": "{{count}} rows carry no confidence"
+  },
+  "admin.landscape.unavailable": {
+    "bn": "পর্যালোচনার সারি আনা যায়নি, তাই এখানে শুধু সীমা দুটি দেখানো হচ্ছে",
+    "en": "The review queue could not be loaded, so only the thresholds are drawn here"
+  },
+  "admin.landscape.noRows": {
+    "bn": "আনা পাতায় কোনো সারি নেই",
+    "en": "The page loaded holds no rows"
+  },
+  "admin.landscape.noConfidence": {
+    "bn": "{{count}}টি সারির একটিতেও মডেলের আত্মবিশ্বাসের মান নেই",
+    "en": "Not one of the {{count}} rows carries a model confidence"
+  },
+  "admin.landscape.bandCount": { "bn": "{{count}}টি কেস", "en": "{{count}} cases" },
+  "admin.landscape.bandCountUnknown": { "bn": "সংখ্যা অজানা", "en": "Count unknown" },
+  "admin.landscape.unrouted": {
+    "bn": "{{count}}টি সারির জন্য সার্ভার কোনো পথ পাঠায়নি",
+    "en": "The server sent no path for {{count}} rows"
+  },
+
+  "admin.cadence.title": { "bn": "জমা পড়ার ধারা", "en": "Submission cadence" },
+  "admin.cadence.subtitle": {
+    "bn": "আনা সারিগুলো যে সময়জুড়ে জমা পড়েছে, ঠিক সেই সময়টুকুই ভাগ করা হয়েছে।",
+    "en": "Bucketed across exactly the window the loaded rows were submitted in."
+  },
+  "admin.cadence.summary": {
+    "bn": "{{total}}টির মধ্যে {{rows}}টি সারি আনা হয়েছে, তার {{counted}}টিতে জমা দেওয়ার সময় আছে",
+    "en": "{{rows}} of {{total}} rows loaded, {{counted}} with a submission time"
+  },
+  "admin.cadence.window": {
+    "bn": "সময়সীমা {{from}} থেকে {{to}}",
+    "en": "Window {{from}} to {{to}}"
+  },
+  "admin.cadence.peak": {
+    "bn": "সবচেয়ে ব্যস্ত ভাগে {{count}}টি",
+    "en": "Busiest bucket: {{count}}"
+  },
+  "admin.cadence.noLine": {
+    "bn": "রেখা আঁকার মতো যথেষ্ট সময়-তথ্য নেই",
+    "en": "Not enough timestamps to draw a line"
+  },
+  "admin.cadence.ordering": {
+    "bn": "পর্যালোচনার সারি আসে অবস্থা, তারপর সবচেয়ে কম আত্মবিশ্বাস, তারপর সবচেয়ে পুরোনো — এই ক্রমে। তাই এই নমুনা সময়ক্রম অনুযায়ী নয়, এবং এটি গোটা সিস্টেমের জমা পড়ার হার নয়।",
+    "en": "The review queue is ordered by state, then least-confident, then oldest — so this sample is not chronological, and it is not the system's submission rate."
+  },
+  "admin.cadence.aria": {
+    "bn": "জমা পড়ার ধারা: {{total}}টির মধ্যে {{rows}}টি সারি, তার {{counted}}টিতে সময় আছে, {{from}} থেকে {{to}}।",
+    "en": "Submission cadence: {{rows}} of {{total}} rows, {{counted}} with a time, {{from}} to {{to}}."
+  },
+
+  "admin.sla.title": { "bn": "সময়সীমার হিসাব", "en": "SLA runway" },
+  "admin.sla.subtitle": {
+    "bn": "আনা প্রতিটি পর্যালোচনার কাজ তার নিজের সময়সীমার সাপেক্ষে।",
+    "en": "Each loaded review task against its own due time."
+  },
+  "admin.sla.asOf": { "bn": "হিসাব {{time}} অনুযায়ী", "en": "As of {{time}}" },
+  "admin.sla.noRows": { "bn": "হিসাব করার মতো কোনো সারি নেই", "en": "No rows to measure" },
+  "admin.sla.band.overdue": { "bn": "সময় পেরিয়ে গেছে", "en": "Overdue" },
+  "admin.sla.band.dueSoon": { "bn": "শীঘ্রই সময় শেষ", "en": "Due soon" },
+  "admin.sla.band.onTime": { "bn": "সময়ের মধ্যে", "en": "On time" },
+  "admin.sla.band.unknown": { "bn": "সময়সীমা জানা নেই", "en": "No due time" },
+  "admin.sla.aria": {
+    "bn": "সময়সীমার হিসাব: {{overdue}}টির সময় পেরিয়ে গেছে, {{dueSoon}}টির শীঘ্রই শেষ, {{onTime}}টি সময়ের মধ্যে — হিসাব {{asOf}} অনুযায়ী।",
+    "en": "SLA runway: {{overdue}} overdue, {{dueSoon}} due soon, {{onTime}} on time — as of {{asOf}}."
+  },
+
+  "admin.composition.title": { "bn": "সারিতে কী আছে", "en": "Queue composition" },
+  "admin.composition.subtitle": {
+    "bn": "আনা {{rows}}টি সারির অবস্থা ও বিশ্লেষণের ধরন।",
+    "en": "State and analysis mode of the {{rows}} rows loaded."
+  },
+  "admin.composition.states": { "bn": "অবস্থা", "en": "State" },
+  "admin.composition.modes": { "bn": "বিশ্লেষণের ধরন", "en": "Analysis mode" },
+  "admin.composition.statesAria": {
+    "bn": "আনা {{rows}}টি সারির অবস্থার মিশ্রণ",
+    "en": "State mix of the {{rows}} rows loaded"
+  },
+  "admin.composition.modesAria": {
+    "bn": "আনা {{rows}}টি সারির বিশ্লেষণ ধরনের মিশ্রণ",
+    "en": "Analysis-mode mix of the {{rows}} rows loaded"
+  },
+  "admin.composition.modeUnknown": {
+    "bn": "{{count}}টি সারির জন্য সার্ভার বিশ্লেষণের ধরন পাঠায়নি",
+    "en": "The server sent no analysis mode for {{count}} rows"
+  },
+  "admin.composition.noRows": {
+    "bn": "আনা পাতায় কোনো সারি নেই",
+    "en": "The page loaded holds no rows"
   }
 }

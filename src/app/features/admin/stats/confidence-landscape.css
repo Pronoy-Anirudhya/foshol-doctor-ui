@@ -1,0 +1,271 @@
+/* Every position arrives as a percentage string in --cl-low / --cl-high / --cl-x / --cl-h, set
+   from signals, exactly as <foshol-confidence-bar> does it. Nothing here measures geometry, so
+   the drawing is testable in jsdom and can never disagree with the numbers beside it. */
+
+:host {
+  --cl-plot-h: 11rem;
+  --cl-rug-h: 1.25rem;
+  --cl-rule-w: 2px;
+}
+
+.cl-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  margin: 0;
+}
+
+.cl-values dt {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-on-console-muted);
+}
+
+.cl-values dd {
+  margin: 0.1rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-console);
+}
+
+.cl-figure {
+  margin: 1.5rem 0 0;
+}
+
+.cl-plot {
+  position: relative;
+}
+
+/* Deliberately NO grid gap. A gap would inset every column by a fraction of itself, so the
+   45% rule would miss the bin-9 edge by a fraction of a pixel; the separation is padding
+   INSIDE each cell instead, which leaves the cell boundaries exactly at i/bins. */
+.cl-bars {
+  display: grid;
+  grid-template-columns: repeat(var(--cl-bins), 1fr);
+  align-items: end;
+  height: var(--cl-plot-h);
+  border-bottom: 1px solid var(--color-slate-500);
+  background-image: repeating-linear-gradient(
+    to top,
+    var(--color-slate-500) 0 1px,
+    transparent 1px 25%
+  );
+}
+
+.cl-cell {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  padding-inline: 1.5px;
+}
+
+.cl-bar {
+  width: 100%;
+  height: var(--cl-h, 0%);
+  /* A bin of 1 stays visible beside a bin of 40; a bin of 0 gets no element at all. */
+  min-height: 3px;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--color-paddy-400);
+  transition: height var(--duration-2) var(--ease-settle);
+}
+
+/* The fullest bin. Lighter AND capped AND named in the caption — three signals, not one. */
+.cl-bar[data-peak] {
+  background-color: var(--color-teal-300);
+  box-shadow: inset 0 3px 0 var(--color-on-console);
+}
+
+.cl-rug {
+  position: relative;
+  height: var(--cl-rug-h);
+  margin-top: 0.4rem;
+}
+
+.cl-tick {
+  position: absolute;
+  inset-block: 0;
+  left: var(--cl-x, 0%);
+  width: 2px;
+  margin-inline-start: -1px;
+  border-radius: 1px;
+  background-color: var(--color-slate-200);
+}
+
+.cl-rule {
+  position: absolute;
+  inset-block: 0;
+  width: var(--cl-rule-w);
+  margin-inline-start: calc(var(--cl-rule-w) / -2);
+  border-radius: 1px;
+  background-color: var(--color-on-console);
+  box-shadow: 0 0 0 1px var(--color-console-deep);
+  pointer-events: none;
+}
+
+.cl-rule[data-threshold='low'] {
+  left: var(--cl-low, 0%);
+}
+
+.cl-rule[data-threshold='high'] {
+  left: var(--cl-high, 0%);
+}
+
+.cl-axis {
+  position: relative;
+  height: 1.1rem;
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-on-console-muted);
+}
+
+.cl-end {
+  position: absolute;
+  top: 0;
+}
+
+.cl-end[data-end='start'] {
+  inset-inline-start: 0;
+}
+
+.cl-end[data-end='finish'] {
+  inset-inline-end: 0;
+}
+
+.cl-rule-label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 700;
+  color: var(--color-on-console);
+}
+
+.cl-rule-label[data-threshold='low'] {
+  left: var(--cl-low, 0%);
+}
+
+.cl-rule-label[data-threshold='high'] {
+  left: var(--cl-high, 0%);
+}
+
+.cl-caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0.85rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-slate-200);
+}
+
+.cl-peak {
+  font-weight: 600;
+  color: var(--color-teal-300);
+}
+
+.cl-empty {
+  margin: 0;
+  border: 1px dashed var(--color-slate-500);
+  border-radius: var(--radius-card);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-slate-200);
+}
+
+/* The three bands the two rules cut the scale into. Distinguished by a lightness ladder
+   (slate-500 → paddy-400 → dawn-300), a hatch on the middle band, and the badge's own text and
+   glyph beside it — never by hue alone, which a deuteranope and a projector both lose. */
+.cl-rail {
+  display: flex;
+  height: 0.5rem;
+  margin-top: 1.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-slate-700);
+}
+
+.cl-rail-seg,
+.cl-swatch {
+  transition: width var(--duration-2) var(--ease-settle);
+}
+
+.cl-rail-seg {
+  height: 100%;
+}
+
+[data-path='UNDETERMINED'] .cl-swatch,
+.cl-rail-seg[data-path='UNDETERMINED'] {
+  background-color: var(--color-slate-500);
+}
+
+[data-path='SECONDARY'] .cl-swatch,
+.cl-rail-seg[data-path='SECONDARY'] {
+  background-color: var(--color-dawn-300);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-console-deep) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+[data-path='PRIMARY'] .cl-swatch,
+.cl-rail-seg[data-path='PRIMARY'] {
+  background-color: var(--color-paddy-400);
+}
+
+/* Columns are Tailwind utilities on the element itself (WEB-UX-030): a media query in a
+   component stylesheet would sit outside the breakpoint scale everything else uses. */
+.cl-legend {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cl-legend-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  border-radius: var(--radius-chip);
+  background-color: var(--color-slate-700);
+  padding: 0.5rem 0.75rem;
+}
+
+.cl-swatch {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+}
+
+.cl-range,
+.cl-count {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-invert); /* 4.5:1 on slate-700, gated by check:contrast */
+}
+
+.cl-count {
+  margin-inline-start: auto;
+  font-weight: 700;
+}
+
+.cl-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-on-console-muted);
+}
+
+.cl-gate {
+  margin-top: 1.1rem;
+  border-top: 1px solid var(--color-slate-600);
+  padding-top: 0.9rem;
+}

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import type { ComputedDose } from '../../../generated/models/computed-dose';
 import type { Remedy } from '../../../generated/models/remedy';
 import { RemedyTypeIcon } from '../../../shared/ui/pictogram/remedy-type-icon';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
@@ -28,6 +29,8 @@ import { remedyId } from '../review-task.adapter';
  * stays populated and readable while a claim is expired or held by somebody else, because
  * discarding an officer's typing on a background timer is the worst possible response to it.
  */
+const EMPTY_DOSES: ReadonlyMap<string, ComputedDose> = new Map();
+
 @Component({
   selector: 'foshol-remedy-editor',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,11 +48,22 @@ export class RemedyEditor {
   readonly loading = input(false);
   /** Human-supplied disease name, rendered verbatim; empty when nothing is selected yet. */
   readonly diseaseName = input('');
+  /**
+   * The server's computed dose per remedy id, already gated to the rank-1 disease by
+   * `OfficerFacade.computedDoseById`. Absent for most remedies — the human-owned rate columns
+   * are null in the seed data until content-owner C15 — and an absent dose renders as nothing
+   * at all, never as a zero or a placeholder (`COMMON-CON-003`).
+   */
+  readonly doses = input<ReadonlyMap<string, ComputedDose>>(EMPTY_DOSES);
 
   readonly toggleRemedy = output<string>();
   readonly noteChange = output<string>();
 
   protected readonly selectedCount = computed(() => this.selectedIds().length);
+
+  protected doseFor(remedy: Remedy): ComputedDose | undefined {
+    return this.doses().get(this.identity(remedy));
+  }
 
   /** D-07 — the identity field is `id` or `remedyId` depending on where the object came from. */
   protected identity(remedy: Remedy): string {

@@ -27,6 +27,23 @@ export const APP_CONFIG = {
     maxAudioSeconds: 30, //              foshol.intake.max-audio-seconds
     maxAudioBytes: 4_194_304, //         foshol.intake.max-audio-bytes (4 MiB)
     noteMaxLength: 2000, //              OpenAPI: submitCase.noteBn maxLength
+    /**
+     * Bounds for the two farmer-reported metrics the dose calculation is reckoned from
+     * (`submitCase.fieldArea` / `cropQuantity`). No server property backs these: they shape the
+     * `<input type="number">` — its `min`, `max` and `step` — and nothing else. The server gate
+     * remains the decision of record (`WEB-NFR-010`), so a value inside these bounds may still be
+     * refused, and the client never rejects on them beyond keeping the control sane.
+     */
+    metrics: {
+      fieldAreaMin: 0.01,
+      fieldAreaMax: 100_000,
+      fieldAreaStep: 0.01,
+      /** শতক — what a Bangladeshi smallholder actually measures a plot in. */
+      defaultFieldAreaUnit: 'DECIMAL' as const,
+      cropQuantityMin: 0.01,
+      cropQuantityMax: 1_000_000,
+      cropQuantityStep: 0.01,
+    },
     quality: {
       minEdgePx: 224, //                 foshol.intake.quality.min-edge-px
       blurVarianceMin: 60.0, //          foshol.intake.quality.blur-variance-min
@@ -89,6 +106,13 @@ export const APP_CONFIG = {
     fallbackEdgePx: 1200, //             last resort before rejecting for size
     analysisEdgePx: 224, //              short edge of the quality-gate canvas
     /**
+     * The live in-page camera viewfinder (`PhotoCamera`) requests this as its `getUserMedia`
+     * ideal resolution. `capture.maxEdgePx`/`jpegQuality` above still govern the re-encode, so
+     * this only sets what the browser is ASKED for, never what leaves the device.
+     */
+    cameraIdealWidthPx: 1920,
+    cameraIdealHeightPx: 1080,
+    /**
      * WEB-FR-124 [DERIVED]. A hue/saturation coverage heuristic is the honest client-side
      * approximation of "is this a crop photograph" — there is no client-side model. Because
      * the heuristic is weak it NEVER permanently blocks a farmer: it always offers an
@@ -144,6 +168,44 @@ export const APP_CONFIG = {
     maxSize: 100, //                     00-common §8.2 max
   },
 
+  /**
+   * The in-session notification list. Every entry comes from an SSE frame the dispatcher already
+   * parsed, so nothing here polls or fetches. Deliberately memory-only: `storageKeys` above names
+   * the only two keys this application may write, and a farmer's case notifications are not one
+   * of them.
+   */
+  notifications: {
+    /** Newest-first, capped. A demo does not need scrollback and an unbounded array is a leak. */
+    maxItems: 30,
+    /** How long a freshly-arrived row keeps its highlight. One-shot, never a timer. */
+    arrivalHighlightMs: 2_400,
+  },
+
+  /**
+   * The admin dashboard derives its widgets from a single page of `/review/queue`, because
+   * `/admin/stats` returns six scalars and the contract has no time-series endpoint at all.
+   * Every number they produce is stated on screen as coming from the rows loaded, never as a
+   * server metric (`WEB-NFR-001`).
+   */
+  admin: {
+    /** One request, one page. `page.maxSize` is the largest honest sample available. */
+    samplePage: 0,
+    sampleSize: 100,
+    /**
+     * 20 bins × 5 percentage points. Chosen so the two thresholds land EXACTLY on a bin edge
+     * (0.45 × 20 = 9, 0.75 × 20 = 15), which is what makes the threshold rules and the band
+     * tallies incapable of visually disagreeing. 24 bins would bisect both.
+     */
+    confidenceBins: 20,
+    /** Buckets across the OBSERVED submission window — never a fixed clock window, which would
+        invent empty buckets for time there is no evidence about. */
+    cadenceBuckets: 12,
+    /** Below this many timestamps a line is a lie with a nice curve on it; show text instead. */
+    cadenceMinRows: 3,
+    /** SLA banding, measured once at load against `slaDueAt`. Not a timer (`WEB-FR-356`). */
+    slaDueSoonMs: 3_600_000, //          PT1H
+  },
+
   ui: {
     spinnerDelayMs: 300, //              delay before a loading indicator appears
     toastMs: 6_000,
@@ -155,6 +217,16 @@ export const APP_CONFIG = {
     tickMs: 1_000,
     msPerSecond: 1_000,
     secondsPerMinute: 60,
+  },
+
+  /**
+   * Hackathon-only affordances, all `false` by default so the shipped UI reads as production
+   * software rather than a rehearsal. No server property backs any of these — flip a value
+   * locally for a live scored demo session and flip it back afterward; never commit `true`.
+   */
+  demo: {
+    /** The seeded-credential card on both login screens (`demo-hint.ts`). */
+    showLoginHints: false,
   },
 } as const;
 

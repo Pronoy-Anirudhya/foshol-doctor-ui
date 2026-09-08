@@ -1,0 +1,132 @@
+<div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
+  <div class="min-w-0">
+    <h2 class="text-lg font-semibold text-on-console">
+      {{ 'admin.stats.thresholds.title' | translate }}
+    </h2>
+    <p class="mt-1 max-w-prose text-sm text-on-console-muted">
+      {{ 'admin.stats.thresholds.subtitle' | translate }}
+    </p>
+  </div>
+
+  <!-- WEB-FR-302 — both values, plainly, as the labelled read-only pair. -->
+  <dl class="cl-values">
+    <div>
+      <dt>{{ 'admin.stats.thresholds.low' | translate }}</dt>
+      <dd data-testid="threshold-low">{{ lowPercent() }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'admin.stats.thresholds.high' | translate }}</dt>
+      <dd data-testid="threshold-high">{{ highPercent() }}</dd>
+    </div>
+  </dl>
+</div>
+
+<figure class="cl-figure" role="img" [attr.aria-label]="ariaLabel()">
+  @switch (mode()) {
+    @case ('plot') {
+      <!-- One colour for every bar, on purpose: tinting a bar by the band it falls in would
+           re-derive the routing this panel exists to display (WEB-NFR-001). -->
+      <div class="cl-plot">
+        <div class="cl-bars" data-testid="cl-bars">
+          @for (bar of bars(); track bar.index) {
+            <div class="cl-cell" [attr.data-count]="bar.count">
+              @if (bar.count > 0) {
+                <div
+                  class="cl-bar"
+                  data-testid="cl-bar"
+                  [attr.data-peak]="bar.peak || null"
+                  [style.--cl-h]="bar.height"
+                ></div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- A tick per case below the axis. Over six cases a histogram looks like a guess;
+             six ticks look like six cases, because that is what they are. -->
+        <div class="cl-rug" data-testid="cl-rug">
+          @for (tick of ticks(); track $index) {
+            <span class="cl-tick" data-testid="cl-tick" [style.--cl-x]="tick"></span>
+          }
+        </div>
+
+        <div class="cl-rule" data-testid="cl-rule" data-threshold="low"></div>
+        <div class="cl-rule" data-testid="cl-rule" data-threshold="high"></div>
+      </div>
+
+      <div class="cl-axis">
+        <span class="cl-end" data-end="start">{{ startPercent }}</span>
+        <span class="cl-end" data-end="finish">{{ endPercent }}</span>
+        <span class="cl-rule-label" data-testid="cl-rule-label" data-threshold="low">
+          {{ lowPercent() }}
+        </span>
+        <span class="cl-rule-label" data-testid="cl-rule-label" data-threshold="high">
+          {{ highPercent() }}
+        </span>
+      </div>
+
+      <figcaption class="cl-caption" data-testid="cl-caption">
+        <span>{{ 'admin.landscape.sample' | translate: sampleParams() }}</span>
+        <span class="cl-peak">{{ 'admin.landscape.peak' | translate: peakParams() }}</span>
+        @if (unscored() > 0) {
+          <span data-testid="cl-unscored">
+            {{ 'admin.landscape.unscored' | translate: { count: unscored() } }}
+          </span>
+        }
+      </figcaption>
+    }
+
+    @case ('unavailable') {
+      <!-- (a) The queue sample never arrived. The bands below still stand: they come from the
+           thresholds alone, which came from /admin/stats and are unaffected. -->
+      <p class="cl-empty" data-testid="cl-unavailable">
+        {{ 'admin.landscape.unavailable' | translate }}
+      </p>
+    }
+
+    @case ('noRows') {
+      <!-- (b) The sample loaded and holds nothing. A flat histogram of nothing is not a shape. -->
+      <p class="cl-empty" data-testid="cl-no-rows">{{ 'admin.landscape.noRows' | translate }}</p>
+    }
+
+    @default {
+      <!-- (c) Rows, but not one carries a confidence. Never a row of zero-height bars. -->
+      <p class="cl-empty" data-testid="cl-no-confidence">
+        {{ 'admin.landscape.noConfidence' | translate: { count: unscored() } }}
+      </p>
+    }
+  }
+</figure>
+
+<!-- The three bands the two rules cut the scale into. Widths come from the thresholds; the
+     counts come from the server's own decisionPath (WEB-NFR-001). -->
+<div class="cl-rail" aria-hidden="true">
+  @for (band of bands(); track band.path) {
+    <div class="cl-rail-seg" [attr.data-path]="band.path" [style.width]="band.width"></div>
+  }
+</div>
+
+<ul class="cl-legend md:grid-cols-3">
+  @for (band of bands(); track band.path) {
+    <li class="cl-legend-item" [attr.data-path]="band.path" data-testid="cl-band">
+      <span class="cl-swatch" aria-hidden="true"></span>
+      <foshol-decision-path-badge [path]="band.path" />
+      <span class="cl-range">{{ band.rangeKey | translate: rangeParams() }}</span>
+      @if (band.count !== null) {
+        <span class="cl-count" data-testid="cl-band-count">
+          {{ 'admin.landscape.bandCount' | translate: { count: band.count } }}
+        </span>
+      } @else {
+        <span class="cl-count">{{ 'admin.landscape.bandCountUnknown' | translate }}</span>
+      }
+    </li>
+  }
+</ul>
+
+@if (unrouted() > 0) {
+  <p class="cl-note" data-testid="cl-unrouted">
+    {{ 'admin.landscape.unrouted' | translate: { count: unrouted() } }}
+  </p>
+}
+
+<p class="cl-note cl-gate">{{ 'admin.stats.thresholds.humanGate' | translate }}</p>

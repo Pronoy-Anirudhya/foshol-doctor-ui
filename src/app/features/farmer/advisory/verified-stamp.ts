@@ -113,7 +113,7 @@ import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
     .vs-name {
       margin: 0.15rem 0 0;
       font-size: 0.95rem;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.25;
       color: var(--color-paddy-800);
     }

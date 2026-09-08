@@ -78,7 +78,7 @@ describe('CaseDraftStore', () => {
     expect(draft.isFull()).toBe(true);
   });
 
-  it('enables submit only between min and max images with a crop chosen', () => {
+  it('enables submit only between min and max images with a crop and a field area', () => {
     const draft = store();
     expect(draft.canSubmit()).toBe(false);
 
@@ -86,9 +86,29 @@ describe('CaseDraftStore', () => {
     expect(draft.canSubmit()).toBe(false);
 
     draft.addImage(image('i-0'));
+    // The server requires `fieldArea` on every submission, so a crop and a photo are not enough.
+    expect(draft.canSubmit()).toBe(false);
+
+    draft.setFieldArea(2);
     expect(draft.canSubmit()).toBe(true);
 
     draft.beginSubmit();
+    expect(draft.canSubmit()).toBe(false);
+  });
+
+  it('treats a zero or cleared field area as no area at all', () => {
+    const draft = store();
+    draft.chooseCrop('crop-1');
+    draft.addImage(image('i-0'));
+
+    draft.setFieldArea(0);
+    expect(draft.hasFieldArea()).toBe(false);
+    expect(draft.canSubmit()).toBe(false);
+
+    draft.setFieldArea(2);
+    expect(draft.hasFieldArea()).toBe(true);
+
+    draft.setFieldArea(null);
     expect(draft.canSubmit()).toBe(false);
   });
 
@@ -97,6 +117,8 @@ describe('CaseDraftStore', () => {
     const draft = store();
     draft.chooseCrop('crop-1');
     draft.addImage(image('i-0'));
+
+    draft.setFieldArea(2);
 
     const first = draft.keyForAttempt();
     draft.beginSubmit();
@@ -123,7 +145,24 @@ describe('CaseDraftStore', () => {
     expect(afterImage).not.toBe(afterNote);
 
     draft.setAudio({ blob: new Blob(['a']), durationMs: 1200, mimeType: 'audio/webm' });
-    expect(draft.keyForAttempt()).not.toBe(afterImage);
+    const afterAudio = draft.keyForAttempt();
+    expect(afterAudio).not.toBe(afterImage);
+
+    // A changed area is a changed body; reusing the key across it is exactly the 409 to avoid.
+    draft.setFieldArea(3);
+    const afterArea = draft.keyForAttempt();
+    expect(afterArea).not.toBe(afterAudio);
+
+    draft.setFieldAreaUnit('ACRE');
+    const afterUnit = draft.keyForAttempt();
+    expect(afterUnit).not.toBe(afterArea);
+
+    draft.setCropQuantity(40);
+    const afterQuantity = draft.keyForAttempt();
+    expect(afterQuantity).not.toBe(afterUnit);
+
+    draft.setCropQuantityUnit('KG');
+    expect(draft.keyForAttempt()).not.toBe(afterQuantity);
   });
 
   it('does not regenerate the key merely because it was asked for twice', () => {
@@ -133,7 +172,7 @@ describe('CaseDraftStore', () => {
   });
 
   // WEB-DATA-020 / WEB-DATA-021 — only the crop id and the note are ever persisted.
-  it('persists only the crop id and the note text', () => {
+  it('persists only the typed-in scalars — never the image or audio bytes', () => {
     const draft = store();
     draft.chooseCrop('crop-1');
     draft.setNote('পাতায় দাগ');
@@ -145,9 +184,25 @@ describe('CaseDraftStore', () => {
     expect(JSON.parse(raw)).toEqual({ cropId: 'crop-1', noteBn: 'পাতায় দাগ' });
     expect(raw).not.toContain('blob:');
     expect(raw).not.toContain('audio');
+
+    draft.setFieldArea(2);
+    draft.setCropQuantity(40);
+    draft.setCropQuantityUnit('KG');
+    TestBed.tick();
+    expect(JSON.parse(storage.getItem(APP_CONFIG.storageKeys.draft) ?? '')).toEqual({
+      cropId: 'crop-1',
+      noteBn: 'পাতায় দাগ',
+      fieldArea: 2,
+      fieldAreaUnit: APP_CONFIG.intake.metrics.defaultFieldAreaUnit,
+      cropQuantity: 40,
+      cropQuantityUnit: 'KG',
+    });
   });
 
-  it('restores the persisted crop and note into a new store instance', () => {
+  // A draft written by a build that predates the field metrics must still restore, with the
+  // metrics simply unanswered — dropping it would discard the crop and note over a question the
+  // farmer was never asked.
+  it('restores a legacy persisted crop and note into a new store instance', () => {
     storage.setItem(
       APP_CONFIG.storageKeys.draft,
       JSON.stringify({ cropId: 'crop-7', noteBn: 'আগের নোট' }),
@@ -157,6 +212,28 @@ describe('CaseDraftStore', () => {
     expect(draft.cropId()).toBe('crop-7');
     expect(draft.noteBn()).toBe('আগের নোট');
     expect(draft.images()).toHaveLength(0);
+    expect(draft.fieldArea()).toBeNull();
+    expect(draft.fieldAreaUnit()).toBe(APP_CONFIG.intake.metrics.defaultFieldAreaUnit);
+  });
+
+  it('restores the persisted field metrics into a new store instance', () => {
+    storage.setItem(
+      APP_CONFIG.storageKeys.draft,
+      JSON.stringify({
+        cropId: 'crop-7',
+        noteBn: '',
+        fieldArea: 5,
+        fieldAreaUnit: 'ACRE',
+        cropQuantity: 12,
+        cropQuantityUnit: 'KG',
+      }),
+    );
+
+    const draft = store();
+    expect(draft.fieldArea()).toBe(5);
+    expect(draft.fieldAreaUnit()).toBe('ACRE');
+    expect(draft.cropQuantity()).toBe(12);
+    expect(draft.cropQuantityUnit()).toBe('KG');
   });
 
   it('ignores a malformed persisted draft (WEB-DATA-024)', () => {

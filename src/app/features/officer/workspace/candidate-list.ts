@@ -26,6 +26,9 @@ import { ConfidenceBar } from '../../../shared/ui/confidence-bar/confidence-bar'
  * `WEB-FR-224` — the rules are the thresholds and nothing more. No band is shaded, no fill is
  * keyed to a band, no path is named. The decision path comes from the badge (`WEB-FR-215`).
  */
+/** Ranks are 1-based on the wire; rank 1 is the one the server built its suggestion from. */
+const TOP_RANK = 1;
+
 @Component({
   selector: 'foshol-candidate-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +47,9 @@ export class CandidateList {
   readonly thresholds = input.required<Thresholds>();
   /** The disease the officer currently has selected, so the list shows what they chose. */
   readonly selectedDiseaseId = input<string | null>(null);
+
+  /** Ranks are 1-based on the wire; rank 1 is the one the server built its suggestion from. */
+  protected readonly topRank = TOP_RANK;
 
   /**
    * The same helper the bar uses, for the same reason: `0.45 * 100` is not `45` in IEEE-754,

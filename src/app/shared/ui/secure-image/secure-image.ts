@@ -18,6 +18,7 @@ import {
   IMAGE_VARIANT_DERIVATIVE,
   type ImageVariant,
 } from '../../../core/media/out-of-contract/media-url.service';
+import { Icon } from '../icon/icon';
 
 /**
  * A case photograph, loaded the only way `WEB-FR-154` permits: through the presigned URL the API
@@ -45,7 +46,7 @@ type LoadState = 'loading' | 'ready' | 'failed';
 @Component({
   selector: 'foshol-secure-image',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [Icon, TranslatePipe],
   templateUrl: './secure-image.html',
   styleUrl: './secure-image.css',
   host: {

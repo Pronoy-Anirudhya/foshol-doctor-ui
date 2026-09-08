@@ -1,5 +1,5 @@
 <a class="back" [routerLink]="queuePath">
-  <span aria-hidden="true">←</span>
+  <foshol-icon name="arrow-left" size="sm" />
   {{ 'officer.case.back' | translate }}
 </a>
 
@@ -33,7 +33,7 @@
       }
       @if (facade.isResubmission()) {
         <span class="resub">
-          <span aria-hidden="true">↩</span>
+          <foshol-icon name="resubmit" size="xs" />
           {{ 'officer.queue.resubmission' | translate }}
         </span>
       }
@@ -61,6 +61,34 @@
     </div>
   </dl>
 
+  <!-- The farmer-reported metrics the server reckons a dose from. `metricsSource` gets its own
+       row rather than a tint or an icon: a spoken area is a transcription and a typed one is
+       not, and an officer needs to know which before trusting a dose (WEB-UX-042). -->
+  <dl class="case-meta" data-testid="case-metrics">
+    <div>
+      <dt>{{ 'officer.case.metrics.fieldArea' | translate }}</dt>
+      <dd class="tabular" data-testid="metrics-field-area">
+        <span class="font-latin">{{ detail.fieldArea }}</span>
+        {{ 'shared.unit.area.' + detail.fieldAreaUnit | translate }}
+      </dd>
+    </div>
+    @if (detail.cropQuantity && detail.cropQuantityUnit) {
+      <div>
+        <dt>{{ 'officer.case.metrics.cropQuantity' | translate }}</dt>
+        <dd class="tabular" data-testid="metrics-crop-quantity">
+          <span class="font-latin">{{ detail.cropQuantity }}</span>
+          {{ 'shared.unit.quantity.' + detail.cropQuantityUnit | translate }}
+        </dd>
+      </div>
+    }
+    <div>
+      <dt>{{ 'officer.case.metrics.source' | translate }}</dt>
+      <dd data-testid="metrics-source">
+        {{ 'officer.case.metrics.source.' + detail.metricsSource | translate }}
+      </dd>
+    </div>
+  </dl>
+
   <!-- WEB-FR-219 — demo beat 8. The code is named, and every action below stays available. -->
   @if (analysis()?.errorCode; as errorCode) {
     <!-- WEB-FR-219 — a failure turned into a demonstrated behaviour. Loud enough to be seen
@@ -70,7 +98,7 @@
       role="status"
       data-testid="degraded-banner"
     >
-      <span class="text-lg leading-snug" aria-hidden="true">⚠</span>
+      <foshol-icon class="mt-0.5 shrink-0 text-dawn-700" name="warning" size="lg" />
       <div>
         <h3 class="font-bold text-dawn-700">{{ 'officer.case.degraded.title' | translate }}</h3>
         <p class="mt-0.5 max-w-[68ch] text-sm text-ink">
@@ -330,6 +358,7 @@
       [loading]="facade.remediesLoading()"
       [disabled]="!canAct()"
       [diseaseName]="selectedDiseaseName()"
+      [doses]="facade.computedDoseById()"
       (toggleRemedy)="toggleRemedy($event)"
       (noteChange)="setNote($event)"
     />
@@ -406,10 +435,15 @@
           'officer.reject.reason' | translate
         }}</label>
         <select
+          #rejectReasonInput
           id="reject-reason"
           [class]="fieldClass + ' touch-target'"
           data-testid="reject-reason"
           [disabled]="!canAct()"
+          [attr.aria-invalid]="rejectAttempted() && rejectReason() === null ? 'true' : null"
+          [attr.aria-errormessage]="
+            rejectAttempted() && rejectReason() === null ? 'reject-reason-error' : null
+          "
           (change)="setRejectReason($event)"
         >
           <option value="">{{ 'officer.reject.reasonPlaceholder' | translate }}</option>
@@ -418,7 +452,9 @@
           }
         </select>
         @if (rejectAttempted() && rejectReason() === null) {
-          <p [class]="fieldErrorClass">{{ 'officer.reject.reasonRequired' | translate }}</p>
+          <p id="reject-reason-error" [class]="fieldErrorClass">
+            {{ 'officer.reject.reasonRequired' | translate }}
+          </p>
         }
 
         <label [class]="fieldLabelClass" for="reject-message">
@@ -428,6 +464,7 @@
           {{ 'officer.reject.messageHint' | translate }}
         </p>
         <textarea
+          #rejectMessageInput
           id="reject-message"
           [class]="fieldClass"
           data-testid="reject-message"
@@ -435,10 +472,20 @@
           aria-describedby="reject-message-hint"
           [value]="rejectMessage()"
           [disabled]="!canAct()"
+          [attr.aria-invalid]="
+            rejectAttempted() && rejectMessage().trim().length === 0 ? 'true' : null
+          "
+          [attr.aria-errormessage]="
+            rejectAttempted() && rejectMessage().trim().length === 0
+              ? 'reject-message-error'
+              : null
+          "
           (input)="setRejectMessage($event)"
         ></textarea>
         @if (rejectAttempted() && rejectMessage().trim().length === 0) {
-          <p [class]="fieldErrorClass">{{ 'officer.reject.messageRequired' | translate }}</p>
+          <p id="reject-message-error" [class]="fieldErrorClass">
+            {{ 'officer.reject.messageRequired' | translate }}
+          </p>
         }
 
         <div class="mt-3.5 flex flex-wrap gap-2">

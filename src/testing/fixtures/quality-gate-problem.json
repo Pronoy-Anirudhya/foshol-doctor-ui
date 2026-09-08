@@ -7,6 +7,7 @@
   "correlationId": "01a07caa-d705-7ad0-a51b-f334668c9fab",
   "rejectedImages": [
     { "position": 1, "reason": "BLURRY", "messageBn": "[messageBn]" },
-    { "position": 2, "reason": "TOO_SMALL", "messageBn": "[messageBn]" }
+    { "position": 2, "reason": "TOO_SMALL", "messageBn": "[messageBn]" },
+    { "position": 3, "reason": "NOT_A_CROP", "messageBn": "[messageBn]" }
   ]
 }

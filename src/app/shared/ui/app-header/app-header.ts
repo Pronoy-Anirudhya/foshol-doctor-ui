@@ -1,9 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthFacade } from '../../../core/auth/auth-facade';
+import { homePathForRole } from '../../../core/auth/auth.guard';
 import { SessionStore } from '../../../core/auth/session-store';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { LangToggle } from '../lang-toggle/lang-toggle';
+import { NotificationBell } from '../notification-bell/notification-bell';
 import { SseIndicator } from '../sse-indicator/sse-indicator';
 
 /**
@@ -25,7 +28,7 @@ import { SseIndicator } from '../sse-indicator/sse-indicator';
 @Component({
   selector: 'foshol-app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, LangToggle, SseIndicator],
+  imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, RouterLink],
   templateUrl: './app-header.html',
   host: { class: 'block' },
 })
@@ -38,6 +41,9 @@ export class AppHeader {
 
   protected readonly authenticated = this.session.isAuthenticated;
   protected readonly role = this.session.role;
+
+  /** Item 3 — the brand mark is a link home, home being whichever surface this role owns. */
+  protected readonly homePath = computed(() => homePathForRole(this.role()));
 
   protected readonly roleKey = computed(() => {
     const role = this.role();
