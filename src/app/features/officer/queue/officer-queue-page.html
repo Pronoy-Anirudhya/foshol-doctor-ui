@@ -1,8 +1,8 @@
-<div [class]="gridClass()">
-  <!-- WEB-UX-030 — at xl this is the left pane; below xl an open case takes the whole screen,
-       because two panes on a phone is one pane too many. -->
+<div [class]="gridClass">
+  <!-- WEB-UX-030 — an open case takes the whole screen at every breakpoint; the queue list and
+       the case detail are never shown side by side. -->
   <section
-    class="min-w-0 xl:block"
+    class="min-w-0"
     [class.hidden]="detailOpen()"
     [attr.aria-label]="'officer.queue.title' | translate"
   >
@@ -10,11 +10,7 @@
       eyebrowKey="officer.queue.eyebrow"
       titleKey="officer.queue.title"
       subtitleKey="officer.queue.subtitle"
-    >
-      <!-- The queue is district-scoped on the server. Saying which district turns an empty
-           queue from a suspected bug into a fact about this officer's patch. -->
-      <foshol-region-chip />
-    </foshol-page-heading>
+    />
 
     <!-- WEB-FR-202 — the sentence the queue exists to make visible, adjacent to the table and
          in the reading path. Not a footnote, not a tooltip. -->
@@ -432,8 +428,8 @@
   </section>
 
   <section class="min-w-0" [class.hidden]="!detailOpen()">
-    <!-- case-workspace-page.html carries its own "back to queue" link — WEB-UX-030's route
-         back below xl — so this pane doesn't duplicate it. -->
+    <!-- case-workspace-page.html carries its own "back to queue" link, so this pane doesn't
+         duplicate it. -->
     <router-outlet (activate)="detailOpen.set(true)" (deactivate)="detailOpen.set(false)" />
   </section>
 </div>

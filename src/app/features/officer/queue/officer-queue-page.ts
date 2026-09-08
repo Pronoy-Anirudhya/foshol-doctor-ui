@@ -23,7 +23,6 @@ import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Icon } from '../../../shared/ui/icon/icon';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
-import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { KpiClock } from '../kpi-clock';
@@ -100,7 +99,6 @@ interface OpenPanel {
     Icon,
     KpiClock,
     PageHeading,
-    RegionChip,
     Paginator,
     Percent1Pipe,
     QueueActionPanel,
@@ -346,14 +344,10 @@ export class OfficerQueuePage {
     'touch-target inline-flex items-center gap-2 rounded-xl bg-slate-800 px-4 text-sm font-semibold text-ink-invert shadow-stamp transition-colors duration-1 ease-settle hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-ink-muted disabled:shadow-none';
 
   /**
-   * At `xl` the console is two panes — queue left, case detail right (`WEB-UX-030`). With no
-   * case open the queue takes the full width, which is what lets the full column set fit.
+   * `WEB-UX-030` — the queue list and an open case's detail pane are never shown side by side;
+   * whichever is active takes the full width of the console.
    */
-  protected readonly gridClass = computed(() =>
-    this.detailOpen()
-      ? 'grid gap-5 xl:grid-cols-[minmax(0,33rem)_minmax(0,1fr)] xl:items-start'
-      : 'grid gap-5',
-  );
+  protected readonly gridClass = 'grid gap-5';
 
   private lastResyncTick = this.sse.resyncTick();
 
