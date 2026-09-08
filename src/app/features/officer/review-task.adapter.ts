@@ -39,6 +39,13 @@ interface FlatReviewTaskBody {
   claimExpiresAt?: unknown;
   claimedAt?: unknown;
   slaDueAt?: unknown;
+  /**
+   * The two operational KPI clocks (`REVIEW-FR-090` / `REVIEW-FR-091`), frozen server-side.
+   * The running server predates them and omits both, which is why they are read defensively
+   * and stay `null` rather than becoming a zero, a dash or an `Invalid Date`.
+   */
+  assignmentDueAt?: unknown;
+  resolutionDueAt?: unknown;
   requeueCount?: unknown;
   isResubmission?: unknown;
   topDiseaseId?: unknown;
@@ -133,6 +140,8 @@ export function adaptReviewTask(response: ReviewCaseDetail, taskId: string): Rev
     claimedAt: readString(body.claimedAt),
     claimExpiresAt: readString(body.claimExpiresAt),
     slaDueAt: readString(body.slaDueAt) ?? '',
+    assignmentDueAt: readString(body.assignmentDueAt),
+    resolutionDueAt: readString(body.resolutionDueAt),
     requeueCount: readNumber(body.requeueCount) ?? 0,
     version: UNKNOWN_TASK_VERSION,
   };

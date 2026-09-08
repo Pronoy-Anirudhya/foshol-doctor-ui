@@ -49,10 +49,26 @@
       <dt>{{ 'officer.case.submitted' | translate }}</dt>
       <dd class="tabular">{{ detail.submittedAt | dhakaDateTime }}</dd>
     </div>
+    <!-- The FARMER's wait (REVIEW-FR-049). Labelled as such, and deliberately not adjacent in
+         meaning to the officer's own KPI clock beside it. -->
     @if (facade.slaDueAt(); as sla) {
       <div>
         <dt>{{ 'officer.case.sla' | translate }}</dt>
         <dd class="tabular">{{ sla | dhakaDateTime }}</dd>
+      </div>
+    }
+    <!-- The OFFICER's own clock (REVIEW-FR-090 / REVIEW-FR-091). Absent until the server sends
+         it, in which case there is no row here at all — never a dash and never an empty box. -->
+    @if (facade.kpiDueAt(); as kpiDue) {
+      <div>
+        <dt>{{ 'officer.queue.col.kpi' | translate }}</dt>
+        <dd>
+          <foshol-kpi-clock
+            [dueAt]="kpiDue"
+            [labelKey]="facade.kpiLabelKey()"
+            [now]="store.now()"
+          />
+        </dd>
       </div>
     }
     <div>
@@ -123,6 +139,19 @@
 
       <div class="ms-auto flex flex-wrap gap-2">
         @if (heldByMe()) {
+          <!-- REVIEW-FR-096 — a transfer is a claim operation, so it lives beside Release
+               rather than among the four terminal actions. Offered ONLY here, which is the
+               only place the officer demonstrably holds a live claim. -->
+          <button
+            type="button"
+            [class]="btnQuiet"
+            data-testid="claim-transfer"
+            [attr.aria-expanded]="transferOpen()"
+            [disabled]="facade.claimPending() || facade.actionPending()"
+            (click)="openTransfer()"
+          >
+            {{ 'officer.transfer.open' | translate }}
+          </button>
           <button
             type="button"
             [class]="btnQuiet"
@@ -170,6 +199,10 @@
       </p>
     } @else if (!heldByMe()) {
       <p class="mt-2.5 text-sm text-ink-muted">{{ 'officer.claim.required' | translate }}</p>
+    }
+
+    @if (transferOpen() && heldByMe()) {
+      <foshol-transfer-panel (close)="openTransfer()" />
     }
   </section>
 

@@ -122,13 +122,17 @@
       }
 
       <!-- The bulk bar appears only once something is selected, and stays while a finished
-           run still has a report to show. There is no bulk endpoint: see queue-bulk-bar.ts. -->
+           run still has a report to show. REVIEW-FR-098 — it posts to the real bulk endpoints
+           and reports their per-item verdicts; see queue-bulk-bar.ts. -->
       @if (showBulkBar()) {
         <foshol-queue-bulk-bar
           class="mt-4 block"
           data-popover-root
           [rows]="selectedRows()"
+          [transferable]="transferableRows()"
           [open]="bulkPanelKind()"
+          [atCap]="atBulkCap()"
+          [maxSize]="bulkMax"
           (toggle)="togglePanel('bulk', $event)"
           (clearSelection)="clearSelection()"
         />
@@ -214,6 +218,21 @@
                 <dt>{{ 'officer.queue.col.sla' | translate }}</dt>
                 <dd class="tabular">{{ view.row.slaDueAt | dhakaTime }}</dd>
               </div>
+              <!-- REVIEW-FR-090 / REVIEW-FR-091 — the OFFICER's own clock, beside but never
+                   merged with the farmer's wait above. Renders nothing when the server sends
+                   no due instant, which is the case on every row today. -->
+              @if (kpiDueAt(view); as kpiDue) {
+                <div>
+                  <dt>{{ 'officer.queue.col.kpi' | translate }}</dt>
+                  <dd>
+                    <foshol-kpi-clock
+                      [dueAt]="kpiDue"
+                      [labelKey]="kpiLabelKey(view)"
+                      [now]="now()"
+                    />
+                  </dd>
+                </div>
+              }
               @if (view.liveStatus) {
                 <div>
                   <dt>{{ 'officer.queue.liveStatus' | translate }}</dt>
@@ -289,6 +308,9 @@
               <th scope="col" class="hidden xl:table-cell">
                 {{ 'officer.queue.col.sla' | translate }}
               </th>
+              <!-- WEB-FR-200 / AC-11 — plain, like every other header cell. No sort control
+                   exists on this screen and none is added for the KPI column either. -->
+              <th scope="col">{{ 'officer.queue.col.kpi' | translate }}</th>
               <th scope="col" class="hidden xl:table-cell">
                 {{ 'officer.queue.col.state' | translate }}
               </th>
@@ -350,6 +372,13 @@
                 </td>
                 <td class="tabular">{{ view.row.submittedAt | dhakaTime }}</td>
                 <td class="hidden tabular xl:table-cell">{{ view.row.slaDueAt | dhakaTime }}</td>
+                <td>
+                  <foshol-kpi-clock
+                    [dueAt]="kpiDueAt(view)"
+                    [labelKey]="kpiLabelKey(view)"
+                    [now]="now()"
+                  />
+                </td>
                 <td class="hidden xl:table-cell">
                   <span class="state" [attr.data-state]="view.row.state">
                     {{ stateKey(view) | translate }}

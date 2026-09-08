@@ -41,9 +41,11 @@ import {
   type RejectionReason,
 } from '../officer-facade';
 import { OFFICER_PATHS } from '../officer-paths';
+import { KpiClock } from '../kpi-clock';
 import { CandidateList } from './candidate-list';
 import { ClaimTimerRing } from './claim-timer-ring';
 import { RemedyEditor } from './remedy-editor';
+import { TransferPanel } from './transfer-panel';
 
 /**
  * The case workspace — where the human approval gate actually happens.
@@ -95,12 +97,14 @@ const BUTTON_BASE =
     GradcamView,
     Icon,
     ImageZoom,
+    KpiClock,
     MatcherChip,
     Percent1Pipe,
     RemedyEditor,
     RouterLink,
     SecureImage,
     Spinner,
+    TransferPanel,
     TranslatePipe,
   ],
   templateUrl: './case-workspace-page.html',
@@ -136,6 +140,8 @@ export class CaseWorkspacePage {
 
   protected readonly activeImageId = signal<string | null>(null);
   protected readonly replaceOpen = signal(false);
+  /** `REVIEW-FR-096` — the transfer panel, reachable only while this officer holds the claim. */
+  protected readonly transferOpen = signal(false);
   protected readonly rejectOpen = signal(false);
   protected readonly rejectReason = signal<RejectionReason | null>(null);
   protected readonly rejectMessage = signal('');
@@ -212,6 +218,12 @@ export class CaseWorkspacePage {
     });
 
     inject(DestroyRef).onDestroy(() => this.facade.closeCase());
+  }
+
+  /** Toggling it shut also puts away whatever the last attempt failed with. */
+  protected openTransfer(): void {
+    this.facade.clearTransferProblem();
+    this.transferOpen.update((open) => !open);
   }
 
   protected pickImage(imageId: string): void {
