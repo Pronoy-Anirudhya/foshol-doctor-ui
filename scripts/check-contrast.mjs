@@ -80,6 +80,7 @@ const PAIRS = [
   ['ink', 'surface-2', 4.5, 'body text on a raised panel'],
   ['ink-muted', 'surface-0', 4.5, 'secondary text'],
   ['ink-muted', 'surface-1', 4.5, 'secondary text on the page ground'],
+  ['ink-muted', 'surface-2', 4.5, 'secondary text on a raised chip'],
   ['ink-faint', 'surface-0', 4.5, 'tertiary text'],
   ['ink-faint', 'surface-1', 4.5, 'tertiary text on the page ground'],
   ['ink-faint', 'surface-2', 4.5, 'tertiary text on a raised panel'],

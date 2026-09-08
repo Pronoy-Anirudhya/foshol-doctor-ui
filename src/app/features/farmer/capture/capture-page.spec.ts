@@ -314,6 +314,13 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     expect(body.get('fieldAreaUnit')).toBe(APP_CONFIG.intake.metrics.defaultFieldAreaUnit);
     expect(body.has('cropQuantity')).toBe(false);
     expect(body.has('cropQuantityUnit')).toBe(false);
+    // Region is an identity attribute: the server copies it from the farmer and ignores any
+    // client value. A UI that sent one would be claiming a case belongs to a district the
+    // server has not agreed to, so the parts must be absent rather than merely ignored.
+    expect(body.has('districtCode')).toBe(false);
+    expect(body.has('divisionCode')).toBe(false);
+    // And nothing geographic reached the request under any other spelling.
+    expect([...body.keys()].filter((k) => /district|division|region/i.test(k))).toEqual([]);
     // WEB-DATA-005 — the key was minted for this attempt, not before the content settled.
     expect(key).toBeNull();
 
