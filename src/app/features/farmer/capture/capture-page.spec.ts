@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { BN_CATALOGUE } from '../../../core/i18n/bn-catalogue';
 import { provideI18n } from '../../../core/i18n/i18n.providers';
@@ -20,7 +20,9 @@ import {
   type SyntheticImage,
 } from '../../../../testing/factories/synthetic-images';
 import { CapturePage } from './capture-page';
+import { FARMER_PATHS } from './farmer-paths';
 import { IMAGE_RASTER } from './image-raster.port';
+import { VoiceRecorder } from './voice-recorder';
 
 /**
  * WEB-TEST-002 — the quality-gate rejection flow, end to end through the real component.
@@ -431,5 +433,170 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     expect(marked?.textContent?.trim()).toBe('ছবি ঝাপসা। অনুগ্রহ করে স্পষ্ট করে আবার তুলুন।');
     // WEB-FR-005 — the server's own Bangla detail is preferred over a generic fallback.
     expect(el.textContent).toContain('[server detail]');
+  });
+});
+
+/**
+ * The way out. A farmer who has changed their mind had only browser navigation, which leaves a
+ * populated draft behind; cancel discards it deliberately (`WEB-DATA-022`) and hands the
+ * microphone back (`WEB-FR-145`). The confirmation is inline rather than `window.confirm`, so
+ * it is assertable in the DOM like every other control on this page.
+ */
+describe('CapturePage — cancel (WEB-DATA-022, WEB-FR-145)', () => {
+  let fixture: ComponentFixture<CapturePage>;
+  let http: HttpTestingController;
+  let draft: CaseDraftStore;
+  let recorder: VoiceRecorder;
+  let navigate: ReturnType<typeof vi.spyOn>;
+
+  async function setUp(withContent: boolean): Promise<void> {
+    const image = passingImage();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideI18n(),
+        { provide: ApiConfiguration, useValue: { rootUrl: APP_CONFIG.api.origin } },
+        { provide: IMAGE_RASTER, useValue: new FakeImageRaster([image]) },
+      ],
+    });
+
+    http = TestBed.inject(HttpTestingController);
+    draft = TestBed.inject(CaseDraftStore);
+    draft.discard();
+    // The router has no routes here, and where it goes is asserted rather than performed.
+    navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+
+    fixture = TestBed.createComponent(CapturePage);
+    // Page-scoped provider (`WEB-FR-145`), so it is reachable only through the component.
+    recorder = fixture.debugElement.injector.get(VoiceRecorder);
+    fixture.detectChanges();
+    http.expectOne(CROPS_URL).flush(crops);
+    await fixture.whenStable();
+
+    if (!withContent) return;
+
+    draft.chooseCrop(crops[0]!.id);
+    const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
+      '[data-testid="capture-file-input"]',
+    );
+    Object.defineProperty(input, 'files', { value: [image.blob], configurable: true });
+    input!.dispatchEvent(new Event('change'));
+    await new Promise((resolve) => setTimeout(resolve));
+    draft.setFieldArea(FIELD_AREA);
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  afterEach(() => {
+    http.verify();
+  });
+
+  function cancelButton(): HTMLButtonElement {
+    return (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      '[data-testid="capture-cancel"]',
+    )!;
+  }
+
+  function prompt(): Element | null {
+    return (fixture.nativeElement as HTMLElement).querySelector(
+      '[data-testid="capture-cancel-prompt"]',
+    );
+  }
+
+  async function press(button: HTMLButtonElement): Promise<void> {
+    button.click();
+    await new Promise((resolve) => setTimeout(resolve));
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  it('asks first and destroys nothing on the first press', async () => {
+    await setUp(true);
+    expect(draft.hasContent()).toBe(true);
+    const idleLabel = cancelButton().textContent?.trim();
+
+    await press(cancelButton());
+
+    // Inline, in the document — not a `window.confirm` the DOM cannot see (nor the farmer's
+    // browser style). The wording itself is asserted by the i18n parity gate, not here.
+    expect(prompt()).not.toBeNull();
+    expect(prompt()?.getAttribute('role')).toBe('alert');
+    // The point of the two-step: after one press the work is still there.
+    expect(draft.imageCount()).toBe(1);
+    expect(draft.cropId()).toBe(crops[0]!.id);
+    expect(navigate).not.toHaveBeenCalled();
+    // WEB-UX-044 — the armed state changes the word, not only the colour.
+    expect(cancelButton().textContent?.trim()).not.toBe(idleLabel);
+  });
+
+  it('backs out of the confirmation with "keep editing", leaving the draft intact', async () => {
+    await setUp(true);
+    await press(cancelButton());
+
+    const keep = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      '[data-testid="capture-cancel-keep"]',
+    );
+    await press(keep!);
+
+    expect(prompt()).toBeNull();
+    expect(draft.imageCount()).toBe(1);
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('discards the draft, frees the microphone and leaves on the second press', async () => {
+    await setUp(true);
+    const released = vi.spyOn(recorder, 'releaseMicrophone');
+
+    await press(cancelButton());
+    await press(cancelButton());
+
+    // WEB-DATA-022 — the store revokes every preview URL and clears the persisted draft.
+    expect(draft.imageCount()).toBe(0);
+    expect(draft.cropId()).toBeNull();
+    expect(draft.hasContent()).toBe(false);
+    // WEB-FR-145 — otherwise the recorder keeps the microphone open on a page nobody is on.
+    expect(released).toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith(FARMER_PATHS.casesList);
+    // Cancelling talks to nobody; the case was never created.
+    expect(http.match(SUBMIT_URL)).toEqual([]);
+  });
+
+  it('leaves immediately when there is nothing to lose', async () => {
+    await setUp(false);
+    expect(draft.hasContent()).toBe(false);
+
+    await press(cancelButton());
+
+    expect(prompt()).toBeNull();
+    expect(navigate).toHaveBeenCalledWith(FARMER_PATHS.casesList);
+  });
+
+  it('is disabled while a submission is in flight, and live again once it fails', async () => {
+    await setUp(true);
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="capture-submit"]')!
+      .click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // There is no abort handle behind the generated client, and the server may already have
+    // created the case — so cancel refuses rather than lying about what it undid.
+    expect(cancelButton().disabled).toBe(true);
+    const request = http.expectOne(SUBMIT_URL);
+    await press(cancelButton());
+    expect(prompt()).toBeNull();
+    expect(navigate).not.toHaveBeenCalled();
+
+    request.flush(null, { status: 0, statusText: 'Network error' });
+    await new Promise((resolve) => setTimeout(resolve));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    // The attempt failed, the draft is the farmer's again, so the way out comes back.
+    expect(cancelButton().disabled).toBe(false);
   });
 });

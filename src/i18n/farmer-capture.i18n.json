@@ -31,6 +31,26 @@
     "bn": "লাইভ ক্যামেরা ভিউ",
     "en": "Live camera view"
   },
+  "farmer.capture.cancel.action": {
+    "bn": "বাতিল",
+    "en": "Cancel"
+  },
+  "farmer.capture.cancel.confirm": {
+    "bn": "হ্যাঁ, মুছে ফেলুন",
+    "en": "Yes, discard"
+  },
+  "farmer.capture.cancel.disabledHint": {
+    "bn": "পাঠানো শুরু হয়ে গেছে, এখন আর বাতিল করা যাবে না।",
+    "en": "Sending has started, so it can no longer be cancelled."
+  },
+  "farmer.capture.cancel.keep": {
+    "bn": "লেখা চালিয়ে যান",
+    "en": "Keep editing"
+  },
+  "farmer.capture.cancel.prompt": {
+    "bn": "আপনার ছবি ও বর্ণনা মুছে যাবে। সত্যিই বাতিল করবেন?",
+    "en": "Your photos and description will be deleted. Cancel anyway?"
+  },
   "farmer.capture.crop.backToCases": {
     "bn": "আপনার কেসগুলোতে ফিরুন",
     "en": "Back to your cases"
