@@ -44,7 +44,10 @@ export type IconName =
   | 'plus'
   | 'bell'
   | 'inbox'
-  | 'pin';
+  | 'pin'
+  | 'view'
+  | 'approve'
+  | 'reject';
 
 @Component({
   selector: 'foshol-icon',
@@ -128,6 +131,24 @@ export type IconName =
         }
         @case ('plus') {
           <path d="M12 6v12M6 12h12" stroke-width="2.2" />
+        }
+        @case ('view') {
+          <!-- An eye: read the case, change nothing. Paired with approve/reject, so it has to
+               read as inspection rather than as a third decision. -->
+          <path d="M2.2 12S5.9 5.4 12 5.4 21.8 12 21.8 12 18.1 18.6 12 18.6 2.2 12 2.2 12Z" />
+          <circle cx="12" cy="12" r="3.1" />
+        }
+        @case ('approve') {
+          <!-- A tick in a ring. The bare tick is used for passive state elsewhere; the ring is
+               what makes this read as an action the officer takes. -->
+          <circle cx="12" cy="12" r="8.8" />
+          <path d="m8.1 12.2 2.7 2.7 5.1-5.6" />
+        }
+        @case ('reject') {
+          <!-- A cross in a ring, deliberately NOT the bare close cross, which everywhere else
+               in this application means "dismiss this UI" rather than "return this case". -->
+          <circle cx="12" cy="12" r="8.8" />
+          <path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" />
         }
         @case ('pin') {
           <!-- A map pin: where a case is filed, and the only place region appears in this UI. -->
