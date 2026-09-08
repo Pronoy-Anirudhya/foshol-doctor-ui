@@ -199,5 +199,162 @@
   "admin.composition.noRows": {
     "bn": "আনা পাতায় কোনো সারি নেই",
     "en": "The page loaded holds no rows"
+  },
+
+  "admin.kpi.linkFromStats": { "bn": "কেপিআই ব্যর্থতা", "en": "KPI failures" },
+  "admin.kpi.backToStats": { "bn": "পরিসংখ্যানে ফিরুন", "en": "Back to statistics" },
+  "admin.kpi.title": { "bn": "কেপিআই ব্যর্থতা", "en": "KPI failures" },
+  "admin.kpi.subtitle": {
+    "bn": "শুধু পড়ার জন্য। সময়সীমা পেরিয়ে যাওয়া কেসগুলো দুই ভাগে দেখানো হয়েছে — জেলার নিজস্ব ব্যর্থতা, আর অফিসারের নিজের ব্যর্থতা।",
+    "en": "Read-only. Missed deadlines, split two ways: the district's own failures, and an officer's own."
+  },
+  "admin.kpi.refreshAria": {
+    "bn": "কেপিআই সংখ্যাগুলো সার্ভার থেকে আবার আনুন",
+    "en": "Fetch the KPI figures from the server again"
+  },
+  "admin.kpi.allClear": {
+    "bn": "সার্ভার গুনে দেখেছে: এই জেলায় কোনো ব্যর্থতা নেই। এটি গোনা ফল, তথ্যের অভাব নয়।",
+    "en": "The server counted, and this district has no failures. That is a counted result, not missing data."
+  },
+  "admin.kpi.empty.title": { "bn": "এখনও কোনো কেপিআই তথ্য আসেনি", "en": "No KPI figures loaded" },
+  "admin.kpi.empty.detail": {
+    "bn": "সার্ভার থেকে সংখ্যাগুলো আনতে হালনাগাদ চাপুন।",
+    "en": "Press refresh to fetch the figures from the server."
+  },
+  "admin.kpi.footnote": {
+    "bn": "সব সংখ্যা কেবল আপনার জেলার — সার্ভার আপনার পরিচয়পত্র থেকেই জেলা পড়ে নেয়, তাই এখান থেকে কোনো জেলা পাঠানো হয় না।",
+    "en": "Every figure is your district only — the server reads the district from your token, so no district is ever sent from here."
+  },
+
+  "admin.kpi.tile.notLoaded": { "bn": "সংখ্যাটি আসেনি", "en": "Figure not loaded" },
+  "admin.kpi.tile.counted": {
+    "bn": "গোনা সংখ্যা — এখানে শূন্য মানে কোনো ব্যর্থতা নেই, তথ্যের অভাব নয়",
+    "en": "A counted figure — a zero here means none, not missing data"
+  },
+  "admin.kpi.tile.drillDown": { "bn": "সারিগুলো দেখুন", "en": "See the rows" },
+
+  "admin.kpi.district.title": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
+  "admin.kpi.district.detail": {
+    "bn": "কেসটি তখনও সবার সাধারণ তালিকায় ছিল, কেউ সেটি নিজের দায়িত্বে নেননি। তাই এই ব্যর্থতা কোনো একজন মানুষের নয়, পুরো জেলার — এবং এটি কারও নামে ভাগ করা হয় না।",
+    "en": "The case was still in the shared pool and nobody had claimed it, so this failure belongs to the district rather than to any one person — and it is never divided among people."
+  },
+  "admin.kpi.assignment.label": { "bn": "দায়িত্ব নেওয়ার সময়সীমা পেরোনো", "en": "Assignment deadline missed" },
+  "admin.kpi.assignment.scope": { "bn": "জেলার মোট — কোনো অফিসার যুক্ত নেই", "en": "District total — no officer attached" },
+  "admin.kpi.assignment.hint": {
+    "bn": "সাধারণ তালিকা থেকে কেউ কেসটি সময়মতো নিজের দায়িত্বে নেননি।",
+    "en": "Nobody claimed the case from the shared pool in time."
+  },
+
+  "admin.kpi.personal.title": { "bn": "অফিসারভিত্তিক ব্যর্থতা", "en": "Failures by officer" },
+  "admin.kpi.personal.detail": {
+    "bn": "এই সংখ্যাগুলো সেই কেসের, যেগুলো একজন অফিসার নিজের দায়িত্বে নিয়েছিলেন এবং সময়সীমার মধ্যে শেষ করেননি। কেবল এগুলোই কারও নামের পাশে বসতে পারে।",
+    "en": "These are cases an officer had claimed and did not finish inside the deadline. They are the only figures that may sit beside a person's name."
+  },
+  "admin.kpi.resolution.label": { "bn": "নিষ্পত্তির সময়সীমা পেরোনো", "en": "Resolution deadline missed" },
+  "admin.kpi.resolution.scope": { "bn": "জেলার মোট — নিচে অফিসারভিত্তিক ভাগ", "en": "District total — broken down by officer below" },
+  "admin.kpi.resolution.hint": {
+    "bn": "অফিসার কেসটি নিজের দায়িত্বে নিয়েছিলেন, কিন্তু সময়সীমার মধ্যে শেষ করেননি।",
+    "en": "The officer had claimed the case but did not finish it inside the deadline."
+  },
+
+  "admin.kpi.officers.title": { "bn": "অফিসারভিত্তিক নিষ্পত্তি-ব্যর্থতা", "en": "Resolution failures per officer" },
+  "admin.kpi.officers.subtitle": {
+    "bn": "শুধু নিষ্পত্তির ব্যর্থতা — অর্থাৎ যে কেস অফিসার নিজের দায়িত্বে নিয়েছিলেন। দায়িত্ব নেওয়ার ব্যর্থতা এখানে নেই, কারণ তখন কেসটি কারও দায়িত্বে ছিল না।",
+    "en": "Resolution failures only — cases the officer had claimed. Assignment failures are not here, because nobody held the case then."
+  },
+  "admin.kpi.officers.aria": {
+    "bn": "{{officers}} জন অফিসারের নিষ্পত্তি-ব্যর্থতা; সবচেয়ে বেশি {{topOfficer}} — {{topCount}}টি",
+    "en": "Resolution failures for {{officers}} officers; the most is {{topOfficer}} with {{topCount}}"
+  },
+  "admin.kpi.officers.barAria": {
+    "bn": "{{officer}} — {{count}}টি নিষ্পত্তি-ব্যর্থতা",
+    "en": "{{officer}} — {{count}} resolution failures"
+  },
+  "admin.kpi.officers.unnamed": { "bn": "সার্ভার নাম পাঠায়নি", "en": "The server sent no name" },
+  "admin.kpi.officers.drillDown": { "bn": "সারিগুলো দেখুন", "en": "See the rows" },
+  "admin.kpi.officers.unattributed": {
+    "bn": "আরও {{count}}টি নিষ্পত্তি-ব্যর্থতার সঙ্গে সার্ভার কোনো অফিসার যুক্ত করেনি। সেগুলো কারও হিসাবে যোগ করা হয়নি।",
+    "en": "The server attached no officer to {{count}} further resolution failures. They are not added to anybody's count."
+  },
+  "admin.kpi.officers.none": {
+    "bn": "সার্ভার গুনে দেখেছে: কোনো অফিসারের নামে নিষ্পত্তি-ব্যর্থতা নেই।",
+    "en": "The server counted, and no officer has a resolution failure."
+  },
+  "admin.kpi.officers.notLoaded": {
+    "bn": "অফিসারভিত্তিক ভাগ এখনও আসেনি।",
+    "en": "The per-officer breakdown has not loaded."
+  },
+
+  "admin.kpi.breaches.back": { "bn": "কেপিআই সারসংক্ষেপে ফিরুন", "en": "Back to the KPI summary" },
+  "admin.kpi.breaches.title": { "bn": "সময়সীমা পেরোনো কেসগুলো", "en": "Missed deadlines" },
+  "admin.kpi.breaches.subtitle": {
+    "bn": "শুধু পড়ার জন্য। প্রতিটি সারি একটি কেস, যার সময়সীমা পেরিয়ে গিয়েছিল।",
+    "en": "Read-only. One row per case whose deadline passed."
+  },
+  "admin.kpi.breaches.refreshAria": {
+    "bn": "সারিগুলো সার্ভার থেকে আবার আনুন",
+    "en": "Fetch the rows from the server again"
+  },
+  "admin.kpi.breaches.filterLabel": { "bn": "ধরন অনুযায়ী ছাঁকুন", "en": "Filter by kind" },
+  "admin.kpi.breaches.filter.all": { "bn": "সব", "en": "All" },
+  "admin.kpi.breaches.filter.ASSIGNMENT": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
+  "admin.kpi.breaches.filter.RESOLUTION": { "bn": "অফিসারের ব্যর্থতা", "en": "Officer failures" },
+  "admin.kpi.breaches.officerFilter": {
+    "bn": "শুধু {{officer}}-এর সারিগুলো দেখানো হচ্ছে",
+    "en": "Showing only the rows for {{officer}}"
+  },
+  "admin.kpi.breaches.officerFilterNote": {
+    "bn": "একজন অফিসারের সঙ্গে কেবল নিষ্পত্তির ব্যর্থতাই যুক্ত থাকতে পারে, তাই এখানে দায়িত্ব নেওয়ার ব্যর্থতা দেখানো হয় না।",
+    "en": "Only resolution failures can belong to an officer, so no assignment failures are shown here."
+  },
+  "admin.kpi.breaches.clearOfficer": { "bn": "ছাঁকনি সরান", "en": "Clear the filter" },
+  "admin.kpi.breaches.staleDetail": {
+    "bn": "শেষ চেষ্টাটি ব্যর্থ হয়েছে। নিচের সারিগুলো সবশেষ সফলভাবে আনা পাতা, এখনকার নয়।",
+    "en": "The last attempt failed. The rows below are the last page that loaded successfully, not the current one."
+  },
+  "admin.kpi.breaches.none.title": { "bn": "কোনো সারি নেই", "en": "No rows" },
+  "admin.kpi.breaches.none.detail": {
+    "bn": "সার্ভার খুঁজে দেখেছে এবং এই ছাঁকনিতে কিছুই পায়নি। এটি গোনা ফল, তথ্যের অভাব নয়।",
+    "en": "The server looked and found nothing under this filter. That is a counted result, not missing data."
+  },
+  "admin.kpi.breaches.notLoaded.title": { "bn": "এখনও কিছু আসেনি", "en": "Nothing loaded yet" },
+  "admin.kpi.breaches.notLoaded.detail": {
+    "bn": "সার্ভার থেকে সারিগুলো আনতে হালনাগাদ চাপুন।",
+    "en": "Press refresh to fetch the rows from the server."
+  },
+  "admin.kpi.breaches.assignment.title": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
+  "admin.kpi.breaches.assignment.detail": {
+    "bn": "এই কেসগুলো তখনও সাধারণ তালিকায় ছিল, কেউ সেগুলো নিজের দায়িত্বে নেননি। তাই এখানে কোনো অফিসারের ঘর নেই।",
+    "en": "These cases were still in the shared pool and nobody had claimed them, so this table has no officer column."
+  },
+  "admin.kpi.breaches.assignment.caption": {
+    "bn": "জেলার ব্যর্থতা: চাষির নাম, ফসল, সময়সীমা এবং কখন পেরিয়েছে",
+    "en": "District failures: farmer, crop, deadline and when it passed"
+  },
+  "admin.kpi.breaches.resolution.title": { "bn": "অফিসারের ব্যর্থতা", "en": "Officer failures" },
+  "admin.kpi.breaches.resolution.detail": {
+    "bn": "সময়সীমা পেরোনোর সময় কেসটি যে অফিসারের দায়িত্বে ছিল, তাঁর নাম এখানে দেখানো হয়েছে।",
+    "en": "The officer who held the claim when the deadline passed is named here."
+  },
+  "admin.kpi.breaches.resolution.caption": {
+    "bn": "অফিসারের ব্যর্থতা: অফিসার, চাষির নাম, ফসল, সময়সীমা এবং কখন পেরিয়েছে",
+    "en": "Officer failures: officer, farmer, crop, deadline and when it passed"
+  },
+  "admin.kpi.breaches.column.officer": { "bn": "অফিসার", "en": "Officer" },
+  "admin.kpi.breaches.column.farmer": { "bn": "চাষি", "en": "Farmer" },
+  "admin.kpi.breaches.column.crop": { "bn": "ফসল", "en": "Crop" },
+  "admin.kpi.breaches.column.dueAt": { "bn": "সময়সীমা", "en": "Deadline" },
+  "admin.kpi.breaches.column.breachedAt": { "bn": "পেরিয়েছে", "en": "Passed" },
+  "admin.kpi.breaches.column.open": { "bn": "কেসটি খুলুন", "en": "Open the case" },
+  "admin.kpi.breaches.noFarmerName": { "bn": "নাম আসেনি", "en": "No name sent" },
+  "admin.kpi.breaches.noTime": { "bn": "সময় আসেনি", "en": "No time sent" },
+  "admin.kpi.breaches.officerUnnamed": { "bn": "নাম আসেনি", "en": "No name sent" },
+  "admin.kpi.breaches.officerMissing": {
+    "bn": "সার্ভার এই সারির সঙ্গে কোনো অফিসার যুক্ত করেনি",
+    "en": "The server attached no officer to this row"
+  },
+  "admin.kpi.breaches.openNote": {
+    "bn": "কেসটি খুললে কনসোল সেটি দেখাবে। যদি কাজটি আর না থাকে, কনসোল স্বাভাবিকভাবেই “পাওয়া যায়নি” বলবে।",
+    "en": "Opening a case shows it in the console. If the task no longer exists, the console simply says it was not found."
   }
 }

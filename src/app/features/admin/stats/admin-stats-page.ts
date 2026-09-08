@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { toProblemView } from '../../../core/errors/problem';
@@ -15,6 +16,7 @@ import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 import { toAdminStatsView } from '../admin-stats.adapter';
+import { ADMIN_PATHS } from '../kpi/admin-paths';
 import { toQueueInsightView } from '../queue-insight.adapter';
 import { ConfidenceLandscape } from './confidence-landscape';
 import { QueueComposition } from './queue-composition';
@@ -64,6 +66,7 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
   selector: 'foshol-admin-stats-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    RouterLink,
     TranslatePipe,
     DhakaDateTimePipe,
     Percent1Pipe,
@@ -121,6 +124,25 @@ const MINUTE_FACTOR = 10 ** MINUTE_DECIMALS;
         </svg>
         {{ 'admin.stats.refresh' | translate }}
       </button>
+
+      <!-- The KPI dashboard is a separate route with its own endpoints and its own store, so
+           this is a link rather than a section: nothing it loads can affect this page. -->
+      <a
+        class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-semibold text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+        [routerLink]="kpiPath"
+        data-testid="kpi-link"
+      >
+        {{ 'admin.kpi.linkFromStats' | translate }}
+        <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
+          <path
+            d="M6 3.5 10.5 8 6 12.5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
     </foshol-page-heading>
 
     <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
@@ -290,6 +312,8 @@ export class AdminStatsPage {
 
   /** One per tile, so the loading state holds the shape the values will land in. */
   protected readonly placeholders = ['casesToday', 'approvalRate', 'medianReview', 'agreement'];
+
+  protected readonly kpiPath = ADMIN_PATHS.kpis;
 
   /**
    * DEVIATIONS.md D-06 — the store holds the body the server sent, which is not the body the

@@ -1,0 +1,140 @@
+/* No @media anywhere: the responsive behaviour is Tailwind breakpoints on the elements plus the
+   horizontal scroll container below, which is what keeps 360 px free of page-level scrolling
+   (WEB-UX-030…034). */
+
+.kb-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-0);
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  transition: background-color var(--duration-1) var(--ease-settle);
+}
+
+.kb-chip:hover {
+  background-color: var(--color-surface-1);
+}
+
+/* The selected filter is bold, filled AND pressed (`aria-pressed`) — three signals, only one of
+   which is colour (WEB-UX-044). */
+.kb-chip[data-selected] {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.kb-officer-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: var(--radius-panel);
+  background-color: var(--color-surface-0);
+  padding: 0.75rem 1rem;
+}
+
+.kb-officer-name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.kb-officer-note {
+  flex: 1 1 16rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+}
+
+.kb-clear {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-surface-3);
+  border-radius: var(--radius-control);
+  background-color: var(--color-surface-1);
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* Wide content scrolls inside its own container; the page itself never scrolls sideways. */
+.kb-scroll {
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-surface-3);
+  border-radius: var(--radius-card);
+  background-color: var(--color-surface-0);
+}
+
+.kb-table {
+  width: 100%;
+  min-width: 44rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.kb-table th {
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid var(--color-surface-3);
+  background-color: var(--color-surface-1);
+  padding: 0.6rem 0.85rem;
+  text-align: start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  white-space: nowrap;
+}
+
+.kb-table td {
+  border-top: 1px solid var(--color-surface-2);
+  padding: 0.7rem 0.85rem;
+  vertical-align: top;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.kb-table tbody tr:hover {
+  background-color: var(--color-surface-1);
+}
+
+.kb-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.kb-absent {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-2);
+  padding: 0.05rem 0.5rem;
+  font-size: 0.6875rem;
+  color: var(--color-ink-muted);
+}
+
+.kb-open {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.kb-open:hover {
+  color: var(--color-ink);
+}

@@ -1,0 +1,306 @@
+<foshol-back-link
+  class="mb-3"
+  variant="console"
+  [to]="paths.kpis"
+  labelKey="admin.kpi.breaches.back"
+/>
+
+<foshol-page-heading
+  eyebrowKey="admin.stats.eyebrow"
+  titleKey="admin.kpi.breaches.title"
+  subtitleKey="admin.kpi.breaches.subtitle"
+>
+  <span
+    class="rounded-pill border border-surface-3 bg-surface-0 px-3 py-1 text-xs font-semibold tracking-wide text-ink-muted uppercase"
+    data-testid="read-only-chip"
+    >{{ 'admin.stats.readOnly' | translate }}</span
+  >
+
+  <!-- The scope, named rather than filtered for: the server reads the district from the JWT. -->
+  <foshol-region-chip />
+
+  <button
+    type="button"
+    class="touch-target inline-flex items-center gap-2 rounded-control bg-console px-4 font-semibold text-on-console shadow-stamp transition-colors duration-1 ease-settle hover:bg-slate-700"
+    data-testid="refresh"
+    [attr.aria-label]="'admin.kpi.breaches.refreshAria' | translate"
+    [disabled]="store.loading()"
+    (click)="refresh()"
+  >
+    <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true" fill="none">
+      <path
+        d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    {{ 'admin.stats.refresh' | translate }}
+  </button>
+</foshol-page-heading>
+
+<!-- The filter. `kind` is a real query parameter; there is deliberately no district control. -->
+<div
+  class="mt-4 flex flex-wrap items-center gap-2"
+  role="group"
+  [attr.aria-label]="'admin.kpi.breaches.filterLabel' | translate"
+>
+  <button
+    type="button"
+    class="kb-chip"
+    [attr.aria-pressed]="activeKind() === null"
+    [attr.data-selected]="activeKind() === null || null"
+    data-testid="filter-all"
+    (click)="selectKind(null)"
+  >
+    {{ 'admin.kpi.breaches.filter.all' | translate }}
+  </button>
+  @for (choice of kindChoices; track choice) {
+    <button
+      type="button"
+      class="kb-chip"
+      [attr.aria-pressed]="activeKind() === choice"
+      [attr.data-selected]="activeKind() === choice || null"
+      [attr.data-kind]="choice"
+      data-testid="filter-kind"
+      (click)="selectKind(choice)"
+    >
+      {{ 'admin.kpi.breaches.filter.' + choice | translate }}
+    </button>
+  }
+</div>
+
+@if (activeOfficerId() !== null) {
+  <!-- An officer filter can only mean resolution breaches, and saying so is the point: an empty
+       assignment table under a person's name would read as a verdict on that person. -->
+  <div class="kb-officer-filter" role="status" data-testid="officer-filter">
+    <p class="kb-officer-name">
+      {{ 'admin.kpi.breaches.officerFilter' | translate: { officer: filteredOfficerLabel() } }}
+    </p>
+    <p class="kb-officer-note">{{ 'admin.kpi.breaches.officerFilterNote' | translate }}</p>
+    <button type="button" class="kb-clear touch-target" data-testid="clear-officer" (click)="clearOfficer()">
+      {{ 'admin.kpi.breaches.clearOfficer' | translate }}
+    </button>
+  </div>
+}
+
+<p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
+  <span data-testid="loaded-at">
+    @if (loadedAt(); as at) {
+      {{ 'admin.stats.updatedAt' | translate: { time: (at | dhakaDateTime) } }}
+    } @else {
+      {{ 'admin.stats.neverLoaded' | translate }}
+    }
+  </span>
+  <foshol-spinner [active]="store.loading()" size="sm" />
+</p>
+
+@if (problem(); as failure) {
+  @if (store.stale()) {
+    <!-- WEB-FR-305 — the rows below are real, but they are not current. -->
+    <div
+      class="mt-4 rounded-panel border border-warning bg-dawn-100 p-4"
+      role="status"
+      data-testid="stale-marker"
+    >
+      <p class="text-sm font-semibold text-dawn-700">{{ 'admin.stats.stale.title' | translate }}</p>
+      <p class="mt-1 max-w-prose text-sm text-ink">
+        {{ 'admin.kpi.breaches.staleDetail' | translate }}
+      </p>
+    </div>
+  }
+  <foshol-error-panel class="mt-4" [problem]="failure" (retry)="refresh()" />
+}
+
+@if (store.hasPage()) {
+  @if (countedEmpty()) {
+    <!-- A counted empty page: the server looked and found nothing. That is a result, and it is
+         said in words that cannot be confused with "nothing has loaded". -->
+    <foshol-empty-state
+      class="mt-6"
+      titleKey="admin.kpi.breaches.none.title"
+      detailKey="admin.kpi.breaches.none.detail"
+    />
+  } @else {
+    @if (assignmentRows().length > 0) {
+      <!-- ── District failures ────────────────────────────────────────────────────────────────
+           No officer column exists in this table. The rows have no owner because nobody had
+           claimed the case; the heading names the district, which is what failed. -->
+      <section class="mt-6" data-testid="assignment-section" aria-labelledby="kb-assignment-heading">
+        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <h2 id="kb-assignment-heading" class="text-lg font-semibold text-ink">
+            {{ 'admin.kpi.breaches.assignment.title' | translate }}
+          </h2>
+          <foshol-region-chip />
+        </div>
+        <p class="mt-1 max-w-prose text-sm text-ink-muted">
+          {{ 'admin.kpi.breaches.assignment.detail' | translate }}
+        </p>
+
+        <div class="kb-scroll">
+          <table class="kb-table" data-testid="assignment-table">
+            <caption class="sr-only">
+              {{ 'admin.kpi.breaches.assignment.caption' | translate }}
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">{{ 'admin.kpi.breaches.column.farmer' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.crop' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.dueAt' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.breachedAt' | translate }}</th>
+                <th scope="col">
+                  <span class="sr-only">{{ 'admin.kpi.breaches.column.open' | translate }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of assignmentRows(); track row.id) {
+                <tr data-testid="assignment-row">
+                  <td>
+                    @if (row.farmerName) {
+                      {{ row.farmerName }}
+                    } @else {
+                      <span class="kb-absent">{{
+                        'admin.kpi.breaches.noFarmerName' | translate
+                      }}</span>
+                    }
+                  </td>
+                  <!-- Crop names render exactly as the server sends them, never translated. -->
+                  <td>{{ row.crop }}</td>
+                  <td class="kb-time">
+                    @if (row.dueAt; as dueAt) {
+                      {{ dueAt | dhakaDateTime }}
+                    } @else {
+                      <span class="kb-absent">{{ 'admin.kpi.breaches.noTime' | translate }}</span>
+                    }
+                  </td>
+                  <td class="kb-time">
+                    @if (row.breachedAt; as breachedAt) {
+                      {{ breachedAt | dhakaDateTime }}
+                    } @else {
+                      <span class="kb-absent">{{ 'admin.kpi.breaches.noTime' | translate }}</span>
+                    }
+                  </td>
+                  <td>
+                    @if (row.taskLink; as link) {
+                      <a class="kb-open touch-target" [routerLink]="link" data-testid="open-task">{{
+                        'admin.kpi.breaches.column.open' | translate
+                      }}</a>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (resolutionRows().length > 0) {
+      <!-- ── Officer failures ─────────────────────────────────────────────────────────────────
+           The only table with a name in it: the officer held the live claim when the deadline
+           passed. -->
+      <section class="mt-8" data-testid="resolution-section" aria-labelledby="kb-resolution-heading">
+        <h2 id="kb-resolution-heading" class="text-lg font-semibold text-ink">
+          {{ 'admin.kpi.breaches.resolution.title' | translate }}
+        </h2>
+        <p class="mt-1 max-w-prose text-sm text-ink-muted">
+          {{ 'admin.kpi.breaches.resolution.detail' | translate }}
+        </p>
+
+        <div class="kb-scroll">
+          <table class="kb-table" data-testid="resolution-table">
+            <caption class="sr-only">
+              {{ 'admin.kpi.breaches.resolution.caption' | translate }}
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">{{ 'admin.kpi.breaches.column.officer' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.farmer' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.crop' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.dueAt' | translate }}</th>
+                <th scope="col">{{ 'admin.kpi.breaches.column.breachedAt' | translate }}</th>
+                <th scope="col">
+                  <span class="sr-only">{{ 'admin.kpi.breaches.column.open' | translate }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of resolutionRows(); track row.id) {
+                <tr data-testid="resolution-row">
+                  <td data-testid="resolution-officer">
+                    @if (row.officerName; as officerName) {
+                      {{ officerName }}
+                    } @else if (row.officerId; as id) {
+                      <span class="font-latin">{{ id }}</span>
+                      <span class="kb-absent">{{
+                        'admin.kpi.breaches.officerUnnamed' | translate
+                      }}</span>
+                    } @else {
+                      <!-- The server sent a resolution breach with no officer at all. Said
+                           plainly, as a gap in the record — never as a person. -->
+                      <span class="kb-absent">{{
+                        'admin.kpi.breaches.officerMissing' | translate
+                      }}</span>
+                    }
+                  </td>
+                  <td>
+                    @if (row.farmerName) {
+                      {{ row.farmerName }}
+                    } @else {
+                      <span class="kb-absent">{{
+                        'admin.kpi.breaches.noFarmerName' | translate
+                      }}</span>
+                    }
+                  </td>
+                  <td>{{ row.crop }}</td>
+                  <td class="kb-time">
+                    @if (row.dueAt; as dueAt) {
+                      {{ dueAt | dhakaDateTime }}
+                    } @else {
+                      <span class="kb-absent">{{ 'admin.kpi.breaches.noTime' | translate }}</span>
+                    }
+                  </td>
+                  <td class="kb-time">
+                    @if (row.breachedAt; as breachedAt) {
+                      {{ breachedAt | dhakaDateTime }}
+                    } @else {
+                      <span class="kb-absent">{{ 'admin.kpi.breaches.noTime' | translate }}</span>
+                    }
+                  </td>
+                  <td>
+                    @if (row.taskLink; as link) {
+                      <a class="kb-open touch-target" [routerLink]="link" data-testid="open-task">{{
+                        'admin.kpi.breaches.column.open' | translate
+                      }}</a>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  }
+
+  <foshol-paginator
+    class="mt-6"
+    [page]="pageIndex()"
+    [size]="size()"
+    [totalElements]="totalElements()"
+    [totalPages]="totalPages()"
+    (pageChange)="goToPage($event)"
+  />
+} @else if (!store.loading() && problem() === null) {
+  <foshol-empty-state
+    class="mt-6"
+    titleKey="admin.kpi.breaches.notLoaded.title"
+    detailKey="admin.kpi.breaches.notLoaded.detail"
+  />
+}
+
+<p class="mt-4 max-w-prose text-xs text-ink-faint">
+  {{ 'admin.kpi.breaches.openNote' | translate }}
+</p>

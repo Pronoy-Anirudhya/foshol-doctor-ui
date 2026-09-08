@@ -1,8 +1,15 @@
 import type { Routes } from '@angular/router';
 
 /**
- * `WEB-FR-300` — the admin surface is **exactly one read-only stats page**. `/admin` redirects
- * to it, and there is deliberately nothing else to route to.
+ * `WEB-FR-300` — the admin surface: the read-only stats page, and the KPI dashboard beside it.
+ * `/admin` redirects to the stats page, which links on to the KPIs.
+ *
+ * The KPI screens are additive and separate on purpose. `/admin/stats` and its spec describe a
+ * page with exactly four tiles and no controls but a refresh; folding a second endpoint's
+ * numbers into it would make one screen answer two different questions at two different
+ * freshnesses. So the KPI summary and its breach drill-down are their own routes, their own
+ * lazy chunks and their own stores — a 500 on either KPI endpoint (which is what the running
+ * backend answers today) cannot touch the stats page at all.
  *
  * `WEB-FR-004` — the page is its own `loadComponent`, so a farmer's bundle never carries it.
  * `app.routes.ts` already guards this group with `roleGuard(['ADMIN'])`.
@@ -32,6 +39,16 @@ export const adminRoutes: Routes = [
     path: 'stats',
     loadComponent: () => import('./stats/admin-stats-page').then((m) => m.AdminStatsPage),
   },
-  // Anything else under /admin is the one page, because there is only one page.
+  {
+    // The KPI drill-down is a SIBLING of the summary rather than a child: it is a whole screen
+    // of its own at every width, and nesting it would put a table inside a dashboard on a phone.
+    path: 'kpis/breaches',
+    loadComponent: () => import('./kpi/kpi-breaches-page').then((m) => m.KpiBreachesPage),
+  },
+  {
+    path: 'kpis',
+    loadComponent: () => import('./kpi/admin-kpi-page').then((m) => m.AdminKpiPage),
+  },
+  // Anything else under /admin lands on the stats page.
   { path: '**', redirectTo: 'stats' },
 ];
