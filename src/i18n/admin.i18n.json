@@ -36,6 +36,25 @@
     "bn": "আজ জমা পড়া কেসের সংখ্যা",
     "en": "Cases submitted today"
   },
+  "admin.stats.casesThisMonth.label": { "bn": "এই মাসের কেস", "en": "This month" },
+  "admin.stats.casesThisMonth.hint": {
+    "bn": "চলতি ক্যালেন্ডার মাসে জমা পড়া কেসের সংখ্যা",
+    "en": "Cases submitted this calendar month"
+  },
+  "admin.stats.casesThisYear.label": { "bn": "এই বছরের কেস", "en": "This year" },
+  "admin.stats.casesThisYear.hint": {
+    "bn": "চলতি ক্যালেন্ডার বছরে জমা পড়া কেসের সংখ্যা",
+    "en": "Cases submitted this calendar year"
+  },
+  "admin.stats.casesLifetime.label": { "bn": "সর্বমোট কেস", "en": "Lifetime" },
+  "admin.stats.casesLifetime.hint": {
+    "bn": "এই জেলায় জমা পড়া প্রতিটি কেস, শুরু থেকে এখন পর্যন্ত",
+    "en": "Every case ever submitted in this district"
+  },
+  "admin.stats.period.filterHint": {
+    "bn": "নিচের কেসের তালিকা এই সময়সীমায় ছাঁকা হবে",
+    "en": "Filters the case list below to this period"
+  },
   "admin.stats.approvalRate.label": { "bn": "অনুমোদনের হার", "en": "Approval rate" },
   "admin.stats.approvalRate.hint": {
     "bn": "প্রকাশিত পরামর্শের মধ্যে যেগুলো অফিসার অদলবদল ছাড়াই অনুমোদন করেছেন",
@@ -61,6 +80,22 @@
   "admin.stats.agreement.noSample": {
     "bn": "এখনও কোনো প্রকাশিত পরামর্শ নেই, তাই কোনো হার নেই",
     "en": "No published advisories yet, so there is no rate"
+  },
+
+  "admin.stats.rejectionRate.label": { "bn": "প্রত্যাখ্যানের হার", "en": "Rejection rate" },
+  "admin.stats.rejectionRate.hint": {
+    "bn": "চূড়ান্ত পর্যালোচনা কাজের মধ্যে যেগুলো অফিসার প্রত্যাখ্যান করেছেন",
+    "en": "Share of terminal review tasks the officer rejected"
+  },
+
+  "admin.stats.kpiSection.title": { "bn": "কেপিআই ব্যর্থতা", "en": "KPI failures" },
+  "admin.stats.kpiSection.subtitle": {
+    "bn": "সময়সীমা পেরিয়ে যাওয়া কেসের সংক্ষিপ্ত রূপ। বিস্তারিত সারির জন্য কেপিআই পাতায় যান।",
+    "en": "A short summary of missed deadlines. See the KPI page for the row-by-row breakdown."
+  },
+  "admin.stats.kpiSection.thresholdsCompact": {
+    "bn": "নিম্ন সীমা {{low}} · উচ্চ সীমা {{high}}",
+    "en": "Low threshold {{low}} · High threshold {{high}}"
   },
 
   "admin.stats.thresholds.title": { "bn": "রাউটিং সীমা", "en": "Routing thresholds" },
@@ -94,6 +129,56 @@
   "admin.queue.unavailable": {
     "bn": "পর্যালোচনার সারি আনা যায়নি। উপরের পরিসংখ্যান এতে বদলায় না; নিচের অংশগুলো ফাঁকা থাকবে।",
     "en": "The review queue could not be loaded. The statistics above are unaffected; the widgets below stay empty."
+  },
+
+  "admin.cases.backToDashboard": { "bn": "ড্যাশবোর্ডে ফিরুন", "en": "Back to the dashboard" },
+  "admin.cases.title": { "bn": "কেসের তালিকা", "en": "Case list" },
+  "admin.cases.subtitle": {
+    "bn": "এই জেলার কেস, সবচেয়ে নতুন জমা আগে। ছাঁকনি দিয়ে সংকীর্ণ করুন, প্রয়োজনে একাধিক কেস একসাথে প্রত্যাখ্যান করুন।",
+    "en": "This district's cases, newest submission first. Narrow with the filters, and reject several at once if you need to."
+  },
+  "admin.cases.filters.label": { "bn": "কেস ছাঁকনি", "en": "Case filters" },
+  "admin.cases.filters.state.label": { "bn": "অবস্থা", "en": "State" },
+  "admin.cases.filters.state.ALL": { "bn": "সব অবস্থা", "en": "Any state" },
+  "admin.cases.filters.kpi.label": { "bn": "কেপিআই", "en": "KPI" },
+  "admin.cases.filters.kpi.ANY": { "bn": "যেকোনো", "en": "Any" },
+  "admin.cases.filters.officer.label": { "bn": "অফিসার", "en": "Officer" },
+  "admin.cases.filters.officer.any": { "bn": "সব অফিসার", "en": "Any officer" },
+  "admin.cases.filters.crop.label": { "bn": "ফসল", "en": "Crop" },
+  "admin.cases.filters.crop.any": { "bn": "সব ফসল", "en": "Any crop" },
+  "admin.cases.filters.decisionPath.label": { "bn": "সিদ্ধান্তের পথ", "en": "Decision path" },
+  "admin.cases.filters.decisionPath.any": { "bn": "সব পথ", "en": "Any path" },
+  "admin.cases.filters.resubmission.label": { "bn": "পুনরায় জমা", "en": "Resubmission" },
+  "admin.cases.filters.resubmission.any": { "bn": "সব কেস", "en": "Any case" },
+  "admin.cases.filters.resubmission.yes": { "bn": "শুধু পুনরায় জমা", "en": "Resubmissions only" },
+  "admin.cases.filters.resubmission.no": { "bn": "শুধু প্রথমবার", "en": "First submissions only" },
+
+  "admin.cases.column.officer": { "bn": "অফিসার", "en": "Officer" },
+  "admin.cases.column.due": { "bn": "সময়সীমা", "en": "Due" },
+
+  "admin.cases.select.disabled": {
+    "bn": "শুধু বিচারাধীন বা গৃহীত কেস বাছাই করা যায়।",
+    "en": "Only pending or claimed cases can be selected."
+  },
+
+  "admin.cases.empty.title": { "bn": "কোনো কেস মেলেনি", "en": "No cases match" },
+  "admin.cases.empty.detail": {
+    "bn": "সার্ভার খুঁজে দেখেছে এবং এই ছাঁকনিতে কিছুই পায়নি। এটি গোনা ফল, তথ্যের অভাব নয়।",
+    "en": "The server looked and found nothing under this filter. That is a counted result, not missing data."
+  },
+  "admin.cases.notLoaded.title": { "bn": "এখনও কিছু আসেনি", "en": "Nothing loaded yet" },
+  "admin.cases.notLoaded.detail": {
+    "bn": "উপরের হালনাগাদ চাপুন কেসের তালিকা আনতে।",
+    "en": "Press refresh above to fetch the case list."
+  },
+  "admin.cases.staleDetail": {
+    "bn": "শেষ চেষ্টাটি ব্যর্থ হয়েছে। নিচের সারিগুলো সবশেষ সফলভাবে আনা পাতা, এখনকার নয়।",
+    "en": "The last attempt failed. The rows below are the last page that loaded successfully, not the current one."
+  },
+
+  "admin.cases.bulk.claimedWarning": {
+    "bn": "বাছাইয়ের কিছু কেস ইতিমধ্যে একজন অফিসারের নেওয়া। অন্য কেউ দাবি ধরে রাখলে সেই কেসটি প্রত্যাখ্যান ব্যর্থ হতে পারে।",
+    "en": "Some of the selected cases are already claimed by an officer. Rejecting one may fail if another officer still holds the claim."
   },
 
   "admin.landscape.aria": {
@@ -232,6 +317,12 @@
     "en": "A counted figure — a zero here means none, not missing data"
   },
   "admin.kpi.tile.drillDown": { "bn": "সারিগুলো দেখুন", "en": "See the rows" },
+
+  "admin.kpi.summary.totalLabel": { "bn": "মোট সময়সীমা পেরোনো", "en": "Total missed deadlines" },
+  "admin.kpi.summary.totalHint": {
+    "bn": "জেলা ও অফিসারের ব্যর্থতা একত্রে — দুটি সংখ্যাই নিচে আলাদাভাবে ব্যাখ্যা করা আছে।",
+    "en": "District and officer failures, combined — each is explained separately below."
+  },
 
   "admin.kpi.district.title": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
   "admin.kpi.district.detail": {
