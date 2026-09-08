@@ -1,7 +1,16 @@
 import type { Routes } from '@angular/router';
 
 /**
- * The farmer surface: pick a crop → capture → watch the case → read the advisory.
+ * The farmer surface: land on your own cases → pick a crop → capture → watch the case →
+ * read the advisory.
+ *
+ * `WEB-FR-153` — a bare `/farmer` (which is where `homePathForRole` sends a freshly
+ * authenticated farmer, and every subsequent visit) redirects to `cases`, not `new`. Landing
+ * a returning farmer directly in a fresh crop picker, with no way to see a case already
+ * submitted short of typing the URL, is the whole of what that requirement exists to prevent.
+ * `case-history-page.ts` carries its own "submit a new case" control (`WEB-FR-153`'s sibling
+ * requirement is satisfied there, not by making the picker the landing page), so this redirect
+ * loses nothing a farmer could do before — it only adds the one thing they could not.
  *
  * `WEB-FR-004` — every page is its own `loadComponent`, so the camera and audio pipeline are
  * not downloaded by a farmer who only came back to re-read an advisory.
@@ -21,7 +30,7 @@ import type { Routes } from '@angular/router';
  * `/farmer/new/capture`, `/farmer/cases/{caseId}`.
  */
 export const farmerRoutes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'new' },
+  { path: '', pathMatch: 'full', redirectTo: 'cases' },
   {
     path: 'new',
     pathMatch: 'full',
