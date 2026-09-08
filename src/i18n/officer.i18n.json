@@ -95,10 +95,6 @@
     "bn": "সরাসরি অবস্থা",
     "en": "Live status"
   },
-  "officer.queue.openAria": {
-    "bn": "{{farmer}}-এর কেস খুলুন",
-    "en": "Open the case from {{farmer}}"
-  },
   "officer.queue.empty.title": {
     "bn": "সারি খালি",
     "en": "The queue is empty"
@@ -122,6 +118,138 @@
   "officer.queue.noMatches.detail": {
     "bn": "অন্য নাম দিয়ে খুঁজুন বা অবস্থার ছাঁকনি সরিয়ে দেখুন।",
     "en": "Try a different search term, or clear the state filter."
+  },
+  "officer.queue.col.actions": {
+    "bn": "পদক্ষেপ",
+    "en": "Actions"
+  },
+  "officer.queue.select.all": {
+    "bn": "এই পাতার সব কার্যযোগ্য কেস বাছাই করুন",
+    "en": "Select every actionable case on this page"
+  },
+  "officer.queue.select.row": {
+    "bn": "{{farmer}}-এর কেস বাছাই করুন",
+    "en": "Select the case from {{farmer}}"
+  },
+  "officer.queue.action.view.title": {
+    "bn": "কেস খুলুন",
+    "en": "Open the case"
+  },
+  "officer.queue.action.view.aria": {
+    "bn": "{{farmer}}-এর কেস খুলুন",
+    "en": "Open the case from {{farmer}}"
+  },
+  "officer.queue.action.approve.title": {
+    "bn": "এখান থেকেই অনুমোদন করুন",
+    "en": "Approve from here"
+  },
+  "officer.queue.action.approve.aria": {
+    "bn": "{{farmer}}-এর কেস অনুমোদন করুন",
+    "en": "Approve the case from {{farmer}}"
+  },
+  "officer.queue.action.approve.reading": {
+    "bn": "কী প্রকাশিত হবে তা পড়া হচ্ছে…",
+    "en": "Reading what would be published…"
+  },
+  "officer.queue.action.approve.summary": {
+    "bn": "রোগ “{{disease}}” এবং সার্ভারের সুপারিশ করা {{count}}টি প্রতিকার কৃষকের কাছে প্রকাশিত হবে।",
+    "en": "This publishes “{{disease}}” with the {{count}} remedies the server suggested."
+  },
+  "officer.queue.action.approve.note": {
+    "bn": "প্রতিকারের বিবরণ বদলাতে হলে কেসটি খুলে সম্পাদনা করুন।",
+    "en": "To change any remedy, open the case and edit it there instead."
+  },
+  "officer.queue.action.approve.confirm": {
+    "bn": "অনুমোদন করে প্রকাশ করুন",
+    "en": "Approve and publish"
+  },
+  "officer.queue.action.approve.unavailable": {
+    "bn": "এই কেসে সার্ভারের কোনো সম্ভাব্য রোগ নেই, তাই এখান থেকে অনুমোদন করা যাবে না। কেসটি খুলে সিদ্ধান্ত নিন।",
+    "en": "This task carries no suggested diagnosis, so it cannot be approved from here. Open the case and decide there."
+  },
+  "officer.queue.action.reject.title": {
+    "bn": "এখান থেকেই ফেরত পাঠান",
+    "en": "Reject from here"
+  },
+  "officer.queue.action.reject.aria": {
+    "bn": "{{farmer}}-এর কেস ফেরত পাঠান",
+    "en": "Reject the case from {{farmer}}"
+  },
+  "officer.queue.action.reject.confirm": {
+    "bn": "ফেরত পাঠান",
+    "en": "Send back"
+  },
+  "officer.queue.action.remedyCount": {
+    "bn": "{{count}}টি প্রতিকার",
+    "en": "{{count}} remedies"
+  },
+  "officer.queue.action.cancel": {
+    "bn": "বাতিল",
+    "en": "Cancel"
+  },
+  "officer.queue.action.approved": {
+    "bn": "কেসটি অনুমোদিত হয়েছে এবং পরামর্শ কৃষকের কাছে গেছে।",
+    "en": "Approved — the advisory has gone to the farmer."
+  },
+  "officer.queue.action.rejected": {
+    "bn": "কেসটি কৃষকের কাছে ফেরত পাঠানো হয়েছে।",
+    "en": "Sent back to the farmer."
+  },
+  "officer.queue.action.locked.decided": {
+    "bn": "সিদ্ধান্ত হয়ে গেছে",
+    "en": "Already decided"
+  },
+  "officer.queue.action.locked.claimed": {
+    "bn": "অন্য কর্মকর্তার হাতে",
+    "en": "Held by another officer"
+  },
+  "officer.queue.bulk.label": {
+    "bn": "বাছাই করা কেসগুলোর পদক্ষেপ",
+    "en": "Actions for the selected cases"
+  },
+  "officer.queue.bulk.selected": {
+    "bn": "{{count}}টি কেস বাছাই করা হয়েছে",
+    "en": "{{count}} cases selected"
+  },
+  "officer.queue.bulk.approve": {
+    "bn": "সবগুলো অনুমোদন",
+    "en": "Approve selected"
+  },
+  "officer.queue.bulk.reject": {
+    "bn": "সবগুলো ফেরত",
+    "en": "Reject selected"
+  },
+  "officer.queue.bulk.clear": {
+    "bn": "বাছাই মুছুন",
+    "en": "Clear selection"
+  },
+  "officer.queue.bulk.confirm": {
+    "bn": "নিশ্চিত করুন",
+    "en": "Confirm"
+  },
+  "officer.queue.bulk.approveSummary": {
+    "bn": "নিচের {{count}}টি কেস অনুমোদিত হবে — প্রতিটির রোগ ও প্রতিকারের সংখ্যা দেখানো হলো।",
+    "en": "These {{count}} cases will be approved — each with the diagnosis and remedy count shown."
+  },
+  "officer.queue.bulk.rejectSummary": {
+    "bn": "একটিই কারণ ও বার্তা বাছাই করা {{count}}টি কেসেই প্রযোজ্য হবে।",
+    "en": "One reason and one message will be applied to all {{count}} selected cases."
+  },
+  "officer.queue.bulk.skipped": {
+    "bn": "{{count}}টি কেসে সার্ভারের কোনো সম্ভাব্য রোগ নেই, তাই সেগুলো বাদ যাবে।",
+    "en": "{{count}} of them carry no suggested diagnosis and will be skipped."
+  },
+  "officer.queue.bulk.progress": {
+    "bn": "{{total}}টির মধ্যে {{done}}টি হয়েছে…",
+    "en": "{{done}} of {{total}} done…"
+  },
+  "officer.queue.bulk.finished": {
+    "bn": "{{succeeded}}টি সফল, {{failed}}টি ব্যর্থ।",
+    "en": "{{succeeded}} succeeded, {{failed}} failed."
+  },
+  "officer.queue.bulk.dismiss": {
+    "bn": "ফলাফল সরান",
+    "en": "Dismiss report"
   },
   "officer.queue.state.PENDING": {
     "bn": "অপেক্ষমাণ",
