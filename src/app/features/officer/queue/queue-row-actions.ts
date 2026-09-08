@@ -23,10 +23,17 @@ import { taskPath } from '../officer-paths';
  * component: the table scrolls inside `.table-wrap`'s `overflow-x: auto`, and an absolutely
  * positioned panel inside a scroll container is a panel with its bottom half cut off.
  */
-export type QueuePopoverKind = 'approve' | 'reject';
+/**
+ * `transfer` is a BULK-only panel kind (`REVIEW-FR-096`): a single task is transferred from the
+ * workspace, where the officer demonstrably holds the claim, not from a queue row. It shares
+ * this union because the queue page runs one open-panel-at-a-time channel for the whole screen,
+ * and this component never emits it.
+ */
+export type QueuePopoverKind = 'approve' | 'reject' | 'transfer';
 
 export const POPOVER_APPROVE: QueuePopoverKind = 'approve';
 export const POPOVER_REJECT: QueuePopoverKind = 'reject';
+export const POPOVER_TRANSFER: QueuePopoverKind = 'transfer';
 
 const ICON_BUTTON =
   'touch-target inline-flex w-11 items-center justify-center rounded-xl border transition-colors duration-1 ease-settle disabled:cursor-not-allowed disabled:border-surface-3 disabled:bg-surface-2 disabled:text-ink-faint';

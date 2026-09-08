@@ -64,8 +64,8 @@
     "en": "Submitted"
   },
   "officer.queue.col.sla": {
-    "bn": "সময়সীমা",
-    "en": "SLA due"
+    "bn": "কৃষকের অপেক্ষা",
+    "en": "Farmer wait"
   },
   "officer.queue.col.state": {
     "bn": "অবস্থা",
@@ -103,18 +103,30 @@
     "bn": "আপনার জেলায় এই মুহূর্তে পর্যালোচনার অপেক্ষায় কোনো কেস নেই। আপনি নিজের জেলার কেসগুলোই দেখেন — উপরে জেলার নাম দেওয়া আছে।",
     "en": "No cases are waiting for review in your district right now. You see your own district's cases; it is named above."
   },
-  "officer.queue.search.label": { "bn": "সারিতে খুঁজুন", "en": "Search the queue" },
+  "officer.queue.search.label": {
+    "bn": "সারিতে খুঁজুন",
+    "en": "Search the queue"
+  },
   "officer.queue.search.placeholder": {
     "bn": "কৃষক, ফসল বা রোগের নাম দিয়ে খুঁজুন",
     "en": "Search by farmer, crop or disease name"
   },
-  "officer.queue.filter.state.label": { "bn": "অবস্থা অনুযায়ী ছাঁকুন", "en": "Filter by state" },
-  "officer.queue.filter.state.all": { "bn": "সব অবস্থা", "en": "All states" },
+  "officer.queue.filter.state.label": {
+    "bn": "অবস্থা অনুযায়ী ছাঁকুন",
+    "en": "Filter by state"
+  },
+  "officer.queue.filter.state.all": {
+    "bn": "সব অবস্থা",
+    "en": "All states"
+  },
   "officer.queue.filter.count": {
     "bn": "{{count}}টি কেস মিলেছে",
     "en": "{{count}} matching cases"
   },
-  "officer.queue.noMatches.title": { "bn": "কোনো কেস মেলেনি", "en": "No matching cases" },
+  "officer.queue.noMatches.title": {
+    "bn": "কোনো কেস মেলেনি",
+    "en": "No matching cases"
+  },
   "officer.queue.noMatches.detail": {
     "bn": "অন্য নাম দিয়ে খুঁজুন বা অবস্থার ছাঁকনি সরিয়ে দেখুন।",
     "en": "Try a different search term, or clear the state filter."
@@ -292,8 +304,8 @@
     "en": "Submitted"
   },
   "officer.case.sla": {
-    "bn": "সময়সীমা",
-    "en": "SLA due"
+    "bn": "কৃষকের অপেক্ষার সময়সীমা",
+    "en": "Farmer wait due"
   },
   "officer.case.caseId": {
     "bn": "কেস আইডি",
@@ -774,5 +786,137 @@
   "officer.live.released": {
     "bn": "কেসটি ছেড়ে দেওয়া হয়েছে।",
     "en": "The case was released."
+  },
+  "officer.queue.col.kpi": {
+    "bn": "আপনার সময়সীমা",
+    "en": "Your deadline"
+  },
+  "officer.kpi.assignment": {
+    "bn": "গ্রহণের সময়সীমা",
+    "en": "Claim by"
+  },
+  "officer.kpi.resolution": {
+    "bn": "নিষ্পত্তির সময়সীমা",
+    "en": "Resolve by"
+  },
+  "officer.kpi.warnGlyph": {
+    "bn": "সতর্কতা",
+    "en": "Warning"
+  },
+  "officer.kpi.tone.normal": {
+    "bn": "সময় আছে",
+    "en": "On track"
+  },
+  "officer.kpi.tone.warn": {
+    "bn": "সময় ফুরিয়ে আসছে",
+    "en": "Running out"
+  },
+  "officer.kpi.tone.critical": {
+    "bn": "খুব অল্প সময় বাকি",
+    "en": "Very little time left"
+  },
+  "officer.kpi.tone.overdue": {
+    "bn": "সময়সীমা পেরিয়ে গেছে",
+    "en": "Overdue"
+  },
+  "officer.queue.bulk.transfer": {
+    "bn": "সহকর্মীকে দিন",
+    "en": "Transfer selected"
+  },
+  "officer.queue.bulk.transferSummary": {
+    "bn": "আপনার নেওয়া {{count}}টি কেস একজন সহকর্মীর কাছে যাবে।",
+    "en": "{{count}} cases you hold will go to one colleague."
+  },
+  "officer.queue.bulk.cap": {
+    "bn": "একসাথে সর্বোচ্চ {{max}}টি কেস বাছাই করা যায়।",
+    "en": "At most {{max}} cases can be selected at once."
+  },
+  "officer.queue.bulk.capReached": {
+    "bn": "বাছাই সর্বোচ্চ {{max}}টি কেসে পৌঁছেছে।",
+    "en": "The selection has reached its limit of {{max}} cases."
+  },
+  "officer.queue.bulk.item.ok": {
+    "bn": "সম্পন্ন",
+    "en": "Done"
+  },
+  "officer.queue.bulk.item.failed": {
+    "bn": "হয়নি",
+    "en": "Not done"
+  },
+  "officer.transfer.open": {
+    "bn": "সহকর্মীকে দিন",
+    "en": "Transfer"
+  },
+  "officer.transfer.title": {
+    "bn": "সহকর্মীকে হস্তান্তর",
+    "en": "Transfer to a colleague"
+  },
+  "officer.transfer.hint": {
+    "bn": "আপনার নেওয়া এই কেসটি একই জেলার সক্রিয় একজন কর্মকর্তার কাছে চলে যাবে।",
+    "en": "The case you are holding moves to an active officer in the same district."
+  },
+  "officer.transfer.clockNote": {
+    "bn": "নিষ্পত্তির সময়সীমা বদলায় না — যিনি কেসটি নেবেন, তিনি একই সময়সীমাই পাবেন।",
+    "en": "The resolution deadline does not move: whoever receives the case inherits the same one."
+  },
+  "officer.transfer.target": {
+    "bn": "কোন সহকর্মী",
+    "en": "Which colleague"
+  },
+  "officer.transfer.targetPlaceholder": {
+    "bn": "একজন বেছে নিন",
+    "en": "Choose an officer"
+  },
+  "officer.transfer.loading": {
+    "bn": "সহকর্মীদের তালিকা আসছে…",
+    "en": "Loading colleagues…"
+  },
+  "officer.transfer.none": {
+    "bn": "এই জেলায় আর কোনো সক্রিয় কর্মকর্তা নেই।",
+    "en": "There is no other active officer in this district."
+  },
+  "officer.transfer.confirm": {
+    "bn": "হস্তান্তর নিশ্চিত করুন",
+    "en": "Confirm transfer"
+  },
+  "officer.transfer.cancel": {
+    "bn": "বাতিল",
+    "en": "Cancel"
+  },
+  "officer.transfer.done": {
+    "bn": "কেসটি সহকর্মীর কাছে পাঠানো হয়েছে।",
+    "en": "The case was handed to your colleague."
+  },
+  "officer.error.ERR_TRANSFER_TO_SELF": {
+    "bn": "কেসটি নিজের কাছেই পাঠানো যায় না।",
+    "en": "A case cannot be transferred to yourself."
+  },
+  "officer.error.ERR_TRANSFER_TARGET_INVALID": {
+    "bn": "এই কর্মকর্তা কেসটি নিতে পারবেন না — তিনি নিষ্ক্রিয়, অন্য জেলার, বা মাঠ কর্মকর্তা নন।",
+    "en": "That officer cannot receive the case: they are inactive, in another district, or not a field officer."
+  },
+  "officer.error.ERR_TASK_TERMINAL": {
+    "bn": "কেসটির সিদ্ধান্ত হয়ে গেছে, তাই আর কিছু করা যাবে না।",
+    "en": "This case is already decided, so nothing further can be done to it."
+  },
+  "officer.error.ERR_CLAIM_NOT_HELD": {
+    "bn": "কেসটি এখন আপনার কাছে নেই, তাই এটি হস্তান্তর করা যাবে না।",
+    "en": "You do not hold this case, so it cannot be transferred."
+  },
+  "officer.error.ERR_TASK_CLAIMED": {
+    "bn": "অন্য একজন কর্মকর্তা কেসটি আগেই নিয়ে নিয়েছেন।",
+    "en": "Another officer reached this case first."
+  },
+  "officer.error.ERR_VERSION_CONFLICT": {
+    "bn": "কেসটি এর মধ্যে বদলে গেছে। নতুন করে এনে আবার দেখুন।",
+    "en": "The case changed in the meantime. Reload it and look again."
+  },
+  "officer.error.ERR_BULK_DUPLICATE": {
+    "bn": "একই কেস একাধিকবার পাঠানো হয়েছে।",
+    "en": "The same case was sent more than once."
+  },
+  "officer.error.ERR_BULK_TOO_LARGE": {
+    "bn": "একসাথে অনুমোদিত সংখ্যার চেয়ে বেশি কেস পাঠানো হয়েছে।",
+    "en": "More cases were sent at once than the server accepts."
   }
 }
