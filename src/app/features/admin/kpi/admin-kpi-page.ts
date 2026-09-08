@@ -7,7 +7,6 @@ import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
-import { RegionChip } from '../../../shared/ui/region-chip/region-chip';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 import { ADMIN_PATHS } from './admin-paths';
@@ -22,10 +21,11 @@ import { OfficerFailureChart } from './officer-failure-chart';
  * **Two halves, and the line between them is the whole design.**
  *
  *  1. *The district.* Assignment breaches happened while the case was still in the shared pool:
- *     no officer had claimed it, so no officer failed it. They appear under a district heading,
- *     as a district total, with the district named by `RegionChip` — a place, not a person.
- *     There is no name column, no blank name cell and no "unassigned officer" row anywhere near
- *     them, because each of those reads as an accusation against whoever was on shift.
+ *     no officer had claimed it, so no officer failed it. They appear under a district heading —
+ *     a district total, a place rather than a person (the district itself is named once, in the
+ *     header's account menu, not repeated on every page). There is no name column, no blank name
+ *     cell and no "unassigned officer" row anywhere near them, because each of those reads as an
+ *     accusation against whoever was on shift.
  *  2. *The officers.* Resolution breaches belong to whoever held the live claim, and only those
  *     appear in a personal breakdown.
  *
@@ -52,7 +52,6 @@ import { OfficerFailureChart } from './officer-failure-chart';
     DhakaDateTimePipe,
     BackLink,
     PageHeading,
-    RegionChip,
     ErrorPanel,
     EmptyState,
     Spinner,
@@ -79,10 +78,6 @@ import { OfficerFailureChart } from './officer-failure-chart';
         data-testid="read-only-chip"
         >{{ 'admin.stats.readOnly' | translate }}</span
       >
-
-      <!-- The scope of every number below, named rather than filtered for: the server reads the
-           district from the JWT and there is no national admin. -->
-      <foshol-region-chip />
 
       <button
         type="button"
@@ -147,62 +142,125 @@ import { OfficerFailureChart } from './officer-failure-chart';
         </p>
       }
 
-      <!-- ── The district half ───────────────────────────────────────────────────────────────
-           An assignment breach has no owner, so it is never shown in a column beside a name.
-           It gets its own section, headed by the district itself. -->
-      <section class="mt-6" data-testid="district-section" aria-labelledby="kpi-district-heading">
-        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <!-- ── Overview ─────────────────────────────────────────────────────────────────────────
+           A headline strip so the reader never has to add the two halves together themselves.
+           Purely a restatement of the figures below in bigger type — every number here is also
+           printed, in full, in one of the two sections underneath. WEB-UX-044: the gradients
+           are decoration, and the console-dark total card carries no meaning the text doesn't. -->
+      <div class="mt-6 grid gap-4 sm:grid-cols-3" data-testid="kpi-hero">
+        <div
+          class="relative isolate overflow-hidden rounded-panel bg-gradient-to-br from-slate-800 to-slate-900 p-5 shadow-lift"
+          data-testid="kpi-hero-total"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            class="pointer-events-none absolute -top-4 -right-4 h-28 w-28 text-white/5"
+            aria-hidden="true"
+            fill="currentColor"
+          >
+            <path
+              d="M10 1a9 9 0 1 0 .001 18.001A9 9 0 0 0 10 1Zm1 13.5H9v-2h2v2Zm0-3.5H9V5.5h2V11Z"
+            />
+          </svg>
+          <p class="relative text-xs font-semibold tracking-wide text-on-console-muted uppercase">
+            {{ 'admin.kpi.summary.totalLabel' | translate }}
+          </p>
+          <p
+            class="relative mt-2 text-5xl leading-none font-bold text-on-console tabular-nums"
+            data-testid="kpi-hero-total-value"
+          >
+            {{ kpis.assignmentFailures + kpis.resolutionFailures }}
+          </p>
+          <p class="relative mt-2 max-w-prose text-sm text-on-console-muted">
+            {{ 'admin.kpi.summary.totalHint' | translate }}
+          </p>
+        </div>
+
+        <div
+          class="card flex flex-col gap-1 border-t-4 border-t-dawn-600 bg-gradient-to-br from-dawn-100/70 to-surface-0 p-5"
+          data-testid="kpi-hero-district"
+        >
+          <p class="text-xs font-semibold tracking-wide text-dawn-700 uppercase">
+            {{ 'admin.kpi.assignment.label' | translate }}
+          </p>
+          <p class="mt-2 text-4xl leading-none font-bold text-ink tabular-nums">
+            {{ kpis.assignmentFailures }}
+          </p>
+          <p class="mt-2 text-sm text-ink-muted">{{ 'admin.kpi.district.title' | translate }}</p>
+        </div>
+
+        <div
+          class="card flex flex-col gap-1 border-t-4 border-t-clay-600 bg-gradient-to-br from-clay-100/70 to-surface-0 p-5"
+          data-testid="kpi-hero-officer"
+        >
+          <p class="text-xs font-semibold tracking-wide text-clay-700 uppercase">
+            {{ 'admin.kpi.resolution.label' | translate }}
+          </p>
+          <p class="mt-2 text-4xl leading-none font-bold text-ink tabular-nums">
+            {{ kpis.resolutionFailures }}
+          </p>
+          <p class="mt-2 text-sm text-ink-muted">{{ 'admin.kpi.personal.title' | translate }}</p>
+        </div>
+      </div>
+
+      <!-- The two halves, side by side once there is room for it — a narrow district column next
+           to the wider officer breakdown, so the page uses the console's full width instead of
+           stacking two half-width-looking blocks down a single left-hand column. -->
+      <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] xl:items-start">
+        <!-- ── The district half ─────────────────────────────────────────────────────────────
+             An assignment breach has no owner, so it is never shown in a column beside a name.
+             It gets its own section, headed by the district itself. -->
+        <section data-testid="district-section" aria-labelledby="kpi-district-heading">
           <h2 id="kpi-district-heading" class="text-lg font-semibold text-ink">
             {{ 'admin.kpi.district.title' | translate }}
           </h2>
-          <foshol-region-chip />
-        </div>
-        <p class="mt-1 max-w-prose text-sm text-ink-muted">
-          {{ 'admin.kpi.district.detail' | translate }}
-        </p>
+          <p class="mt-1 max-w-prose text-sm text-ink-muted">
+            {{ 'admin.kpi.district.detail' | translate }}
+          </p>
 
-        <foshol-kpi-count-tile
-          class="mt-3 max-w-xl"
-          kind="ASSIGNMENT"
-          labelKey="admin.kpi.assignment.label"
-          scopeKey="admin.kpi.assignment.scope"
-          hintKey="admin.kpi.assignment.hint"
-          [count]="kpis.assignmentFailures"
-          [stale]="store.stale()"
-        />
-      </section>
+          <foshol-kpi-count-tile
+            class="mt-3"
+            kind="ASSIGNMENT"
+            labelKey="admin.kpi.assignment.label"
+            scopeKey="admin.kpi.assignment.scope"
+            hintKey="admin.kpi.assignment.hint"
+            [count]="kpis.assignmentFailures"
+            [stale]="store.stale()"
+          />
+        </section>
 
-      <!-- ── The personal half ───────────────────────────────────────────────────────────────
-           Resolution breaches happened on a case an officer had claimed, so these are the only
-           figures that may carry a name. The district total sits above the per-officer bars so
-           the bars can be read against it — and any remainder the server named nobody for is
-           stated as its own line rather than folded into somebody's bar. -->
-      <section class="mt-8" data-testid="officer-section" aria-labelledby="kpi-officer-heading">
-        <h2 id="kpi-officer-heading" class="text-lg font-semibold text-ink">
-          {{ 'admin.kpi.personal.title' | translate }}
-        </h2>
-        <p class="mt-1 max-w-prose text-sm text-ink-muted">
-          {{ 'admin.kpi.personal.detail' | translate }}
-        </p>
+        <!-- ── The personal half ─────────────────────────────────────────────────────────────
+             Resolution breaches happened on a case an officer had claimed, so these are the only
+             figures that may carry a name. The district total sits above the per-officer bars so
+             the bars can be read against it — and any remainder the server named nobody for is
+             stated as its own line rather than folded into somebody's bar. -->
+        <section data-testid="officer-section" aria-labelledby="kpi-officer-heading">
+          <h2 id="kpi-officer-heading" class="text-lg font-semibold text-ink">
+            {{ 'admin.kpi.personal.title' | translate }}
+          </h2>
+          <p class="mt-1 max-w-prose text-sm text-ink-muted">
+            {{ 'admin.kpi.personal.detail' | translate }}
+          </p>
 
-        <foshol-kpi-count-tile
-          class="mt-3 max-w-xl"
-          kind="RESOLUTION"
-          labelKey="admin.kpi.resolution.label"
-          scopeKey="admin.kpi.resolution.scope"
-          hintKey="admin.kpi.resolution.hint"
-          [count]="kpis.resolutionFailures"
-          [stale]="store.stale()"
-        />
+          <foshol-kpi-count-tile
+            class="mt-3"
+            kind="RESOLUTION"
+            labelKey="admin.kpi.resolution.label"
+            scopeKey="admin.kpi.resolution.scope"
+            hintKey="admin.kpi.resolution.hint"
+            [count]="kpis.resolutionFailures"
+            [stale]="store.stale()"
+          />
 
-        <foshol-officer-failure-chart
-          class="card mt-4 p-5"
-          [officers]="kpis.officers"
-          [unattributed]="kpis.unattributedResolutionFailures"
-          [stale]="store.stale()"
-          [counted]="true"
-        />
-      </section>
+          <foshol-officer-failure-chart
+            class="card mt-4 p-5"
+            [officers]="kpis.officers"
+            [unattributed]="kpis.unattributedResolutionFailures"
+            [stale]="store.stale()"
+            [counted]="true"
+          />
+        </section>
+      </div>
     } @else if (store.loading()) {
       <div class="mt-6 grid gap-4 md:grid-cols-2">
         @for (placeholder of placeholders; track placeholder) {

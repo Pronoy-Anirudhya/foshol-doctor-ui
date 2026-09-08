@@ -25,14 +25,65 @@ export type BreachKind = 'ASSIGNMENT' | 'RESOLUTION';
   host: { class: 'block' },
   template: `
     <div
-      class="card flex h-full flex-col gap-1 border-t-4 p-5 transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift"
+      class="card relative isolate flex h-full flex-col gap-1 overflow-hidden border-t-4 p-5 transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift"
       [class]="accentBorderClass()"
       [attr.data-stale]="stale() || null"
       [attr.data-kind]="kind()"
       data-testid="kpi-tile"
     >
-      <div class="flex items-start justify-between gap-3">
-        <p class="text-xs font-semibold tracking-wide text-ink-faint uppercase">
+      <svg
+        viewBox="0 0 20 20"
+        class="pointer-events-none absolute -top-3 -right-3 h-20 w-20 opacity-[0.06]"
+        [class]="accentIconClass()"
+        aria-hidden="true"
+        fill="none"
+      >
+        @if (kind() === 'ASSIGNMENT') {
+          <path
+            d="M3 17V8l7-4 7 4v9M3 17h14M3 17v-6h4v6M13 17v-6h4v6M8 10h.01"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        } @else {
+          <path
+            d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 8c0-3.3 2.7-6 6-6s6 2.7 6 6"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        }
+      </svg>
+
+      <div class="relative flex items-center gap-2">
+        <span
+          class="grid h-7 w-7 shrink-0 place-items-center rounded-lg"
+          [class]="accentBgClass()"
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 20 20" class="h-4 w-4" [class]="accentIconClass()" fill="none">
+            @if (kind() === 'ASSIGNMENT') {
+              <path
+                d="M3 17V8l7-4 7 4v9M3 17h14M3 17v-6h4v6M13 17v-6h4v6M8 10h.01"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            } @else {
+              <path
+                d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 8c0-3.3 2.7-6 6-6s6 2.7 6 6"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            }
+          </svg>
+        </span>
+        <p class="flex-1 text-xs font-semibold tracking-wide text-ink-faint uppercase">
           {{ labelKey() | translate }}
         </p>
         @if (stale()) {
@@ -102,6 +153,14 @@ export class KpiCountTile {
   );
 
   protected readonly scopeClass = computed(() =>
+    this.kind() === 'ASSIGNMENT' ? 'text-dawn-700' : 'text-clay-700',
+  );
+
+  protected readonly accentBgClass = computed(() =>
+    this.kind() === 'ASSIGNMENT' ? 'bg-dawn-100' : 'bg-clay-100',
+  );
+
+  protected readonly accentIconClass = computed(() =>
     this.kind() === 'ASSIGNMENT' ? 'text-dawn-700' : 'text-clay-700',
   );
 }

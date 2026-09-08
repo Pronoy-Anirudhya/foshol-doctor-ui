@@ -6,6 +6,7 @@
 
 .ofc-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   gap: 0.75rem;
   margin: 1rem 0 0;
   padding: 0;
@@ -21,12 +22,39 @@
   border-radius: var(--radius-chip);
   background-color: var(--color-surface-0);
   padding: 0.6rem 0.75rem;
+  transition: box-shadow var(--duration-2) var(--ease-settle);
+}
+
+.ofc-row:hover {
+  box-shadow: var(--shadow-card);
+}
+
+/* Top three by count, purely a visual highlight — the rank number is the same fact in text. */
+.ofc-row[data-top] {
+  border-color: var(--color-clay-300);
+}
+
+.ofc-rank {
+  display: inline-grid;
+  place-items: center;
+  height: 1.375rem;
+  width: 1.375rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-2);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-ink-muted);
+}
+
+.ofc-row[data-top] .ofc-rank {
+  background-color: var(--color-clay-600);
+  color: var(--color-on-danger);
 }
 
 .ofc-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   grid-column: 1 / -1;
 }
@@ -58,7 +86,7 @@
 
 .ofc-track {
   grid-column: 1;
-  height: 0.6rem;
+  height: 0.7rem;
   overflow: hidden;
   border-radius: var(--radius-pill);
   background-color: var(--color-surface-2);
@@ -68,8 +96,8 @@
   height: 100%;
   min-width: 0.35rem;
   border-radius: var(--radius-pill);
-  background-color: var(--color-danger);
-  transition: width var(--duration-2) var(--ease-settle);
+  background-image: linear-gradient(90deg, var(--color-dawn-600), var(--color-clay-600));
+  transition: width var(--duration-3) var(--ease-settle);
 }
 
 .ofc-link {
