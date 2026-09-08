@@ -85,7 +85,7 @@ const SKELETON_TILES = 3;
     VoicePanel,
   ],
   template: `
-    <div class="mx-auto w-full max-w-2xl px-4 pt-6 pb-28 sm:px-6 md:pt-10">
+    <div class="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 md:pt-10 xl:max-w-4xl">
       <foshol-page-heading
         eyebrowKey="farmer.capture.eyebrow"
         titleKey="farmer.capture.title"
@@ -207,7 +207,7 @@ const SKELETON_TILES = 3;
 
     <!-- Within thumb reach at 360 px, and out of the way of the note box's own keyboard. -->
     <div class="submit-bar">
-      <div class="mx-auto flex w-full max-w-2xl items-center gap-3 px-4 sm:px-6">
+      <div class="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 sm:px-6 xl:max-w-4xl">
         <p class="min-w-0 flex-1 text-sm text-ink-muted">
           {{ 'farmer.capture.submit.hint' | translate: { min: minImages } }}
         </p>

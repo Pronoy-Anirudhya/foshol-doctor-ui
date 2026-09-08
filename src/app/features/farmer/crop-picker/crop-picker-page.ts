@@ -26,14 +26,17 @@ import { CropGrid } from './crop-grid';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CropGrid, EmptyState, ErrorPanel, PageHeading, Skeleton, TranslatePipe],
   template: `
-    <div class="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 md:py-10">
+    <div class="w-full px-4 py-6 sm:px-6 md:py-10">
       <foshol-page-heading
         eyebrowKey="farmer.capture.eyebrow"
         titleKey="farmer.capture.crop.title"
         subtitleKey="farmer.capture.crop.subtitle"
       />
 
-      <div class="mt-6">
+      <!-- Only 3 crops are seeded, so the grid itself stays capped and centred even though the
+           page around it now uses the shell's full width — stretching a 3-tile grid edge to
+           edge would look sparse, not spacious. -->
+      <div class="mx-auto mt-6 max-w-xl xl:max-w-2xl">
         @if (crops.isLoading()) {
           <foshol-skeleton variant="media" [count]="cropSkeletonCount" />
         } @else if (problem(); as failure) {
@@ -52,7 +55,7 @@ import { CropGrid } from './crop-grid';
         }
       </div>
 
-      <div class="mt-8">
+      <div class="mx-auto mt-8 max-w-xl xl:max-w-2xl">
         <button
           type="button"
           class="continue touch-target"
