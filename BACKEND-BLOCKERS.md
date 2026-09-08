@@ -206,6 +206,11 @@ facade method rather than a screen:
 **Owner:** A5 (`review`). Until it lands the console behaves correctly; it is slower and
 non-atomic, and the UI says so rather than implying otherwise.
 
+**RESOLVED.** `POST /review/tasks/bulk-transfer`, `bulk-approve` and `bulk-reject` shipped, and
+they answer `200` with the per-task result array this entry asked for — partial success is
+modelled rather than collapsed into one status. The console now calls them instead of looping the
+single-task writes; the single-task endpoints stay for the per-row actions.
+
 ---
 
 ## B7 · `expectedVersion` is accepted but not enforced
@@ -237,3 +242,36 @@ there are two clients. The `409` path is implemented and correct; it simply neve
 
 **Fix:** compare `expectedVersion` against the persisted row and answer `409` when they differ,
 in `approve`, `reject` and `revise`. Owner: A5 (`review`).
+
+
+---
+
+## B8 · The running stack predates the KPI work
+
+**What.** Not a code defect — an operational note, recorded because it cost an afternoon to
+diagnose and will cost the next person the same.
+
+The KPI contract, the Java sources and migration `V108__review_kpi_and_transfer.sql` are all
+present in the backend repo and compiled into `app/build/resources/main/`. The **process listening
+on :8080 is an older build**, so every new endpoint is routed but blows up underneath:
+
+```
+GET /api/v1/review/officers       → 500 ERR_INTERNAL
+GET /api/v1/review/kpi-warnings   → 500 ERR_INTERNAL
+GET /api/v1/admin/kpis            → 500 ERR_INTERNAL
+GET /api/v1/admin/kpis/breaches   → 500 ERR_INTERNAL
+```
+
+and `GET /review/queue` rows carry neither `assignmentDueAt` nor `resolutionDueAt`.
+
+A **500 rather than a 404** is the tell: the routes are mapped, so this is not a missing feature —
+it is a stale process against a database that never ran V108.
+
+**Fix:** restart the stack (`./tools/start-stack.sh`) so the migration applies and the new
+handlers load.
+
+**What the client does about it.** Both KPI due instants are nullable on the contract anyway, so
+every clock renders nothing rather than `Invalid Date` when they are absent, the bell still works
+from live frames when its seed fetch fails, and the admin dashboard keeps the existing
+`WEB-FR-305` stale-and-error behaviour. The console is therefore correct against both the old and
+the new server — but nothing KPI-shaped can be demonstrated until the restart.
