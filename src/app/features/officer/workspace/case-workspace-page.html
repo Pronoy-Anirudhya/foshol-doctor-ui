@@ -406,10 +406,15 @@
           'officer.reject.reason' | translate
         }}</label>
         <select
+          #rejectReasonInput
           id="reject-reason"
           [class]="fieldClass + ' touch-target'"
           data-testid="reject-reason"
           [disabled]="!canAct()"
+          [attr.aria-invalid]="rejectAttempted() && rejectReason() === null ? 'true' : null"
+          [attr.aria-errormessage]="
+            rejectAttempted() && rejectReason() === null ? 'reject-reason-error' : null
+          "
           (change)="setRejectReason($event)"
         >
           <option value="">{{ 'officer.reject.reasonPlaceholder' | translate }}</option>
@@ -418,7 +423,9 @@
           }
         </select>
         @if (rejectAttempted() && rejectReason() === null) {
-          <p [class]="fieldErrorClass">{{ 'officer.reject.reasonRequired' | translate }}</p>
+          <p id="reject-reason-error" [class]="fieldErrorClass">
+            {{ 'officer.reject.reasonRequired' | translate }}
+          </p>
         }
 
         <label [class]="fieldLabelClass" for="reject-message">
@@ -428,6 +435,7 @@
           {{ 'officer.reject.messageHint' | translate }}
         </p>
         <textarea
+          #rejectMessageInput
           id="reject-message"
           [class]="fieldClass"
           data-testid="reject-message"
@@ -435,10 +443,20 @@
           aria-describedby="reject-message-hint"
           [value]="rejectMessage()"
           [disabled]="!canAct()"
+          [attr.aria-invalid]="
+            rejectAttempted() && rejectMessage().trim().length === 0 ? 'true' : null
+          "
+          [attr.aria-errormessage]="
+            rejectAttempted() && rejectMessage().trim().length === 0
+              ? 'reject-message-error'
+              : null
+          "
           (input)="setRejectMessage($event)"
         ></textarea>
         @if (rejectAttempted() && rejectMessage().trim().length === 0) {
-          <p [class]="fieldErrorClass">{{ 'officer.reject.messageRequired' | translate }}</p>
+          <p id="reject-message-error" [class]="fieldErrorClass">
+            {{ 'officer.reject.messageRequired' | translate }}
+          </p>
         }
 
         <div class="mt-3.5 flex flex-wrap gap-2">

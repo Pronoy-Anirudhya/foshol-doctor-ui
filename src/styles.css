@@ -252,6 +252,22 @@
     border-radius: 4px;
   }
 
+  /* A required field that failed validation gets a red border everywhere in the app, from one
+     rule rather than a per-component copy: every field component already sets `aria-invalid`
+     for screen readers, and border colour rides along with that same attribute instead of a
+     second, separately-maintained "is this field invalid" flag. Colour is not the only cue —
+     the error text beside the field carries the same information (WEB-UX-044).
+     `!important`, matching the `[hidden]` rule in this same layer: a component's own scoped
+     `.field { border-color: ... }` is unlayered CSS, which beats anything in `@layer base` on
+     cascade order alone, regardless of specificity — the same reason `[hidden]` needs it. */
+  :is(input, select, textarea)[aria-invalid='true'] {
+    border-color: var(--color-clay-600) !important;
+  }
+
+  :is(input, select, textarea)[aria-invalid='true']:focus-visible {
+    outline-color: var(--color-clay-600);
+  }
+
   /* Numbers must not jitter as they tick. */
   :where(output, time, .tabular) {
     font-variant-numeric: tabular-nums;

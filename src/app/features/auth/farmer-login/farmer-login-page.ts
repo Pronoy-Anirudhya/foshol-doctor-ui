@@ -8,6 +8,7 @@ import {
   inject,
   Injector,
   signal,
+  viewChild,
   viewChildren,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -80,6 +81,7 @@ const DEV_FIXED = 'DEV_FIXED';
                 {{ 'auth.farmer.phoneLabel' | translate }}
               </label>
               <input
+                #phoneInput
                 id="phone"
                 type="tel"
                 inputmode="tel"
@@ -277,12 +279,17 @@ const DEV_FIXED = 'DEV_FIXED';
       box-shadow: var(--shadow-card);
       transition:
         background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
+        box-shadow var(--duration-2) var(--ease-settle),
+        transform var(--duration-1) var(--ease-settle);
     }
 
     .btn-primary:hover:not(:disabled) {
       background: var(--color-paddy-700);
       box-shadow: var(--shadow-lift);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     .btn-primary:disabled {
@@ -385,6 +392,8 @@ export class FarmerLoginPage {
     () => this.phoneTouched() && this.phoneForm.controls.phone.invalid,
   );
 
+  private readonly phoneInputRef = viewChild<ElementRef<HTMLInputElement>>('phoneInput');
+
   /** One notice at a time: the verification failure on step two, otherwise the send failure. */
   protected readonly activeProblem = computed(() =>
     this.onCodeStep()
@@ -403,7 +412,11 @@ export class FarmerLoginPage {
   protected async sendCode(): Promise<void> {
     this.phoneTouched.set(true);
     this.phoneForm.controls.phone.markAsTouched();
-    if (this.phoneForm.invalid || this.facade.requestPending() || this.cooldown.active()) return;
+    if (this.phoneForm.invalid) {
+      this.phoneInputRef()?.nativeElement.focus();
+      return;
+    }
+    if (this.facade.requestPending() || this.cooldown.active()) return;
 
     const phone = this.phoneForm.controls.phone.value.trim();
     if (!(await this.facade.requestOtp(phone))) return;
@@ -432,7 +445,12 @@ export class FarmerLoginPage {
   }
 
   protected async submitCode(): Promise<void> {
-    if (!this.codeComplete() || this.facade.verifyPending()) return;
+    if (!this.codeComplete()) {
+      this.codeTouched.set(true);
+      this.focusBox(this.digits().findIndex((digit) => digit === ''));
+      return;
+    }
+    if (this.facade.verifyPending()) return;
 
     if (!(await this.facade.verifyOtp(this._phone(), this.code()))) {
       // WEB-SEC-006 — a rejected code is cleared rather than left on screen to be re-read.
