@@ -243,9 +243,22 @@ const SKELETON_TILES = 3;
 
     <!-- Within thumb reach at 360 px, and out of the way of the note box's own keyboard. -->
     <div class="submit-bar">
+      <!-- The confirm step lives above the row so the two buttons below never swap places
+           under a thumb that is already moving towards one of them. -->
+      @if (confirmingCancel()) {
+        <div class="mx-auto w-full max-w-3xl px-4 pb-2 sm:px-6 xl:max-w-4xl">
+          <p class="refusal m-0" role="alert" data-testid="capture-cancel-prompt">
+            {{ 'farmer.capture.cancel.prompt' | translate }}
+          </p>
+        </div>
+      }
+
       <div class="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 sm:px-6 xl:max-w-4xl">
         <p class="min-w-0 flex-1 text-sm text-ink-muted" data-testid="capture-submit-hint">
-          @if (areaMissing()) {
+          @if (draft.isSubmitting()) {
+            <!-- Says why cancel just went grey, rather than leaving the farmer to guess. -->
+            {{ 'farmer.capture.cancel.disabledHint' | translate }}
+          } @else if (areaMissing()) {
             <!-- A disabled button that says why beats a disabled button that does not. -->
             <span class="font-semibold text-clay-700">{{
               'farmer.capture.submit.needArea' | translate
@@ -254,6 +267,32 @@ const SKELETON_TILES = 3;
             {{ 'farmer.capture.submit.hint' | translate: { min: minImages } }}
           }
         </p>
+        @if (confirmingCancel()) {
+          <button
+            type="button"
+            class="keep touch-target"
+            data-testid="capture-cancel-keep"
+            (click)="keepEditing()"
+          >
+            {{ 'farmer.capture.cancel.keep' | translate }}
+          </button>
+        }
+        <!-- Subordinate to Send by weight and fill; the confirming state changes the WORD as
+             well as the colour, so the warning is not carried by colour alone (WEB-UX-044). -->
+        <button
+          type="button"
+          class="cancel touch-target"
+          [class.cancel-armed]="confirmingCancel()"
+          data-testid="capture-cancel"
+          [disabled]="draft.isSubmitting()"
+          (click)="cancel()"
+        >
+          @if (confirmingCancel()) {
+            {{ 'farmer.capture.cancel.confirm' | translate }}
+          } @else {
+            {{ 'farmer.capture.cancel.action' | translate }}
+          }
+        </button>
         <button
           type="button"
           class="submit touch-target"
@@ -402,6 +441,39 @@ const SKELETON_TILES = 3;
       box-shadow: none;
       cursor: not-allowed;
     }
+
+    /* No fill and no shadow: a destructive action must never read as the primary one. */
+    .cancel,
+    .keep {
+      flex: none;
+      padding: 0.8rem 1rem;
+      border-radius: 1rem;
+      background: transparent;
+      color: var(--color-ink-muted);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      transition:
+        background-color var(--duration-1) var(--ease-settle),
+        color var(--duration-1) var(--ease-settle);
+    }
+
+    .cancel:hover:not(:disabled),
+    .keep:hover {
+      background: var(--color-surface-2);
+      color: var(--color-ink);
+    }
+
+    .cancel-armed,
+    .cancel-armed:hover:not(:disabled) {
+      border: 1px solid var(--color-clay-300);
+      background: var(--color-clay-100);
+      color: var(--color-clay-700);
+    }
+
+    .cancel:disabled {
+      color: var(--color-ink-faint);
+      cursor: not-allowed;
+    }
   `,
 })
 export class CapturePage {
@@ -448,6 +520,9 @@ export class CapturePage {
   private readonly _rejections = signal<readonly RejectedPick[]>([]);
   private readonly _problem = signal<ProblemView | null>(null);
   private readonly overflow = signal<string | null>(null);
+  private readonly _confirmingCancel = signal(false);
+
+  protected readonly confirmingCancel = this._confirmingCancel.asReadonly();
 
   protected readonly rejections = this._rejections.asReadonly();
   protected readonly problem = this._problem.asReadonly();
@@ -579,8 +654,52 @@ export class CapturePage {
     void this.ingest(source, true);
   }
 
+  /**
+   * Abandon the draft and leave (`WEB-DATA-022` does the cleanup: every preview object URL
+   * revoked, the persisted draft removed).
+   *
+   * Two presses when there is work to lose. `window.confirm` blocks the whole tab, is styled
+   * by the browser rather than by us, and appears nowhere else in this application, so the
+   * confirmation is an inline row in the submit bar instead — visible, translated, and
+   * keyboard-reachable like every other control here.
+   *
+   * **Disabled while a submission is in flight, on purpose.** The generated client hands back
+   * a Promise (`firstValueFrom`), so there is no subscription to unsubscribe and no abort
+   * handle to pull; and even if there were, the request may already have reached the server
+   * and created the case. A control labelled "cancel" that leaves a case created — and the
+   * farmer believing none exists — is a lie about what happened, which is the same reasoning
+   * `DEVIATIONS.md` D-12 applies to the officer's un-transmittable step edits: a control that
+   * cannot keep its promise is worse than no control. A failed attempt puts the draft back in
+   * the farmer's hands, so cancel is available again the moment `isSubmitting()` clears.
+   */
+  protected cancel(): void {
+    if (this.draft.isSubmitting()) return;
+
+    if (this.draft.hasContent() && !this._confirmingCancel()) {
+      this._confirmingCancel.set(true);
+      return;
+    }
+    void this.leave();
+  }
+
+  /** The second half of the two-step: back to editing, nothing touched. */
+  protected keepEditing(): void {
+    this._confirmingCancel.set(false);
+  }
+
+  private async leave(): Promise<void> {
+    this._confirmingCancel.set(false);
+    // WEB-FR-145 — leaving by cancel must free the microphone exactly as submitting does;
+    // otherwise the recording indicator stays lit on a page the farmer has left.
+    this.recorder.releaseMicrophone();
+    this.draft.discard();
+    await this.router.navigateByUrl(FARMER_PATHS.casesList);
+  }
+
   protected async submit(): Promise<void> {
     if (!this.canSubmit()) return;
+    // An armed confirmation is stale the moment the farmer commits to sending instead.
+    this._confirmingCancel.set(false);
 
     const cropId = this.draft.cropId();
     if (cropId === null) return;

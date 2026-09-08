@@ -57,25 +57,18 @@
 
 /* ── Cards, below md (WEB-UX-032) ─────────────────────────────────── */
 
-/* `display`, every breakpoint, `cursor-pointer` and the hover lift are Tailwind utilities on
-   the elements themselves, never rules here. A scoped `.cards { display: flex }` compiles to
+/* `display`, every breakpoint and the hover lift are Tailwind utilities on the elements
+   themselves, never rules here. A scoped `.cards { display: flex }` compiles to
    `.cards[_ngcontent-x]` — (0,2,0) — which beats `.md\:hidden` (0,1,0) at every width, so the
-   desktop table never got to show. Keeping them in the template (WEB-UX-034) makes that bug
-   structurally impossible and keeps this file inside its budget. Only the ::after overlay has
-   no utility equivalent: it stretches each row's one real link over the whole surface, so the
-   row is the click target while staying a single, keyboard-focusable anchor. */
+   desktop table never got to show (WEB-UX-034).
+
+   The stretched `::after` overlay that made the whole row a link is GONE: it covered every
+   pixel, so it swallowed every control the row later needed. See `queue-row-actions`. */
 .queue-card {
   padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.row-link::after,
-.card-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
 }
 
 /* State-keyed accent — WEB-UX-044, alongside .state's text, not instead of it. The bare
@@ -108,18 +101,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-}
-
-.card-link,
-.row-link {
-  /* WEB-UX-033 — a row's one control is still a touch target. */
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 44px;
-  font-weight: 700;
-  color: var(--color-slate-700);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .card-crop,
@@ -205,6 +186,19 @@
 .queue-table th.num,
 .queue-table td.num {
   text-align: end;
+}
+
+.queue-table th.pick,
+.queue-table td.pick {
+  inline-size: 2.5rem;
+  padding-inline-end: 0;
+}
+
+/* The confirm step's own row. Zebra striping and the state accent both key off the data rows,
+   so this one is deliberately given neither: it belongs to the row above, not beside it. */
+.panel-row td {
+  background: var(--color-surface-1);
+  padding: 0.75rem 0.9rem;
 }
 
 .queue-table td {

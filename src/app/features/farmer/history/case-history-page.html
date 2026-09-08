@@ -11,6 +11,9 @@
       <p class="mt-1.5 mb-0 text-sm text-ink-muted">
         {{ 'farmer.history.subtitle' | translate }}
       </p>
+      <!-- The header's copy of this is hidden below md, and a farmer is on a phone. Read-only:
+           the server files a case under the farmer's own region, never one the app chose. -->
+      <foshol-region-chip class="mt-2 inline-flex md:hidden" />
     </div>
 
     <a

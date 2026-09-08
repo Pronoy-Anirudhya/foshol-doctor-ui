@@ -10,7 +10,11 @@
       eyebrowKey="officer.queue.eyebrow"
       titleKey="officer.queue.title"
       subtitleKey="officer.queue.subtitle"
-    />
+    >
+      <!-- The queue is district-scoped on the server. Saying which district turns an empty
+           queue from a suspected bug into a fact about this officer's patch. -->
+      <foshol-region-chip />
+    </foshol-page-heading>
 
     <!-- WEB-FR-202 — the sentence the queue exists to make visible, adjacent to the table and
          in the reading path. Not a footnote, not a tooltip. -->
@@ -117,26 +121,47 @@
         </p>
       }
 
+      <!-- The bulk bar appears only once something is selected, and stays while a finished
+           run still has a report to show. There is no bulk endpoint: see queue-bulk-bar.ts. -->
+      @if (showBulkBar()) {
+        <foshol-queue-bulk-bar
+          class="mt-4 block"
+          data-popover-root
+          [rows]="selectedRows()"
+          [open]="bulkPanelKind()"
+          (toggle)="togglePanel('bulk', $event)"
+          (clearSelection)="clearSelection()"
+        />
+      }
+
       <!-- WEB-UX-032 — stacked cards below md. -->
       <ul class="mt-4 flex flex-col gap-3 list-none p-0 md:hidden" data-testid="queue-cards">
         @for (view of filteredRows(); track view.row.reviewTaskId) {
           <li
-            class="card queue-card relative cursor-pointer transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift active:translate-y-0"
+            class="card queue-card transition-transform duration-2 ease-settle hover:-translate-y-0.5 hover:shadow-lift"
             data-testid="queue-card"
             [attr.data-case-id]="view.row.caseId"
             [attr.data-state]="view.row.state"
             [attr.data-live]="view.liveStatus ? '' : null"
           >
             <div class="card-top">
-              <a
-                class="card-link"
-                [routerLink]="taskLink(view)"
-                [attr.aria-label]="
-                  'officer.queue.openAria' | translate: { farmer: view.row.farmerName }
-                "
-              >
-                {{ view.row.farmerName }}
-              </a>
+              @if (canAction(view)) {
+                <label class="touch-target inline-flex items-center gap-2 text-sm font-bold">
+                  <input
+                    type="checkbox"
+                    class="h-5 w-5 accent-paddy-600"
+                    data-testid="queue-card-select"
+                    [checked]="isSelected(view)"
+                    [attr.aria-label]="
+                      'officer.queue.select.row' | translate: { farmer: view.row.farmerName }
+                    "
+                    (change)="toggleRow(view)"
+                  />
+                  {{ view.row.farmerName }}
+                </label>
+              } @else {
+                <span class="font-bold text-ink">{{ view.row.farmerName }}</span>
+              }
               <span class="state" [attr.data-state]="view.row.state">
                 {{ stateKey(view) | translate }}
               </span>
@@ -196,6 +221,31 @@
                 </div>
               }
             </dl>
+
+            <!-- The card's equivalent of the table's actions column. -->
+            <div class="mt-1 flex items-center justify-end" data-popover-root>
+              <foshol-queue-row-actions
+                scope="card"
+                [view]="view"
+                [open]="panelKind(view)"
+                [canApprove]="canApprove(view)"
+                [canReject]="canAction(view)"
+                [busy]="facade.rowActionTaskId() !== null"
+                [lockedKey]="lockedKey(view)"
+                (toggle)="togglePanel(view.row.reviewTaskId, $event)"
+              />
+            </div>
+
+            @if (panelKind(view); as kind) {
+              <foshol-queue-action-panel
+                class="mt-2 block"
+                data-popover-root
+                scope="card"
+                [view]="view"
+                [kind]="kind"
+                (dismiss)="closePanel()"
+              />
+            }
           </li>
         }
       </ul>
@@ -213,6 +263,20 @@
                  no aria-sort: the sort control does not exist, because the server's order is
                  the one detail this screen exists to demonstrate. -->
             <tr>
+              <!-- A checkbox is a selection control, not a sort control: it changes which rows
+                   an action applies to and never the order they are read in. -->
+              <th scope="col" class="pick">
+                <input
+                  type="checkbox"
+                  class="h-5 w-5 accent-paddy-600"
+                  data-testid="queue-select-all"
+                  [checked]="allSelected()"
+                  [indeterminate]="someSelected()"
+                  [disabled]="noneActionable()"
+                  [attr.aria-label]="'officer.queue.select.all' | translate"
+                  (change)="toggleAll()"
+                />
+              </th>
               <th scope="col">{{ 'officer.queue.col.farmer' | translate }}</th>
               <th scope="col">{{ 'officer.queue.col.crop' | translate }}</th>
               <th scope="col">{{ 'officer.queue.col.candidate' | translate }}</th>
@@ -228,27 +292,34 @@
               <th scope="col" class="hidden xl:table-cell">
                 {{ 'officer.queue.col.state' | translate }}
               </th>
+              <!-- WEB-FR-200 / AC-11 — plain, like every other header cell. -->
+              <th scope="col">{{ 'officer.queue.col.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
             @for (view of filteredRows(); track view.row.reviewTaskId) {
               <tr
-                class="relative cursor-pointer"
                 data-testid="queue-row"
                 [attr.data-case-id]="view.row.caseId"
                 [attr.data-state]="view.row.state"
                 [attr.data-live]="view.liveStatus ? '' : null"
               >
+                <td class="pick">
+                  @if (canAction(view)) {
+                    <input
+                      type="checkbox"
+                      class="h-5 w-5 accent-paddy-600"
+                      data-testid="queue-row-select"
+                      [checked]="isSelected(view)"
+                      [attr.aria-label]="
+                        'officer.queue.select.row' | translate: { farmer: view.row.farmerName }
+                      "
+                      (change)="toggleRow(view)"
+                    />
+                  }
+                </td>
                 <td>
-                  <a
-                    class="row-link"
-                    [routerLink]="taskLink(view)"
-                    [attr.aria-label]="
-                      'officer.queue.openAria' | translate: { farmer: view.row.farmerName }
-                    "
-                  >
-                    {{ view.row.farmerName }}
-                  </a>
+                  <span class="font-bold text-ink">{{ view.row.farmerName }}</span>
                   @if (view.row.isResubmission) {
                     <span class="resub" [title]="'officer.queue.resubmissionHint' | translate">
                       <foshol-icon name="resubmit" size="xs" />
@@ -287,7 +358,34 @@
                     <span class="live-status">{{ statusKey(view) | translate }}</span>
                   }
                 </td>
+                <td data-popover-root>
+                  <foshol-queue-row-actions
+                    [view]="view"
+                    [open]="panelKind(view)"
+                    [canApprove]="canApprove(view)"
+                    [canReject]="canAction(view)"
+                    [busy]="facade.rowActionTaskId() !== null"
+                    [lockedKey]="lockedKey(view)"
+                    (toggle)="togglePanel(view.row.reviewTaskId, $event)"
+                  />
+                </td>
               </tr>
+
+              <!-- The confirm step is an expansion row rather than a floating popover: the
+                   table lives inside `.table-wrap`'s `overflow-x: auto`, and an absolutely
+                   positioned panel in a scroll container is a panel with its bottom cut off.
+                   An extra row is also the only version that stays in the reading order. -->
+              @if (panelKind(view); as kind) {
+                <tr class="panel-row" data-testid="queue-panel-row">
+                  <td [attr.colspan]="COLUMN_COUNT" data-popover-root>
+                    <foshol-queue-action-panel
+                      [view]="view"
+                      [kind]="kind"
+                      (dismiss)="closePanel()"
+                    />
+                  </td>
+                </tr>
+              }
             }
           </tbody>
         </table>

@@ -166,3 +166,74 @@ to store it. See `DEVIATIONS.md` D-12.
   Starting the sidecar with `FOSHOL_AI_MODE=live` yields `status: DOWN` and a 503 on every
   request, so `FOSHOL_SPRING_PROFILES=local` would make **every** case `UNDETERMINED`. Until
   weights are wired in, `local,demo` (replay) is the profile that makes beats 4–7 work.
+
+---
+
+## B6 · No bulk approve / reject endpoint
+
+**What.** The officer console now offers multi-select with bulk approve and bulk reject. The
+frozen contract has only the single-task writes:
+
+```
+POST /api/v1/review/tasks/{taskId}/approve
+POST /api/v1/review/tasks/{taskId}/reject
+```
+
+Checked against both `openapi/foshol-api.yaml` and the upstream
+`foshol-doctor/docs/openapi/foshol-api.yaml`: there is no bulk, batch or multi-task operation
+anywhere in the contract.
+
+**How the client copes meanwhile.** The UI drives the existing per-task endpoints **sequentially**
+and reports a per-row outcome, because partial failure is the normal case rather than the
+exception — a `409` simply means another officer reached that task first. It is honest and it
+works today, but it is N round trips where one would do, each approve costing a claim, a task
+read and a write, and it cannot be atomic: a bulk of ten that fails at the seventh leaves six
+advisories published.
+
+**What the endpoint would need to carry.** Stated so the client can swap to it by changing one
+facade method rather than a screen:
+
+- The **task ids**, and per task the `expectedVersion` the client holds — optimistic locking is
+  the only thing stopping two officers publishing the same advisory twice, so a bulk call that
+  drops it would be a regression, not a shortcut.
+- For approve: the `diseaseId` and `remedyIds` per task. They differ per case, so this cannot be
+  one disease applied to many — a bulk approve that published one disease across a selection
+  would be authoring agronomic content, which `COMMON-CON-003` forbids outright.
+- For reject: one `reasonCode` and one `messageBn` may reasonably apply to the whole selection.
+- **A per-task result array, not a single status.** Partial success is the expected outcome, and
+  an all-or-nothing 4xx would leave the officer unable to tell which cases went out.
+
+**Owner:** A5 (`review`). Until it lands the console behaves correctly; it is slower and
+non-atomic, and the UI says so rather than implying otherwise.
+
+---
+
+## B7 · `expectedVersion` is accepted but not enforced
+
+**What.** Both write endpoints take an `expectedVersion` and the frozen contract documents a
+`409` for a stale one, but the server does not check it.
+
+**Reproducible.** With `officer`/`password` against a `PENDING` task:
+
+```
+POST /api/v1/review/tasks/{id}/claim   → 200, version = 0
+POST /api/v1/review/tasks/{id}/reject  { expectedVersion: -5, … }   → 200
+```
+
+`-5` is not merely stale, it is impossible, and the rejection was still recorded. Verified twice,
+independently.
+
+**Why it matters.** Optimistic locking is the only thing standing between two officers and two
+conflicting decisions on one case. The console is built to hold the line — it sends the version
+`claim` returned, and `WEB-FR-235` handling refreshes the case and preserves the editor on a
+`409` rather than retrying — but with the check absent, the last write simply wins and the first
+officer is never told. That is now more exposed than it was: the queue offers inline and bulk
+approve/reject, so two officers working the same district can act on the same row in the time it
+takes to open a confirm.
+
+**What the client does about it.** Nothing, deliberately. Re-implementing the check here would be
+guessing at a rule the server owns (`WEB-NFR-001`), and a client-side lock protects nobody once
+there are two clients. The `409` path is implemented and correct; it simply never fires today.
+
+**Fix:** compare `expectedVersion` against the persisted row and answer `409` when they differ,
+in `approve`, `reject` and `revise`. Owner: A5 (`review`).

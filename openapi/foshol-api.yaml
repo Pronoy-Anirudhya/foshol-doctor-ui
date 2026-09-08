@@ -99,6 +99,40 @@ paths:
               schema: { $ref: '#/components/schemas/Principal' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /api/v1/geo/divisions:
+    get:
+      tags: [auth]
+      operationId: listDivisions
+      responses:
+        '200':
+          description: Bangladesh's eight divisions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GeoDivision' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /api/v1/geo/divisions/{divisionCode}/districts:
+    get:
+      tags: [auth]
+      operationId: listDistrictsByDivision
+      parameters:
+        - name: divisionCode
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Districts in the division
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GeoDistrict' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
   # ── knowledge ─────────────────────────────────────────────────────────────
   /api/v1/crops:
     get:
@@ -654,7 +688,30 @@ components:
         name:              { type: string }
         role:              { type: string, enum: [FARMER, OFFICER, ADMIN] }
         districtCode:      { type: string }
+        divisionCode:      { type: string }
+        districtNameBn:   { type: string, nullable: true }
+        districtNameEn:   { type: string, nullable: true }
+        divisionNameBn:   { type: string, nullable: true }
+        divisionNameEn:   { type: string, nullable: true }
         preferredLanguage: { type: string, enum: [bn, en] }
+        username:          { type: string, nullable: true }
+
+    GeoDivision:
+      type: object
+      required: [code, nameEn, nameBn]
+      properties:
+        code:   { type: string }
+        nameEn: { type: string }
+        nameBn: { type: string }
+
+    GeoDistrict:
+      type: object
+      required: [code, divisionCode, nameEn, nameBn]
+      properties:
+        code:         { type: string }
+        divisionCode: { type: string }
+        nameEn:       { type: string }
+        nameBn:       { type: string }
 
     Crop:
       type: object
