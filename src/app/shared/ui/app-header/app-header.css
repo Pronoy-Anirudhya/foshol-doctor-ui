@@ -1,0 +1,29 @@
+/* Layout, colour and breakpoint behaviour stay in Tailwind utilities computed in the component
+   (WEB-UX-034); this file only carries what a class list cannot express — a feature query.
+
+   The bar is pinned (see the host class in app-header.ts), so page content now scrolls BEHIND
+   it instead of past it. A wash plus a blur keeps a hint of the movement underneath while
+   removing the high-frequency detail that would otherwise read through the labels. The idiom —
+   `color-mix(...)` at 92% over `backdrop-filter: blur(8px)` — is the one `.submit-bar` in
+   features/farmer/capture/capture-page.ts already establishes.
+
+   Guarded by @supports rather than applied unconditionally: without the blur, translucency
+   alone puts moving text under the header's own text, and WEB-UX-042's contrast floor is not
+   something to leave to whatever happens to be scrolling past. A browser with no
+   `backdrop-filter` therefore keeps the fully opaque Tailwind background. 92% is deliberately
+   shy of a visible tint so the ink/surface pair on screen is still, to within a rounding
+   error, the pair scripts/check-contrast.mjs measures. */
+@supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+  .hd-bar {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .hd-bar-light {
+    background: color-mix(in srgb, var(--color-surface-0) 92%, transparent);
+  }
+
+  .hd-bar-dark {
+    background: color-mix(in srgb, var(--color-slate-800) 92%, transparent);
+  }
+}

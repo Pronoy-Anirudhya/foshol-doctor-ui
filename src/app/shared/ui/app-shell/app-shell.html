@@ -10,7 +10,15 @@
 <foshol-app-header [tone]="headerTone()" [navOpen]="navOpen()" (menuToggle)="toggleNav()" />
 
 <!-- WEB-FR-402 — directly under the header so it is seen, above the content so it never
-     covers a control. -->
+     covers a control.
+
+     Left in normal flow now that the header is pinned, rather than pinned as a second bar
+     beneath it. Pinning it would satisfy "is seen" and then break the other half of the same
+     requirement: a pinned banner sits ON TOP of whatever scrolls under it, which on a 360 px
+     phone is a control roughly every 3.5 rem. It would also steal that height from the reading
+     area for as long as the signal is out — precisely when a farmer is most likely to be
+     mid-capture — and would collide with the desktop nav column, which pins to the same offset.
+     In flow it is the first thing seen on the surface, above every control and covering none. -->
 <foshol-offline-banner />
 
 <div class="flex flex-1 items-start">
@@ -21,10 +29,13 @@
        shell's own width cap (`case-history-page.html`'s full-bleed trick) can measure against
        THIS box with `cqw` instead of `vw`. Plain `vw` assumes `main` is centered in the raw
        viewport, which stopped being true the moment a persistent nav became its sibling. -->
+  <!-- scroll-mt-16 — WEB-UX-040's skip link jumps to this element, and a pinned header would
+       otherwise park its first 4 rem behind the bar it just skipped past. Matches the header
+       height (see side-nav.ts for where that number comes from). -->
   <main
     id="main"
     tabindex="-1"
-    class="min-w-0 flex-1 [container-type:inline-size]"
+    class="min-w-0 flex-1 scroll-mt-16 [container-type:inline-size]"
     [attr.aria-label]="'shared.mainLandmark' | translate"
   >
     <div [class]="mainClass()">

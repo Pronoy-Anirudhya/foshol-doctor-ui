@@ -2,6 +2,13 @@
    WEB-UX-034; this file only carries what a class list can't: link states and the icon-rail's
    label-hiding. */
 
+/* The drawer is an overlay, and the header it opens from is pinned — so without a scrim the
+   bar stays at full strength behind the panel and the two read as one surface. Dimming what is
+   covered is also the only cue that a tap outside will close it. */
+.sn-backdrop {
+  background-color: rgb(0 0 0 / 0.45);
+}
+
 .sn-list {
   display: grid;
   gap: 0.25rem;

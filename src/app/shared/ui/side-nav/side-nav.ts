@@ -84,9 +84,19 @@ export class SideNav {
 
   /** The collapsed width lives here, never beside `md:w-60` in the template, so the two can
       never both land in the class list at once and leave the cascade to pick a winner. */
+  /*
+   * `4rem` is the header's height, and the column pins directly below it now that the header
+   * itself is pinned (app-header.ts). It is not a tunable and so not an APP_CONFIG constant
+   * (WEB-NFR-009 exempts CSS values): the bar is one flex row whose tallest child is a
+   * `touch-target` control — 44 px, the WEB-UX-041 floor — inside `py-2.5`, so 2.75 rem +
+   * 1.25 rem = 4 rem exactly, at every breakpoint. Change either of those in app-header.html
+   * and change this with them.
+   * The light tone's 1 px bottom border falls inside the column's own `md:p-3`, so the two
+   * tones do not need two offsets.
+   */
   protected readonly desktopClass = computed(
     () =>
-      `sn-nav hidden md:sticky md:top-[3.75rem] md:flex md:h-[calc(100dvh-3.75rem)] md:flex-col md:gap-0.5 md:border-e md:p-3 ${
+      `sn-nav hidden md:sticky md:top-[4rem] md:flex md:h-[calc(100dvh-4rem)] md:flex-col md:gap-0.5 md:border-e md:p-3 ${
         this.collapsed() ? 'md:w-[4.5rem]' : 'md:w-60'
       } ${this.toneClass()}`,
   );
