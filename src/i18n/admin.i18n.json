@@ -1,67 +1,114 @@
 {
-  "admin.stats.eyebrow": { "bn": "প্রশাসক", "en": "Administrator" },
-  "admin.stats.title": { "bn": "ড্যাশবোর্ড", "en": "Dashboard" },
+  "admin.stats.eyebrow": {
+    "bn": "প্রশাসক",
+    "en": "Administrator"
+  },
+  "admin.stats.title": {
+    "bn": "ড্যাশবোর্ড",
+    "en": "Dashboard"
+  },
   "admin.stats.subtitle": {
-    "bn": "আপনার জেলার কেসের পরিমাণ, পর্যালোচনার মান আর রাউটিং সীমা — সবশেষ হালনাগাদ অনুযায়ী।",
+    "bn": "আপনার জেলার কেসের পরিমাণ, পর্যালোচনার মান ও রাউটিং সীমা — সর্বশেষ হালনাগাদ অনুযায়ী।",
     "en": "Your district's case volume, review quality and routing thresholds, as of the last refresh."
   },
-
-  "admin.stats.refresh": { "bn": "হালনাগাদ করুন", "en": "Refresh" },
+  "admin.stats.refresh": {
+    "bn": "হালনাগাদ করুন",
+    "en": "Refresh"
+  },
   "admin.stats.refreshAria": {
     "bn": "পরিসংখ্যান সার্ভার থেকে আবার আনুন",
     "en": "Fetch the statistics from the server again"
   },
-  "admin.stats.updatedAt": { "bn": "{{time}} পর্যন্ত তথ্য", "en": "Data as of {{time}}" },
-  "admin.stats.neverLoaded": { "bn": "এখনও কোনো তথ্য আসেনি", "en": "No data loaded yet" },
-
-  "admin.stats.stale.title": { "bn": "পুরোনো তথ্য দেখানো হচ্ছে", "en": "Showing stale values" },
+  "admin.stats.updatedAt": {
+    "bn": "{{time}} পর্যন্ত তথ্য",
+    "en": "Data as of {{time}}"
+  },
+  "admin.stats.neverLoaded": {
+    "bn": "এখনও কোনো তথ্য আসেনি",
+    "en": "No data loaded yet"
+  },
+  "admin.stats.stale.title": {
+    "bn": "পুরোনো তথ্য দেখানো হচ্ছে",
+    "en": "Showing stale values"
+  },
   "admin.stats.stale.detail": {
-    "bn": "শেষ চেষ্টা ব্যর্থ হয়েছে। নিচের সংখ্যাগুলো সবশেষ সফলভাবে আনা তথ্য — এখনকার নয়।",
+    "bn": "সর্বশেষ চেষ্টাটি ব্যর্থ হয়েছে। নিচের সংখ্যাগুলো আগের সফল হালনাগাদের, বর্তমান নয়।",
     "en": "The last attempt failed. The numbers below are the last values that loaded successfully, not the current ones."
   },
-  "admin.stats.stale.marker": { "bn": "পুরোনো", "en": "Stale" },
-  "admin.stats.empty.title": { "bn": "এখনও কোনো পরিসংখ্যান আসেনি", "en": "No statistics loaded" },
+  "admin.stats.stale.marker": {
+    "bn": "পুরোনো",
+    "en": "Stale"
+  },
+  "admin.stats.empty.title": {
+    "bn": "এখনও কোনো পরিসংখ্যান আসেনি",
+    "en": "No statistics loaded"
+  },
   "admin.stats.empty.detail": {
     "bn": "সার্ভার থেকে তথ্য আনতে হালনাগাদ চাপুন।",
     "en": "Press refresh to fetch the values from the server."
   },
-
-  "admin.stats.noData": { "bn": "এখনও যথেষ্ট তথ্য নেই", "en": "Not enough data yet" },
-  "admin.stats.percentValue": { "bn": "{{value}}%", "en": "{{value}}%" },
-  "admin.stats.minutesValue": { "bn": "{{value}} মিনিট", "en": "{{value}} min" },
-
-  "admin.stats.casesToday.label": { "bn": "আজকের কেস", "en": "Cases today" },
+  "admin.stats.noData": {
+    "bn": "এখনও যথেষ্ট তথ্য নেই",
+    "en": "Not enough data yet"
+  },
+  "admin.stats.percentValue": {
+    "bn": "{{value}}%",
+    "en": "{{value}}%"
+  },
+  "admin.stats.minutesValue": {
+    "bn": "{{value}} মিনিট",
+    "en": "{{value}} min"
+  },
+  "admin.stats.casesToday.label": {
+    "bn": "আজকের কেস",
+    "en": "Cases today"
+  },
   "admin.stats.casesToday.hint": {
     "bn": "আজ জমা পড়া কেসের সংখ্যা",
     "en": "Cases submitted today"
   },
-  "admin.stats.casesThisMonth.label": { "bn": "এই মাসের কেস", "en": "This month" },
+  "admin.stats.casesThisMonth.label": {
+    "bn": "এই মাসের কেস",
+    "en": "This month"
+  },
   "admin.stats.casesThisMonth.hint": {
     "bn": "চলতি মাসে জমা পড়া কেসের সংখ্যা",
     "en": "Cases submitted this calendar month"
   },
-  "admin.stats.casesThisYear.label": { "bn": "এই বছরের কেস", "en": "This year" },
+  "admin.stats.casesThisYear.label": {
+    "bn": "এই বছরের কেস",
+    "en": "This year"
+  },
   "admin.stats.casesThisYear.hint": {
     "bn": "চলতি বছরে জমা পড়া কেসের সংখ্যা",
     "en": "Cases submitted this calendar year"
   },
-  "admin.stats.casesLifetime.label": { "bn": "সর্বমোট কেস", "en": "Lifetime" },
+  "admin.stats.casesLifetime.label": {
+    "bn": "সর্বমোট কেস",
+    "en": "Lifetime"
+  },
   "admin.stats.casesLifetime.hint": {
     "bn": "শুরু থেকে এ পর্যন্ত এই জেলার সব কেস",
     "en": "Every case ever submitted in this district"
   },
   "admin.stats.period.filterHint": {
-    "bn": "এই সময়কাল অনুযায়ী নিচের কেসের তালিকা ছাঁকা হবে",
+    "bn": "নির্বাচিত সময়কাল অনুযায়ী নিচের কেস তালিকা ফিল্টার করা হবে",
     "en": "Filters the case list below to this period"
   },
-  "admin.stats.approvalRate.label": { "bn": "অনুমোদনের হার", "en": "Approval rate" },
+  "admin.stats.approvalRate.label": {
+    "bn": "অনুমোদনের হার",
+    "en": "Approval rate"
+  },
   "admin.stats.approvalRate.hint": {
-    "bn": "প্রকাশিত পরামর্শের যত অংশ অফিসার কোনো বদল ছাড়াই অনুমোদন করেছেন",
+    "bn": "প্রকাশিত পরামর্শের যত শতাংশ অফিসার কোনো পরিবর্তন ছাড়াই অনুমোদন করেছেন",
     "en": "Share of published advisories the officer approved unedited"
   },
-  "admin.stats.medianReview.label": { "bn": "পর্যালোচনার মধ্যক সময়", "en": "Median review time" },
+  "admin.stats.medianReview.label": {
+    "bn": "পর্যালোচনার মধ্যক সময়",
+    "en": "Median review time"
+  },
   "admin.stats.medianReview.hint": {
-    "bn": "পর্যালোচনার কাজ তৈরি হওয়া থেকে শেষ হওয়া পর্যন্ত",
+    "bn": "পর্যালোচনার কাজ তৈরি হওয়া থেকে সম্পন্ন হওয়া পর্যন্ত সময়",
     "en": "From review task created to completed"
   },
   "admin.stats.agreement.label": {
@@ -69,7 +116,7 @@
     "en": "Auto-Diagnosis Acceptance Rate"
   },
   "admin.stats.agreement.hint": {
-    "bn": "প্রকাশিত পরামর্শের যত অংশে অফিসার মডেলের শীর্ষ রোগটিই অপরিবর্তিত রেখেছেন",
+    "bn": "প্রকাশিত পরামর্শের যত শতাংশে অফিসার মডেলের শীর্ষ রোগ অপরিবর্তিত রেখেছেন",
     "en": "Share of published advisories that kept the model's top-ranked disease unchanged"
   },
   "admin.stats.agreement.sample": {
@@ -77,119 +124,191 @@
     "en": "Computed from {{count}} published advisories"
   },
   "admin.stats.agreement.noSample": {
-    "bn": "এখনও কোনো পরামর্শ প্রকাশ হয়নি, তাই এই হার হিসাব করা যায়নি",
+    "bn": "এখনো কোনো পরামর্শ প্রকাশিত হয়নি, তাই এই হার নির্ণয় করা যায়নি",
     "en": "No published advisories yet, so there is no rate"
   },
-
-  "admin.stats.rejectionRate.label": { "bn": "প্রত্যাখ্যানের হার", "en": "Rejection rate" },
+  "admin.stats.rejectionRate.label": {
+    "bn": "প্রত্যাখ্যানের হার",
+    "en": "Rejection rate"
+  },
   "admin.stats.rejectionRate.hint": {
-    "bn": "শেষ হওয়া পর্যালোচনার কাজের যত অংশ অফিসার প্রত্যাখ্যান করেছেন",
+    "bn": "সম্পন্ন পর্যালোচনার যত শতাংশ অফিসার প্রত্যাখ্যান করেছেন",
     "en": "Share of terminal review tasks the officer rejected"
   },
-
-  "admin.stats.kpiSection.title": { "bn": "কেপিআই ব্যর্থতা", "en": "KPI failures" },
+  "admin.stats.kpiSection.title": {
+    "bn": "KPI ব্যর্থতা",
+    "en": "KPI failures"
+  },
   "admin.stats.kpiSection.subtitle": {
-    "bn": "সময়সীমা পেরোনো কেসের সংক্ষিপ্ত হিসাব। সারি ধরে দেখতে কেপিআই পাতায় যান।",
+    "bn": "সময়সীমা অতিক্রম করা কেসের সংক্ষিপ্ত হিসাব। বিস্তারিত দেখতে KPI পাতায় যান।",
     "en": "A short summary of missed deadlines. See the KPI page for the row-by-row breakdown."
   },
   "admin.stats.kpiSection.thresholdsCompact": {
     "bn": "নিম্ন সীমা {{low}} · উচ্চ সীমা {{high}}",
     "en": "Low threshold {{low}} · High threshold {{high}}"
   },
-
-  "admin.stats.thresholds.title": { "bn": "রাউটিং সীমা", "en": "Routing thresholds" },
+  "admin.stats.thresholds.title": {
+    "bn": "রাউটিং সীমা",
+    "en": "Routing thresholds"
+  },
   "admin.stats.thresholds.subtitle": {
-    "bn": "সার্ভারে নির্ধারিত দুটি মান। মডেলের নিশ্চয়তা এই দুই সীমার কোন দিকে পড়ে, তার উপরেই কেসের পথ ঠিক হয়।",
+    "bn": "সার্ভারে নির্ধারিত দুটি সীমা। মডেলের নিশ্চয়তা এই দুই সীমার কোথায় পড়ে, তার উপরেই কেসের পথ নির্ধারিত হয়।",
     "en": "Two values set on the server. Where the model's confidence falls between them decides the case's path."
   },
-  "admin.stats.thresholds.low": { "bn": "নিম্ন সীমা", "en": "Low threshold" },
-  "admin.stats.thresholds.high": { "bn": "উচ্চ সীমা", "en": "High threshold" },
+  "admin.stats.thresholds.low": {
+    "bn": "নিম্ন সীমা",
+    "en": "Low threshold"
+  },
+  "admin.stats.thresholds.high": {
+    "bn": "উচ্চ সীমা",
+    "en": "High threshold"
+  },
   "admin.stats.thresholds.humanGate": {
-    "bn": "কেস যে পথেই যাক, কৃষকের কাছে পরামর্শ পৌঁছানোর আগে একজন অফিসার সেটি অনুমোদন করেন।",
+    "bn": "কেস যে পথেই যাক, কৃষকের কাছে পরামর্শ পৌঁছানোর আগে একজন অফিসারের অনুমোদন বাধ্যতামূলক।",
     "en": "Whichever path a case takes, a field officer approves it before any advice reaches the farmer."
   },
   "admin.stats.thresholds.unavailable": {
     "bn": "সার্ভার এবার সীমা দুটি পাঠায়নি",
     "en": "The server did not report the thresholds"
   },
-
-  "admin.stats.band.UNDETERMINED.range": { "bn": "{{low}}-এর নিচে", "en": "Below {{low}}" },
+  "admin.stats.band.UNDETERMINED.range": {
+    "bn": "{{low}}-এর নিচে",
+    "en": "Below {{low}}"
+  },
   "admin.stats.band.SECONDARY.range": {
     "bn": "{{low}} থেকে {{high}}",
     "en": "{{low}} to {{high}}"
   },
-  "admin.stats.band.PRIMARY.range": { "bn": "{{high}} বা তার বেশি", "en": "{{high}} and above" },
-
+  "admin.stats.band.PRIMARY.range": {
+    "bn": "{{high}} বা তার বেশি",
+    "en": "{{high}} and above"
+  },
   "admin.stats.omitted": {
-    "bn": "সার্ভার যা পাঠায়নি তা এখানে বাদ রাখা হয়েছে — শূন্য বসিয়ে দেওয়া হয়নি।",
+    "bn": "সার্ভার যে তথ্য পাঠায়নি তা বাদ রাখা হয়েছে — শূন্য ধরে নেওয়া হয়নি।",
     "en": "What the server does not report is left out rather than shown as zero."
   },
-
   "admin.queue.unavailable": {
-    "bn": "পর্যালোচনার সারি আনা যায়নি। উপরের পরিসংখ্যান এতে বদলায় না; নিচের অংশগুলো ফাঁকা থাকবে।",
+    "bn": "পর্যালোচনার কিউ আনা যায়নি। উপরের পরিসংখ্যান এতে অপরিবর্তিত থাকে; নিচের অংশগুলো ফাঁকা দেখাবে।",
     "en": "The review queue could not be loaded. The statistics above are unaffected; the widgets below stay empty."
   },
-
-  "admin.cases.backToDashboard": { "bn": "ড্যাশবোর্ডে ফিরুন", "en": "Back to the dashboard" },
-  "admin.cases.title": { "bn": "কেসের তালিকা", "en": "Case list" },
+  "admin.cases.backToDashboard": {
+    "bn": "ড্যাশবোর্ডে ফিরুন",
+    "en": "Back to the dashboard"
+  },
+  "admin.cases.title": {
+    "bn": "কেসের তালিকা",
+    "en": "Case list"
+  },
   "admin.cases.subtitle": {
-    "bn": "এই জেলার কেস, সবচেয়ে নতুন জমা সবার উপরে। ছাঁকনি দিয়ে তালিকা ছোট করুন, দরকার হলে একসঙ্গে একাধিক কেস প্রত্যাখ্যান করুন।",
+    "bn": "এই জেলার কেস, সর্বশেষ জমা সবার উপরে। ফিল্টার ব্যবহার করে তালিকা ছোট করুন, প্রয়োজনে একসঙ্গে একাধিক কেস প্রত্যাখ্যান করুন।",
     "en": "This district's cases, newest submission first. Narrow with the filters, and reject several at once if you need to."
   },
-  "admin.cases.filters.label": { "bn": "কেস ছাঁকনি", "en": "Case filters" },
-  "admin.cases.filters.state.label": { "bn": "অবস্থা", "en": "State" },
-  "admin.cases.filters.state.ALL": { "bn": "সব অবস্থা", "en": "Any state" },
-  "admin.cases.filters.kpi.label": { "bn": "কেপিআই", "en": "KPI" },
-  "admin.cases.filters.kpi.ANY": { "bn": "যেকোনো", "en": "Any" },
-  "admin.cases.filters.officer.label": { "bn": "অফিসার", "en": "Officer" },
-  "admin.cases.filters.officer.any": { "bn": "সব অফিসার", "en": "Any officer" },
-  "admin.cases.filters.crop.label": { "bn": "ফসল", "en": "Crop" },
-  "admin.cases.filters.crop.any": { "bn": "সব ফসল", "en": "Any crop" },
-  "admin.cases.filters.decisionPath.label": { "bn": "সিদ্ধান্তের পথ", "en": "Decision path" },
-  "admin.cases.filters.decisionPath.any": { "bn": "সব পথ", "en": "Any path" },
-  "admin.cases.filters.resubmission.label": { "bn": "পুনরায় জমা", "en": "Resubmission" },
-  "admin.cases.filters.resubmission.any": { "bn": "সব কেস", "en": "Any case" },
-  "admin.cases.filters.resubmission.yes": { "bn": "শুধু পুনরায় জমা", "en": "Resubmissions only" },
-  "admin.cases.filters.resubmission.no": { "bn": "শুধু প্রথমবার", "en": "First submissions only" },
-
-  "admin.cases.column.officer": { "bn": "অফিসার", "en": "Officer" },
-  "admin.cases.column.due": { "bn": "সময়সীমা", "en": "Due" },
-
+  "admin.cases.filters.label": {
+    "bn": "কেস ফিল্টার",
+    "en": "Case filters"
+  },
+  "admin.cases.filters.state.label": {
+    "bn": "অবস্থা",
+    "en": "State"
+  },
+  "admin.cases.filters.state.ALL": {
+    "bn": "সব অবস্থা",
+    "en": "Any state"
+  },
+  "admin.cases.filters.kpi.label": {
+    "bn": "KPI",
+    "en": "KPI"
+  },
+  "admin.cases.filters.kpi.ANY": {
+    "bn": "যেকোনো",
+    "en": "Any"
+  },
+  "admin.cases.filters.officer.label": {
+    "bn": "অফিসার",
+    "en": "Officer"
+  },
+  "admin.cases.filters.officer.any": {
+    "bn": "সব অফিসার",
+    "en": "Any officer"
+  },
+  "admin.cases.filters.crop.label": {
+    "bn": "ফসল",
+    "en": "Crop"
+  },
+  "admin.cases.filters.crop.any": {
+    "bn": "সব ফসল",
+    "en": "Any crop"
+  },
+  "admin.cases.filters.decisionPath.label": {
+    "bn": "সিদ্ধান্তের পথ",
+    "en": "Decision path"
+  },
+  "admin.cases.filters.decisionPath.any": {
+    "bn": "সব পথ",
+    "en": "Any path"
+  },
+  "admin.cases.filters.resubmission.label": {
+    "bn": "পুনরায় জমা",
+    "en": "Resubmission"
+  },
+  "admin.cases.filters.resubmission.any": {
+    "bn": "সব কেস",
+    "en": "Any case"
+  },
+  "admin.cases.filters.resubmission.yes": {
+    "bn": "শুধু পুনরায় জমা",
+    "en": "Resubmissions only"
+  },
+  "admin.cases.filters.resubmission.no": {
+    "bn": "শুধু প্রথমবার",
+    "en": "First submissions only"
+  },
+  "admin.cases.column.officer": {
+    "bn": "অফিসার",
+    "en": "Officer"
+  },
+  "admin.cases.column.due": {
+    "bn": "সময়সীমা",
+    "en": "Due"
+  },
   "admin.cases.select.disabled": {
-    "bn": "শুধু বিচারাধীন বা দায়িত্বে নেওয়া কেস বাছাই করা যায়।",
+    "bn": "শুধু বিচারাধীন বা দায়িত্বে নেওয়া কেস নির্বাচন করা যায়।",
     "en": "Only pending or claimed cases can be selected."
   },
-
-  "admin.cases.empty.title": { "bn": "কোনো কেস মেলেনি", "en": "No cases match" },
+  "admin.cases.empty.title": {
+    "bn": "কোনো কেস মেলেনি",
+    "en": "No cases match"
+  },
   "admin.cases.empty.detail": {
-    "bn": "সার্ভার খুঁজে দেখেছে, এই ছাঁকনিতে কিছুই পায়নি। এটি গোনা ফল, তথ্যের অভাব নয়।",
+    "bn": "সার্ভার অনুসন্ধান করে এই ফিল্টারে কিছুই পায়নি। এটি যাচাই করা ফলাফল — তথ্য অনুপস্থিত নয়।",
     "en": "The server looked and found nothing under this filter. That is a counted result, not missing data."
   },
-  "admin.cases.notLoaded.title": { "bn": "এখনও কিছু আসেনি", "en": "Nothing loaded yet" },
+  "admin.cases.notLoaded.title": {
+    "bn": "এখনও কিছু আসেনি",
+    "en": "Nothing loaded yet"
+  },
   "admin.cases.notLoaded.detail": {
     "bn": "কেসের তালিকা আনতে উপরের হালনাগাদ চাপুন।",
     "en": "Press refresh above to fetch the case list."
   },
   "admin.cases.staleDetail": {
-    "bn": "শেষ চেষ্টা ব্যর্থ হয়েছে। নিচের সারিগুলো সবশেষ সফলভাবে আনা পাতা — এখনকার নয়।",
+    "bn": "সর্বশেষ চেষ্টাটি ব্যর্থ হয়েছে। নিচের তালিকাটি আগের সফল হালনাগাদের, বর্তমান নয়।",
     "en": "The last attempt failed. The rows below are the last page that loaded successfully, not the current one."
   },
-
   "admin.cases.bulk.claimedWarning": {
-    "bn": "বাছাই করা কিছু কেস আগেই একজন অফিসার দায়িত্বে নিয়েছেন। সেই দায়িত্ব বহাল থাকলে ওই কেসের প্রত্যাখ্যান ব্যর্থ হতে পারে।",
+    "bn": "নির্বাচিত কিছু কেস ইতিমধ্যে একজন অফিসারের দায়িত্বে রয়েছে। সেই দায়িত্ব বহাল থাকলে ওই কেসগুলোর প্রত্যাখ্যান ব্যর্থ হতে পারে।",
     "en": "Some of the selected cases are already claimed by an officer. Rejecting one may fail if another officer still holds the claim."
   },
-
   "admin.landscape.aria": {
-    "bn": "রাউটিং সীমা: নিম্ন {{low}}, উচ্চ {{high}}। আনা {{rows}}টি সারির মধ্যে {{scored}}টিতে মডেলের নিশ্চয়তার মান আছে।",
+    "bn": "রাউটিং সীমা: নিম্ন {{low}}, উচ্চ {{high}}। আনা {{rows}}টি রেকর্ডের মধ্যে {{scored}}টিতে মডেলের নিশ্চয়তার মান রয়েছে।",
     "en": "Routing thresholds: low {{low}}, high {{high}}. Of {{rows}} rows loaded, {{scored}} carry a model confidence."
   },
   "admin.landscape.sample": {
-    "bn": "মোট {{total}}টির মধ্যে {{rows}}টি সারি আনা হয়েছে",
+    "bn": "মোট {{total}}টির মধ্যে {{rows}}টি রেকর্ড আনা হয়েছে",
     "en": "{{rows}} of {{total}} rows loaded"
   },
   "admin.landscape.peak": {
-    "bn": "সবচেয়ে ঘন ভাগ {{from}}–{{to}}, {{count}}টি কেস",
+    "bn": "সর্বাধিক ঘনত্ব {{from}}–{{to}} সীমায়, {{count}}টি কেস",
     "en": "Fullest bin {{from}}–{{to}}, {{count}} cases"
   },
   "admin.landscape.unscored": {
@@ -197,7 +316,7 @@
     "en": "{{count}} rows carry no confidence"
   },
   "admin.landscape.unavailable": {
-    "bn": "পর্যালোচনার সারি আনা যায়নি, তাই এখানে কেবল সীমা দুটি দেখানো হচ্ছে",
+    "bn": "পর্যালোচনার কিউ আনা যায়নি, তাই এখানে কেবল সীমা দুটি দেখানো হচ্ছে",
     "en": "The review queue could not be loaded, so only the thresholds are drawn here"
   },
   "admin.landscape.noRows": {
@@ -205,23 +324,31 @@
     "en": "The page loaded holds no rows"
   },
   "admin.landscape.noConfidence": {
-    "bn": "{{count}}টি সারির একটিতেও মডেলের নিশ্চয়তার মান নেই",
+    "bn": "আনা {{count}}টি রেকর্ডের কোনোটিতেই মডেলের নিশ্চয়তার মান নেই",
     "en": "Not one of the {{count}} rows carries a model confidence"
   },
-  "admin.landscape.bandCount": { "bn": "{{count}}টি কেস", "en": "{{count}} cases" },
-  "admin.landscape.bandCountUnknown": { "bn": "সংখ্যা অজানা", "en": "Count unknown" },
+  "admin.landscape.bandCount": {
+    "bn": "{{count}}টি কেস",
+    "en": "{{count}} cases"
+  },
+  "admin.landscape.bandCountUnknown": {
+    "bn": "সংখ্যা অজানা",
+    "en": "Count unknown"
+  },
   "admin.landscape.unrouted": {
-    "bn": "{{count}}টি সারির জন্য সার্ভার কোনো পথ পাঠায়নি",
+    "bn": "{{count}}টি রেকর্ডের জন্য সার্ভার কোনো রাউটিং পথ পাঠায়নি",
     "en": "The server sent no path for {{count}} rows"
   },
-
-  "admin.cadence.title": { "bn": "জমা পড়ার ধারা", "en": "Submission cadence" },
+  "admin.cadence.title": {
+    "bn": "জমা পড়ার ধারা",
+    "en": "Submission cadence"
+  },
   "admin.cadence.subtitle": {
-    "bn": "আনা সারিগুলো যে সময়জুড়ে জমা পড়েছে, ঠিক সেটুকু সময়ই ভাগ করা হয়েছে।",
+    "bn": "আনা রেকর্ডগুলো যে সময়জুড়ে জমা পড়েছে, ঠিক সেটুকু সময়ই ভাগ করে দেখানো হয়েছে।",
     "en": "Bucketed across exactly the window the loaded rows were submitted in."
   },
   "admin.cadence.summary": {
-    "bn": "মোট {{total}}টির মধ্যে {{rows}}টি সারি আনা হয়েছে, তার {{counted}}টিতে জমা দেওয়ার সময় আছে",
+    "bn": "মোট {{total}}টির মধ্যে {{rows}}টি রেকর্ড আনা হয়েছে, যার {{counted}}টিতে জমার সময় রয়েছে",
     "en": "{{rows}} of {{total}} rows loaded, {{counted}} with a submission time"
   },
   "admin.cadence.window": {
@@ -237,37 +364,65 @@
     "en": "Not enough timestamps to draw a line"
   },
   "admin.cadence.ordering": {
-    "bn": "পর্যালোচনার সারি এখন সবচেয়ে নতুন জমা আগে পাঠায়, তাই এই নমুনায় কেবল সাম্প্রতিক কেসগুলোই আছে — এটি গোটা সিস্টেমের জমা পড়ার হার নয়।",
+    "bn": "পর্যালোচনার কিউ এখন সর্বশেষ জমা আগে পাঠায়, তাই এই নমুনায় কেবল সাম্প্রতিক কেসগুলোই রয়েছে — এটি সামগ্রিক জমার হার নয়।",
     "en": "The review queue now returns the newest submissions first, so this sample holds only the most recent cases — it is not the system's submission rate."
   },
   "admin.cadence.aria": {
-    "bn": "জমা পড়ার ধারা: {{total}}টির মধ্যে {{rows}}টি সারি, তার {{counted}}টিতে সময় আছে, {{from}} থেকে {{to}}।",
+    "bn": "জমার ধারা: {{total}}টির মধ্যে {{rows}}টি রেকর্ড, যার {{counted}}টিতে সময় রয়েছে, {{from}} থেকে {{to}} পর্যন্ত।",
     "en": "Submission cadence: {{rows}} of {{total}} rows, {{counted}} with a time, {{from}} to {{to}}."
   },
-
-  "admin.sla.title": { "bn": "সময়সীমার হিসাব", "en": "SLA runway" },
+  "admin.sla.title": {
+    "bn": "সময়সীমার হিসাব",
+    "en": "SLA runway"
+  },
   "admin.sla.subtitle": {
-    "bn": "আনা প্রতিটি পর্যালোচনার কাজ তার নিজের সময়সীমার সাপেক্ষে।",
+    "bn": "আনা প্রতিটি পর্যালোচনার কাজ তার নিজস্ব সময়সীমার সাপেক্ষে।",
     "en": "Each loaded review task against its own due time."
   },
-  "admin.sla.asOf": { "bn": "{{time}} পর্যন্ত হিসাব", "en": "As of {{time}}" },
-  "admin.sla.noRows": { "bn": "হিসাব করার মতো কোনো সারি নেই", "en": "No rows to measure" },
-  "admin.sla.band.overdue": { "bn": "সময় পেরিয়ে গেছে", "en": "Overdue" },
-  "admin.sla.band.dueSoon": { "bn": "শীঘ্রই সময় শেষ", "en": "Due soon" },
-  "admin.sla.band.onTime": { "bn": "সময়ের মধ্যে", "en": "On time" },
-  "admin.sla.band.unknown": { "bn": "সময়সীমা জানা নেই", "en": "No due time" },
+  "admin.sla.asOf": {
+    "bn": "{{time}} পর্যন্ত হিসাব",
+    "en": "As of {{time}}"
+  },
+  "admin.sla.noRows": {
+    "bn": "হিসাব করার মতো কোনো সারি নেই",
+    "en": "No rows to measure"
+  },
+  "admin.sla.band.overdue": {
+    "bn": "সময় পেরিয়ে গেছে",
+    "en": "Overdue"
+  },
+  "admin.sla.band.dueSoon": {
+    "bn": "শীঘ্রই সময় শেষ",
+    "en": "Due soon"
+  },
+  "admin.sla.band.onTime": {
+    "bn": "সময়ের মধ্যে",
+    "en": "On time"
+  },
+  "admin.sla.band.unknown": {
+    "bn": "সময়সীমা জানা নেই",
+    "en": "No due time"
+  },
   "admin.sla.aria": {
-    "bn": "সময়সীমার হিসাব: {{overdue}}টির সময় পেরিয়ে গেছে, {{dueSoon}}টির শীঘ্রই শেষ, {{onTime}}টি সময়ের মধ্যে — {{asOf}} পর্যন্ত হিসাব।",
+    "bn": "সময়সীমার হিসাব: {{overdue}}টি অতিক্রান্ত, {{dueSoon}}টির সময় প্রায় শেষ, {{onTime}}টি সময়ের মধ্যে — {{asOf}} পর্যন্ত।",
     "en": "SLA runway: {{overdue}} overdue, {{dueSoon}} due soon, {{onTime}} on time — as of {{asOf}}."
   },
-
-  "admin.composition.title": { "bn": "সারিতে কী আছে", "en": "Queue composition" },
+  "admin.composition.title": {
+    "bn": "সারিতে কী আছে",
+    "en": "Queue composition"
+  },
   "admin.composition.subtitle": {
     "bn": "আনা {{rows}}টি সারির অবস্থা ও বিশ্লেষণের ধরন।",
     "en": "State and analysis mode of the {{rows}} rows loaded."
   },
-  "admin.composition.states": { "bn": "অবস্থা", "en": "State" },
-  "admin.composition.modes": { "bn": "বিশ্লেষণের ধরন", "en": "Analysis mode" },
+  "admin.composition.states": {
+    "bn": "অবস্থা",
+    "en": "State"
+  },
+  "admin.composition.modes": {
+    "bn": "বিশ্লেষণের ধরন",
+    "en": "Analysis mode"
+  },
   "admin.composition.statesAria": {
     "bn": "আনা {{rows}}টি সারির অবস্থার মিশ্রণ",
     "en": "State mix of the {{rows}} rows loaded"
@@ -277,54 +432,71 @@
     "en": "Analysis-mode mix of the {{rows}} rows loaded"
   },
   "admin.composition.modeUnknown": {
-    "bn": "{{count}}টি সারির জন্য সার্ভার বিশ্লেষণের ধরন পাঠায়নি",
+    "bn": "{{count}}টি রেকর্ডের জন্য সার্ভার বিশ্লেষণের ধরন পাঠায়নি",
     "en": "The server sent no analysis mode for {{count}} rows"
   },
   "admin.composition.noRows": {
     "bn": "আনা পাতায় কোনো সারি নেই",
     "en": "The page loaded holds no rows"
   },
-
-  "admin.kpi.backToStats": { "bn": "ড্যাশবোর্ডে ফিরুন", "en": "Back to the dashboard" },
-  "admin.kpi.title": { "bn": "কেপিআই ব্যর্থতা", "en": "KPI failures" },
+  "admin.kpi.backToStats": {
+    "bn": "ড্যাশবোর্ডে ফিরুন",
+    "en": "Back to the dashboard"
+  },
+  "admin.kpi.title": {
+    "bn": "KPI ব্যর্থতা",
+    "en": "KPI failures"
+  },
   "admin.kpi.subtitle": {
-    "bn": "সময়সীমা পেরোনো কেসগুলো দুই ভাগে — জেলার নিজস্ব ব্যর্থতা, আর অফিসারের নিজের ব্যর্থতা।",
+    "bn": "সময়সীমা অতিক্রম করা কেস দুই ভাগে — জেলার সম্মিলিত ব্যর্থতা এবং অফিসারের নিজস্ব ব্যর্থতা।",
     "en": "Missed deadlines, split two ways: the district's own failures, and an officer's own."
   },
   "admin.kpi.refreshAria": {
-    "bn": "কেপিআই সংখ্যাগুলো সার্ভার থেকে আবার আনুন",
+    "bn": "KPI সংখ্যাগুলো সার্ভার থেকে আবার আনুন",
     "en": "Fetch the KPI figures from the server again"
   },
   "admin.kpi.allClear": {
-    "bn": "সার্ভার গুনে দেখেছে, এই জেলায় কোনো ব্যর্থতা নেই। এটি গোনা ফল, তথ্যের অভাব নয়।",
+    "bn": "সার্ভার গণনা করে দেখেছে, এই জেলায় কোনো ব্যর্থতা নেই। এটি যাচাই করা ফলাফল — তথ্য অনুপস্থিত নয়।",
     "en": "The server counted, and this district has no failures. That is a counted result, not missing data."
   },
-  "admin.kpi.empty.title": { "bn": "এখনও কোনো কেপিআই তথ্য আসেনি", "en": "No KPI figures loaded" },
+  "admin.kpi.empty.title": {
+    "bn": "এখনও কোনো KPI তথ্য আসেনি",
+    "en": "No KPI figures loaded"
+  },
   "admin.kpi.empty.detail": {
     "bn": "সার্ভার থেকে সংখ্যাগুলো আনতে হালনাগাদ চাপুন।",
     "en": "Press refresh to fetch the figures from the server."
   },
   "admin.kpi.footnote": {
-    "bn": "সব সংখ্যা কেবল আপনার জেলার — সার্ভার আপনার পরিচয়পত্র থেকেই জেলা পড়ে নেয়, তাই এখান থেকে কোনো জেলা পাঠানো হয় না।",
+    "bn": "সব সংখ্যা কেবল আপনার জেলার। সার্ভার আপনার লগইন তথ্য থেকেই জেলা শনাক্ত করে, তাই ক্লায়েন্ট থেকে কোনো জেলা পাঠানো হয় না।",
     "en": "Every figure is your district only — the server reads the district from your token, so no district is ever sent from here."
   },
-
-  "admin.kpi.tile.notLoaded": { "bn": "সংখ্যাটি আসেনি", "en": "Figure not loaded" },
+  "admin.kpi.tile.notLoaded": {
+    "bn": "সংখ্যাটি আসেনি",
+    "en": "Figure not loaded"
+  },
   "admin.kpi.tile.counted": {
-    "bn": "গোনা সংখ্যা — এখানে শূন্য মানে কোনো ব্যর্থতা নেই, তথ্যের অভাব নয়",
+    "bn": "গণনাকৃত সংখ্যা — এখানে শূন্য মানে কোনো ব্যর্থতা নেই, তথ্যের অভাব নয়",
     "en": "A counted figure — a zero here means none, not missing data"
   },
-  "admin.kpi.tile.drillDown": { "bn": "সারিগুলো দেখুন", "en": "See the rows" },
-
-  "admin.kpi.summary.totalLabel": { "bn": "মোট সময়সীমা পেরোনো", "en": "Total missed deadlines" },
+  "admin.kpi.tile.drillDown": {
+    "bn": "সারিগুলো দেখুন",
+    "en": "See the rows"
+  },
+  "admin.kpi.summary.totalLabel": {
+    "bn": "মোট সময়সীমা পেরোনো",
+    "en": "Total missed deadlines"
+  },
   "admin.kpi.summary.totalHint": {
-    "bn": "জেলা ও অফিসারের ব্যর্থতা একত্রে — দুটি সংখ্যাই নিচে আলাদা করে ব্যাখ্যা করা আছে।",
+    "bn": "জেলা ও অফিসারের ব্যর্থতার সমষ্টি — দুটি সংখ্যাই নিচে আলাদাভাবে ব্যাখ্যা করা হয়েছে।",
     "en": "District and officer failures, combined — each is explained separately below."
   },
-
-  "admin.kpi.district.title": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
+  "admin.kpi.district.title": {
+    "bn": "জেলার ব্যর্থতা",
+    "en": "District failures"
+  },
   "admin.kpi.district.detail": {
-    "bn": "কেসটি তখনও সবার সাধারণ তালিকায় ছিল, কেউ সেটি নিজের দায়িত্বে নেননি। তাই এই ব্যর্থতা কোনো একজন মানুষের নয়, পুরো জেলার — এবং এটি কারও নামে ভাগ করা হয় না।",
+    "bn": "কেসটি তখনো সাধারণ কিউতে ছিল, কেউ দায়িত্ব নেননি। তাই এই ব্যর্থতা কোনো একজন অফিসারের নয়, সমগ্র জেলার — এবং এটি কারও নামে গণনা করা হয় না।",
     "en": "The case was still in the shared pool and nobody had claimed it, so this failure belongs to the district rather than to any one person — and it is never divided among people."
   },
   "admin.kpi.assignment.label": {
@@ -336,13 +508,15 @@
     "en": "District total — no officer attached"
   },
   "admin.kpi.assignment.hint": {
-    "bn": "সাধারণ তালিকা থেকে কেউ কেসটি সময়মতো নিজের দায়িত্বে নেননি।",
+    "bn": "সাধারণ কিউ থেকে কেউ কেসটি সময়মতো দায়িত্বে নেননি।",
     "en": "Nobody claimed the case from the shared pool in time."
   },
-
-  "admin.kpi.personal.title": { "bn": "অফিসারভিত্তিক ব্যর্থতা", "en": "Failures by officer" },
+  "admin.kpi.personal.title": {
+    "bn": "অফিসারভিত্তিক ব্যর্থতা",
+    "en": "Failures by officer"
+  },
   "admin.kpi.personal.detail": {
-    "bn": "এই সংখ্যাগুলো সেই কেসের, যেগুলো একজন অফিসার নিজের দায়িত্বে নিয়েছিলেন কিন্তু সময়সীমার মধ্যে শেষ করেননি। কেবল এগুলোই কারও নামের পাশে বসতে পারে।",
+    "bn": "এই সংখ্যাগুলো সেসব কেসের, যেগুলো একজন অফিসার দায়িত্বে নিয়েছিলেন কিন্তু সময়সীমার মধ্যে সম্পন্ন করেননি। কেবল এগুলোই কারও নামের পাশে বসতে পারে।",
     "en": "These are cases an officer had claimed and did not finish inside the deadline. They are the only figures that may sit beside a person's name."
   },
   "admin.kpi.resolution.label": {
@@ -354,111 +528,175 @@
     "en": "District total — broken down by officer below"
   },
   "admin.kpi.resolution.hint": {
-    "bn": "অফিসার কেসটি নিজের দায়িত্বে নিয়েছিলেন, কিন্তু সময়সীমার মধ্যে শেষ করেননি।",
+    "bn": "অফিসার কেসটি দায়িত্বে নিয়েছিলেন, কিন্তু সময়সীমার মধ্যে সম্পন্ন করেননি।",
     "en": "The officer had claimed the case but did not finish it inside the deadline."
   },
-
   "admin.kpi.officers.title": {
     "bn": "অফিসারভিত্তিক নিষ্পত্তি-ব্যর্থতা",
     "en": "Resolution failures per officer"
   },
   "admin.kpi.officers.subtitle": {
-    "bn": "শুধু নিষ্পত্তির ব্যর্থতা — অর্থাৎ যে কেস অফিসার নিজের দায়িত্বে নিয়েছিলেন। দায়িত্ব নেওয়ার ব্যর্থতা এখানে নেই, কারণ তখন কেসটি কারও দায়িত্বে ছিল না।",
+    "bn": "শুধু নিষ্পত্তির ব্যর্থতা — অর্থাৎ যেসব কেস অফিসার দায়িত্বে নিয়েছিলেন। দায়িত্ব গ্রহণের ব্যর্থতা এখানে নেই, কারণ তখন কেসটি কারও দায়িত্বে ছিল না।",
     "en": "Resolution failures only — cases the officer had claimed. Assignment failures are not here, because nobody held the case then."
   },
   "admin.kpi.officers.aria": {
-    "bn": "{{officers}} জন অফিসারের নিষ্পত্তি-ব্যর্থতা; সবচেয়ে বেশি {{topOfficer}} — {{topCount}}টি",
+    "bn": "{{officers}} জন অফিসারের নিষ্পত্তি ব্যর্থতা; সর্বাধিক {{topOfficer}} — {{topCount}}টি",
     "en": "Resolution failures for {{officers}} officers; the most is {{topOfficer}} with {{topCount}}"
   },
   "admin.kpi.officers.barAria": {
     "bn": "{{officer}} — {{count}}টি নিষ্পত্তি-ব্যর্থতা",
     "en": "{{officer}} — {{count}} resolution failures"
   },
-  "admin.kpi.officers.unnamed": { "bn": "সার্ভার নাম পাঠায়নি", "en": "The server sent no name" },
-  "admin.kpi.officers.drillDown": { "bn": "সারিগুলো দেখুন", "en": "See the rows" },
+  "admin.kpi.officers.unnamed": {
+    "bn": "সার্ভার নাম পাঠায়নি",
+    "en": "The server sent no name"
+  },
+  "admin.kpi.officers.drillDown": {
+    "bn": "সারিগুলো দেখুন",
+    "en": "See the rows"
+  },
   "admin.kpi.officers.unattributed": {
-    "bn": "আরও {{count}}টি নিষ্পত্তি-ব্যর্থতার সঙ্গে সার্ভার কোনো অফিসার যুক্ত করেনি। সেগুলো কারও হিসাবে যোগ করা হয়নি।",
+    "bn": "আরও {{count}}টি নিষ্পত্তি ব্যর্থতার সঙ্গে সার্ভার কোনো অফিসার যুক্ত করেনি। সেগুলো কারও হিসাবে যোগ করা হয়নি।",
     "en": "The server attached no officer to {{count}} further resolution failures. They are not added to anybody's count."
   },
   "admin.kpi.officers.none": {
-    "bn": "সার্ভার গুনে দেখেছে, কোনো অফিসারের নামে নিষ্পত্তি-ব্যর্থতা নেই।",
+    "bn": "সার্ভার গণনা করে দেখেছে, কোনো অফিসারের নামে নিষ্পত্তি ব্যর্থতা নেই।",
     "en": "The server counted, and no officer has a resolution failure."
   },
   "admin.kpi.officers.notLoaded": {
     "bn": "অফিসারভিত্তিক ভাগ এখনও আসেনি।",
     "en": "The per-officer breakdown has not loaded."
   },
-
-  "admin.kpi.breaches.back": { "bn": "কেপিআই সারসংক্ষেপে ফিরুন", "en": "Back to the KPI summary" },
-  "admin.kpi.breaches.title": { "bn": "সময়সীমা পেরোনো কেস", "en": "Missed deadlines" },
+  "admin.kpi.breaches.back": {
+    "bn": "KPI সারসংক্ষেপে ফিরুন",
+    "en": "Back to the KPI summary"
+  },
+  "admin.kpi.breaches.title": {
+    "bn": "সময়সীমা পেরোনো কেস",
+    "en": "Missed deadlines"
+  },
   "admin.kpi.breaches.subtitle": {
-    "bn": "প্রতিটি সারি একটি কেস, যার সময়সীমা পেরিয়ে গিয়েছিল।",
+    "bn": "প্রতিটি সারি একটি কেস, যার সময়সীমা অতিক্রান্ত হয়েছে।",
     "en": "One row per case whose deadline passed."
   },
   "admin.kpi.breaches.refreshAria": {
     "bn": "সারিগুলো সার্ভার থেকে আবার আনুন",
     "en": "Fetch the rows from the server again"
   },
-  "admin.kpi.breaches.filterLabel": { "bn": "ধরন অনুযায়ী ছাঁকুন", "en": "Filter by kind" },
-  "admin.kpi.breaches.filter.all": { "bn": "সব", "en": "All" },
-  "admin.kpi.breaches.filter.ASSIGNMENT": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
-  "admin.kpi.breaches.filter.RESOLUTION": { "bn": "অফিসারের ব্যর্থতা", "en": "Officer failures" },
+  "admin.kpi.breaches.filterLabel": {
+    "bn": "ধরন অনুযায়ী ফিল্টার",
+    "en": "Filter by kind"
+  },
+  "admin.kpi.breaches.filter.all": {
+    "bn": "সব",
+    "en": "All"
+  },
+  "admin.kpi.breaches.filter.ASSIGNMENT": {
+    "bn": "জেলার ব্যর্থতা",
+    "en": "District failures"
+  },
+  "admin.kpi.breaches.filter.RESOLUTION": {
+    "bn": "অফিসারের ব্যর্থতা",
+    "en": "Officer failures"
+  },
   "admin.kpi.breaches.officerFilter": {
     "bn": "শুধু {{officer}}-এর সারিগুলো দেখানো হচ্ছে",
     "en": "Showing only the rows for {{officer}}"
   },
   "admin.kpi.breaches.officerFilterNote": {
-    "bn": "একজন অফিসারের সঙ্গে কেবল নিষ্পত্তির ব্যর্থতাই যুক্ত থাকতে পারে, তাই এখানে দায়িত্ব নেওয়ার ব্যর্থতা দেখানো হয় না।",
+    "bn": "একজন অফিসারের সঙ্গে কেবল নিষ্পত্তির ব্যর্থতাই যুক্ত থাকতে পারে, তাই এখানে দায়িত্ব গ্রহণের ব্যর্থতা দেখানো হয় না।",
     "en": "Only resolution failures can belong to an officer, so no assignment failures are shown here."
   },
-  "admin.kpi.breaches.clearOfficer": { "bn": "ছাঁকনি সরান", "en": "Clear the filter" },
+  "admin.kpi.breaches.clearOfficer": {
+    "bn": "ফিল্টার সরান",
+    "en": "Clear the filter"
+  },
   "admin.kpi.breaches.staleDetail": {
-    "bn": "শেষ চেষ্টা ব্যর্থ হয়েছে। নিচের সারিগুলো সবশেষ সফলভাবে আনা পাতা — এখনকার নয়।",
+    "bn": "সর্বশেষ চেষ্টাটি ব্যর্থ হয়েছে। নিচের তালিকাটি আগের সফল হালনাগাদের, বর্তমান নয়।",
     "en": "The last attempt failed. The rows below are the last page that loaded successfully, not the current one."
   },
-  "admin.kpi.breaches.none.title": { "bn": "কোনো সারি নেই", "en": "No rows" },
+  "admin.kpi.breaches.none.title": {
+    "bn": "কোনো সারি নেই",
+    "en": "No rows"
+  },
   "admin.kpi.breaches.none.detail": {
-    "bn": "সার্ভার খুঁজে দেখেছে, এই ছাঁকনিতে কিছুই পায়নি। এটি গোনা ফল, তথ্যের অভাব নয়।",
+    "bn": "সার্ভার অনুসন্ধান করে এই ফিল্টারে কিছুই পায়নি। এটি যাচাই করা ফলাফল — তথ্য অনুপস্থিত নয়।",
     "en": "The server looked and found nothing under this filter. That is a counted result, not missing data."
   },
-  "admin.kpi.breaches.notLoaded.title": { "bn": "এখনও কিছু আসেনি", "en": "Nothing loaded yet" },
+  "admin.kpi.breaches.notLoaded.title": {
+    "bn": "এখনও কিছু আসেনি",
+    "en": "Nothing loaded yet"
+  },
   "admin.kpi.breaches.notLoaded.detail": {
     "bn": "সার্ভার থেকে সারিগুলো আনতে হালনাগাদ চাপুন।",
     "en": "Press refresh to fetch the rows from the server."
   },
-  "admin.kpi.breaches.assignment.title": { "bn": "জেলার ব্যর্থতা", "en": "District failures" },
+  "admin.kpi.breaches.assignment.title": {
+    "bn": "জেলার ব্যর্থতা",
+    "en": "District failures"
+  },
   "admin.kpi.breaches.assignment.detail": {
-    "bn": "এই কেসগুলো তখনও সাধারণ তালিকায় ছিল, কেউ সেগুলো নিজের দায়িত্বে নেননি। তাই এই ছকে অফিসারের ঘর নেই।",
+    "bn": "এই কেসগুলো তখনো সাধারণ কিউতে ছিল, কেউ দায়িত্ব নেননি। তাই এই টেবিলে অফিসারের কলাম নেই।",
     "en": "These cases were still in the shared pool and nobody had claimed them, so this table has no officer column."
   },
   "admin.kpi.breaches.assignment.caption": {
-    "bn": "জেলার ব্যর্থতা: কৃষক, ফসল, সময়সীমা এবং কখন পেরিয়েছে",
+    "bn": "জেলার ব্যর্থতা: কৃষক, ফসল, সময়সীমা ও অতিক্রমের সময়",
     "en": "District failures: farmer, crop, deadline and when it passed"
   },
-  "admin.kpi.breaches.resolution.title": { "bn": "অফিসারের ব্যর্থতা", "en": "Officer failures" },
+  "admin.kpi.breaches.resolution.title": {
+    "bn": "অফিসারের ব্যর্থতা",
+    "en": "Officer failures"
+  },
   "admin.kpi.breaches.resolution.detail": {
-    "bn": "সময়সীমা পেরোনোর সময় কেসটি যে অফিসারের দায়িত্বে ছিল, এখানে তাঁর নাম দেখানো হয়েছে।",
+    "bn": "সময়সীমা অতিক্রমের সময় কেসটি যে অফিসারের দায়িত্বে ছিল, এখানে তাঁর নাম দেখানো হয়েছে।",
     "en": "The officer who held the claim when the deadline passed is named here."
   },
   "admin.kpi.breaches.resolution.caption": {
-    "bn": "অফিসারের ব্যর্থতা: অফিসার, কৃষক, ফসল, সময়সীমা এবং কখন পেরিয়েছে",
+    "bn": "অফিসারের ব্যর্থতা: অফিসার, কৃষক, ফসল, সময়সীমা ও অতিক্রমের সময়",
     "en": "Officer failures: officer, farmer, crop, deadline and when it passed"
   },
-  "admin.kpi.breaches.column.officer": { "bn": "অফিসার", "en": "Officer" },
-  "admin.kpi.breaches.column.farmer": { "bn": "কৃষক", "en": "Farmer" },
-  "admin.kpi.breaches.column.crop": { "bn": "ফসল", "en": "Crop" },
-  "admin.kpi.breaches.column.dueAt": { "bn": "সময়সীমা", "en": "Deadline" },
-  "admin.kpi.breaches.column.breachedAt": { "bn": "পেরিয়েছে", "en": "Passed" },
-  "admin.kpi.breaches.noFarmerName": { "bn": "নাম আসেনি", "en": "No name sent" },
-  "admin.kpi.breaches.noTime": { "bn": "সময় আসেনি", "en": "No time sent" },
-  "admin.kpi.breaches.officerUnnamed": { "bn": "নাম আসেনি", "en": "No name sent" },
+  "admin.kpi.breaches.column.officer": {
+    "bn": "অফিসার",
+    "en": "Officer"
+  },
+  "admin.kpi.breaches.column.farmer": {
+    "bn": "কৃষক",
+    "en": "Farmer"
+  },
+  "admin.kpi.breaches.column.crop": {
+    "bn": "ফসল",
+    "en": "Crop"
+  },
+  "admin.kpi.breaches.column.dueAt": {
+    "bn": "সময়সীমা",
+    "en": "Deadline"
+  },
+  "admin.kpi.breaches.column.breachedAt": {
+    "bn": "পেরিয়েছে",
+    "en": "Passed"
+  },
+  "admin.kpi.breaches.noFarmerName": {
+    "bn": "নাম আসেনি",
+    "en": "No name sent"
+  },
+  "admin.kpi.breaches.noTime": {
+    "bn": "সময় আসেনি",
+    "en": "No time sent"
+  },
+  "admin.kpi.breaches.officerUnnamed": {
+    "bn": "নাম আসেনি",
+    "en": "No name sent"
+  },
   "admin.kpi.breaches.officerMissing": {
     "bn": "সার্ভার এই সারির সঙ্গে কোনো অফিসার যুক্ত করেনি",
     "en": "The server attached no officer to this row"
   },
-  "admin.kpi.breaches.column.open": { "bn": "কেসটি খুলুন", "en": "Open the case" },
+  "admin.kpi.breaches.column.open": {
+    "bn": "কেসটি খুলুন",
+    "en": "Open the case"
+  },
   "admin.kpi.breaches.openNote": {
-    "bn": "কেসটি খুললে কনসোল সেটি দেখাবে। কাজটি আর না থাকলে কনসোল স্বাভাবিকভাবেই “পাওয়া যায়নি” বলবে।",
+    "bn": "কেসটি খুললে কনসোলে সেটি দেখা যাবে। কাজটি আর না থাকলে কনসোল স্বাভাবিকভাবেই “পাওয়া যায়নি” জানাবে।",
     "en": "Opening a case shows it in the console. If the task no longer exists, the console simply says it was not found."
   }
 }
