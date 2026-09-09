@@ -200,11 +200,25 @@ import { OfficerFailureChart } from './officer-failure-chart';
       <!-- The two halves, side by side once there is room for it — a narrow district column next
            to the wider officer breakdown, so the page uses the console's full width instead of
            stacking two half-width-looking blocks down a single left-hand column. -->
-      <div class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] xl:items-start">
+      <!--
+        A row subgrid is what keeps the two halves in step. Each section spans the same three
+        rows — heading, intro, figures — so the intro paragraphs share a row and the taller one
+        sets its height for both. Before this the sections were independent block flows, and
+        because the district intro wraps to more lines in a 24rem column than the officer intro
+        does in a wide one, the two tiles started at different heights. A zero row gap at xl
+        hands the vertical rhythm back to the margin utilities inside, so spacing is unchanged.
+      -->
+      <div
+        class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] xl:grid-rows-[auto_auto_1fr] xl:gap-y-0"
+      >
         <!-- ── The district half ─────────────────────────────────────────────────────────────
              An assignment breach has no owner, so it is never shown in a column beside a name.
              It gets its own section, headed by the district itself. -->
-        <section data-testid="district-section" aria-labelledby="kpi-district-heading">
+        <section
+          class="xl:grid xl:grid-rows-subgrid xl:row-span-3"
+          data-testid="district-section"
+          aria-labelledby="kpi-district-heading"
+        >
           <h2 id="kpi-district-heading" class="text-lg font-semibold text-ink">
             {{ 'admin.kpi.district.title' | translate }}
           </h2>
@@ -212,15 +226,17 @@ import { OfficerFailureChart } from './officer-failure-chart';
             {{ 'admin.kpi.district.detail' | translate }}
           </p>
 
-          <foshol-kpi-count-tile
-            class="mt-3"
-            kind="ASSIGNMENT"
-            labelKey="admin.kpi.assignment.label"
-            scopeKey="admin.kpi.assignment.scope"
-            hintKey="admin.kpi.assignment.hint"
-            [count]="kpis.assignmentFailures"
-            [stale]="store.stale()"
-          />
+          <div>
+            <foshol-kpi-count-tile
+              class="mt-3"
+              kind="ASSIGNMENT"
+              labelKey="admin.kpi.assignment.label"
+              scopeKey="admin.kpi.assignment.scope"
+              hintKey="admin.kpi.assignment.hint"
+              [count]="kpis.assignmentFailures"
+              [stale]="store.stale()"
+            />
+          </div>
         </section>
 
         <!-- ── The personal half ─────────────────────────────────────────────────────────────
@@ -228,7 +244,11 @@ import { OfficerFailureChart } from './officer-failure-chart';
              figures that may carry a name. The district total sits above the per-officer bars so
              the bars can be read against it — and any remainder the server named nobody for is
              stated as its own line rather than folded into somebody's bar. -->
-        <section data-testid="officer-section" aria-labelledby="kpi-officer-heading">
+        <section
+          class="xl:grid xl:grid-rows-subgrid xl:row-span-3"
+          data-testid="officer-section"
+          aria-labelledby="kpi-officer-heading"
+        >
           <h2 id="kpi-officer-heading" class="text-lg font-semibold text-ink">
             {{ 'admin.kpi.personal.title' | translate }}
           </h2>
@@ -236,23 +256,25 @@ import { OfficerFailureChart } from './officer-failure-chart';
             {{ 'admin.kpi.personal.detail' | translate }}
           </p>
 
-          <foshol-kpi-count-tile
-            class="mt-3"
-            kind="RESOLUTION"
-            labelKey="admin.kpi.resolution.label"
-            scopeKey="admin.kpi.resolution.scope"
-            hintKey="admin.kpi.resolution.hint"
-            [count]="kpis.resolutionFailures"
-            [stale]="store.stale()"
-          />
+          <div>
+            <foshol-kpi-count-tile
+              class="mt-3"
+              kind="RESOLUTION"
+              labelKey="admin.kpi.resolution.label"
+              scopeKey="admin.kpi.resolution.scope"
+              hintKey="admin.kpi.resolution.hint"
+              [count]="kpis.resolutionFailures"
+              [stale]="store.stale()"
+            />
 
-          <foshol-officer-failure-chart
-            class="card mt-4 p-5"
-            [officers]="kpis.officers"
-            [unattributed]="kpis.unattributedResolutionFailures"
-            [stale]="store.stale()"
-            [counted]="true"
-          />
+            <foshol-officer-failure-chart
+              class="card mt-4 p-5"
+              [officers]="kpis.officers"
+              [unattributed]="kpis.unattributedResolutionFailures"
+              [stale]="store.stale()"
+              [counted]="true"
+            />
+          </div>
         </section>
       </div>
     } @else if (store.loading()) {
