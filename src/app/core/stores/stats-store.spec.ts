@@ -4,6 +4,12 @@ import { StatsStore } from './stats-store';
 
 const STATS: AdminStats = {
   casesToday: 1,
+  // The four counters the schema marks required. Present so the fixture satisfies `AdminStats`
+  // rather than only the subset this spec reads.
+  casesThisMonth: 1,
+  casesThisYear: 1,
+  casesLifetime: 1,
+  agreementSampleSize: 1,
   approvalRate: 1,
   medianReviewSeconds: 42,
   modelOfficerAgreementRate: 1,
