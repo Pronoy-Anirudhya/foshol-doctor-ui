@@ -126,6 +126,10 @@
   background: var(--color-surface-0);
   padding: 0.85rem 1rem 1rem;
   box-shadow: var(--shadow-card);
+  /* The panel is itself a grid item in the two/three-column console layout, so it inherits the
+     same `min-width: auto` default its own contents do. Without this a wide child stretches the
+     panel over its neighbour instead of wrapping inside it. */
+  min-width: 0;
 }
 
 .panel-head {
@@ -167,9 +171,26 @@
 .model-meta {
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  /*
+   * `minmax(0, …)` rather than `minmax(9rem, …)`: a 9rem floor is a floor the track cannot go
+   * below even when the panel is narrower than the tracks it implies, and this panel sits in a
+   * half- or third-width console column (`xl:grid-cols-2` / `2xl:grid-cols-3`). Two tracks plus
+   * the column gap already exceeded that width, so the row spilled out of `.panel` and painted
+   * over the neighbouring column. The `auto-fit` behaviour is unchanged above the floor.
+   */
+  grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr));
   gap: 0.6rem 1.25rem;
   font-size: 0.8125rem;
+}
+
+/*
+ * A grid item defaults to `min-width: auto`, which means "never narrower than my longest
+ * unbreakable word". `visionModelId` is exactly that — `plantdoc-vit-b16-bn-2024.11` has no
+ * break opportunity — so without this the cell widened the whole track and pushed the row past
+ * the panel. `.id` supplies the wrap; this supplies permission to use it.
+ */
+.model-meta > div {
+  min-width: 0;
 }
 
 /* ── Decision ───────────────────────────────────────────────────────────────────────────── */
