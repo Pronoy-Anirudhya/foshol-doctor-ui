@@ -80,8 +80,8 @@
     "en": "Queue"
   },
   "shared.nav.OFFICER.farmers": {
-    "bn": "কৃষক",
-    "en": "Farmers"
+    "bn": "কৃষক নিবন্ধন",
+    "en": "Register Farmer"
   },
   "shared.nav.ADMIN.dashboard": {
     "bn": "ড্যাশবোর্ড",
@@ -96,8 +96,8 @@
     "en": "KPI failures"
   },
   "shared.nav.ADMIN.farmers": {
-    "bn": "কৃষক",
-    "en": "Farmers"
+    "bn": "কৃষক নিবন্ধন",
+    "en": "Register Farmer"
   },
   "shared.region.aria": {
     "bn": "আপনার নিবন্ধিত এলাকা",
