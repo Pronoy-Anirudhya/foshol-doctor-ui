@@ -115,8 +115,8 @@ const STEP_REVIEW = 'review';
     <div class="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 md:pt-10 xl:max-w-4xl">
       <foshol-back-link
         class="mb-4 block"
-        [to]="newCasePath"
-        labelKey="farmer.capture.backToCrop"
+        [to]="casesListPath"
+        labelKey="farmer.capture.backToCases"
       />
 
       <foshol-page-heading
@@ -292,8 +292,10 @@ const STEP_REVIEW = 'review';
     </div>
 
     <!-- Within thumb reach at 360 px, and out of the way of the note box's own keyboard. Send
-         lives here as well as on the review card, so it is available from every step the moment
-         the draft is submittable — the stepper guides, it does not gate. -->
+         unlocks on the review step and not before: a farmer who has not seen what is about to
+         be sent cannot meaningfully consent to sending it, and the earlier behaviour let a
+         half-finished draft go the moment it happened to satisfy the minimum. The rail still
+         reaches every step directly, so review is one tap away from anywhere. -->
     <div class="submit-bar">
       <!-- The confirm step lives above the row so the two buttons below never swap places
            under a thumb that is already moving towards one of them. -->
@@ -349,7 +351,7 @@ const STEP_REVIEW = 'review';
           type="button"
           class="submit touch-target"
           data-testid="capture-submit"
-          [disabled]="!canSubmit()"
+          [disabled]="!canSend()"
           (click)="submit()"
         >
           @if (draft.isSubmitting()) {
@@ -491,7 +493,7 @@ export class CapturePage {
 
   protected readonly draft = inject(CaseDraftStore);
 
-  protected readonly newCasePath = FARMER_PATHS.newCase;
+  protected readonly casesListPath = FARMER_PATHS.casesList;
   protected readonly acceptTypes = APP_CONFIG.intake.allowedImageTypes.join(',');
   protected readonly maxImages = APP_CONFIG.intake.maxImages;
   protected readonly minImages = APP_CONFIG.intake.minImages;
@@ -600,6 +602,19 @@ export class CapturePage {
 
   /** WEB-FR-101 — no crop, no submission; and nothing goes out while a pick is being judged. */
   protected readonly canSubmit = computed(() => this.draft.canSubmit() && !this.analysing());
+
+  /**
+   * Whether Send may be pressed *now* — the draft being valid AND the farmer standing on the
+   * review step.
+   *
+   * Kept separate from `canSubmit` on purpose: `canSubmit` answers "is this draft sendable",
+   * which is what the review card and the rail tick ask, while this answers "may it be sent
+   * from where we are". Folding the two together would light the review step's rail tick before
+   * the farmer ever reached it.
+   */
+  protected readonly canSend = computed(
+    () => this.canSubmit() && this._activeStepId() === STEP_REVIEW,
+  );
 
   /**
    * The area is called out once the farmer has a photograph in the draft, not on arrival: at
@@ -751,7 +766,7 @@ export class CapturePage {
   }
 
   protected async submit(): Promise<void> {
-    if (!this.canSubmit()) return;
+    if (!this.canSend()) return;
     // An armed confirmation is stale the moment the farmer commits to sending instead.
     this._confirmingCancel.set(false);
 
@@ -794,7 +809,14 @@ export class CapturePage {
       await this.router.navigateByUrl(FARMER_PATHS.caseStatus(accepted.caseId));
     } catch (caught: unknown) {
       this.draft.failSubmit();
-      this._problem.set(toProblemView(caught));
+      const problem = toProblemView(caught);
+      this._problem.set(problem);
+
+      // A 422 names the images it refused (`rejectedImages[].position`), and the marks it puts
+      // on them live on the photographs card. Send is pressed from the review step, so without
+      // this the farmer is told an image was rejected while looking at a screen that shows no
+      // images — the one place the answer is not. Take them to it (`WEB-FR-150`).
+      if (problem.rejectedImages.length > NO_SLOTS) this.showStep(STEP_PHOTOS);
     }
   }
 

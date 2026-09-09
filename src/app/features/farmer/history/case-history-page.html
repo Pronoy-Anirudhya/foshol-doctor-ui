@@ -2,8 +2,8 @@
      shell-relative box; above it, a box centred on `<main>` (via `cqw`, not `vw` — the shell's
      persistent nav is `main`'s sibling now, not part of it, so a viewport-relative centring
      trick would centre on the wrong box) that stops growing at 90rem (1440px) — self-centering
-     regardless of AppShell's own narrower cap, which this page deliberately overrides so the
-     case list can use the whole main column instead of a cramped single column. -->
+     regardless of AppShell's own narrower cap, which this page deliberately overrides so both
+     the case list AND an open case use the whole main column instead of a cramped single one. -->
 <div class="xl:w-[min(100cqw,90rem)] xl:mx-[calc(50%-min(50cqw,45rem))] xl:px-8">
   <div class="mb-6 flex flex-wrap items-end justify-between gap-4" [class.hidden]="detailOpen()">
     <div class="min-w-0">
@@ -77,10 +77,11 @@
     </select>
   </div>
 
-  <!-- WEB-UX-030 — below xl the list steps aside for an open case; at 360 px it is the page. -->
-  <div [class]="gridClass()">
+  <!-- WEB-UX-030 — an open case gets the page to itself at EVERY width; the list steps aside
+       rather than shrinking into a column beside it. -->
+  <div class="grid gap-6">
     <section
-      class="grid gap-4 xl:block"
+      class="grid gap-4"
       [class.hidden]="detailOpen()"
       aria-labelledby="ch-heading"
       data-testid="case-history"
@@ -109,7 +110,7 @@
             {{ 'farmer.history.filter.count' | translate: { count: filteredRows().length } }}
           </p>
         }
-        <ul [class]="listClass()" [attr.aria-label]="'farmer.history.listLabel' | translate">
+        <ul [class]="listClass" [attr.aria-label]="'farmer.history.listLabel' | translate">
           <!-- Rendered in the order received; the server owns "newest first" (WEB-FR-153). -->
           @for (entry of filteredRows(); track entry.row.caseId) {
             <li>
@@ -201,7 +202,7 @@
              sibling of the <ul> rather than a child: beside an open case the list itself is the
              scrolling box, so the page controls stay put beneath it. -->
         <foshol-paginator
-          [class]="paginatorClass()"
+          [class]="paginatorClass"
           [page]="pageIndex()"
           [size]="pageSize()"
           [totalElements]="totalElements()"

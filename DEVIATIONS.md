@@ -640,3 +640,43 @@ neither of which is this).
 Until one of those happens, the alternative available to the UI alone is to **drop the phone
 lookup entirely**, which would forfeit the duplicate check `WEB-FR-312` added it for. The
 requester chose to keep the lookup with this deviation recorded.
+
+---
+
+## D-22 update · Send is now gated to the review step
+
+D-22 recorded that "Send is enabled the moment the draft is valid regardless of which card is
+showing". That is **reversed**: Send unlocks only on the review step (`capture-page.ts`
+`canSend`).
+
+**Why.** A farmer who has not seen what is about to be sent cannot meaningfully consent to
+sending it, and the old behaviour let a draft go the instant it happened to satisfy the minimum —
+before the photographs had been checked or the field area confirmed. The requester asked for the
+change directly.
+
+**What D-22's argument actually protected, and still does.** That entry's `WEB-FR-140`/`141`
+reasoning is about the **description box** being reachable at all times, not about Send. The
+always-visible step rail is untouched: every step, review included, is one tap away from
+anywhere, so the free-text description is no further behind a "next" than it was.
+
+**One thing this exposed.** A `422` names the images it refused and marks them on the
+photographs card. With Send moved to the review step, the farmer was being told an image was
+rejected while looking at the one screen that shows no images — so a rejection now moves them to
+the photographs step (`capture-page.ts`, submit's catch).
+
+---
+
+## D-30 · The standalone crop picker page is gone
+
+`/farmer/new` was a standalone crop-picker page that navigated to `/farmer/new/capture`, whose
+first step was *again* crop selection with the earlier choice pre-selected. The picker is
+removed; `/farmer/new` now loads the stepper directly and `/farmer/new/capture` redirects to it
+so older links still land somewhere sensible.
+
+Nothing was lost: `CropGrid` — the actual picker UI — is unchanged and is what step one has always
+rendered. `capture-page`'s back link returned to the picker and now returns to the case list
+(`farmer.capture.backToCases`).
+
+Safe because nothing required a crop to be chosen before the stepper opened: there was no guard,
+no redirect and no effect on `new/capture`, and the stepper always opened on the crop step
+regardless.

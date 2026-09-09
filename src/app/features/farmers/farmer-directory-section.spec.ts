@@ -115,7 +115,7 @@ describe('FarmerDirectorySection', () => {
     await answer(pageOf([]));
     typeInto('directory-search-name', 'রহিম');
     fixture.detectChanges();
-    click('directory-search-name-go');
+    click('directory-search-go');
 
     const request = await answer(pageOf([]));
     expect(request.request.params.get('q')).toBe('রহিম');
@@ -126,12 +126,12 @@ describe('FarmerDirectorySection', () => {
     await answer(pageOf([]));
     typeInto('directory-search-name', 'রহিম');
     fixture.detectChanges();
-    click('directory-search-name-go');
+    click('directory-search-go');
     await answer(pageOf([]));
 
     typeInto('directory-search-phone', '01712345678');
     fixture.detectChanges();
-    click('directory-search-phone-go');
+    click('directory-search-go');
 
     const request = await answer(pageOf([]));
     expect(request.request.params.get('phone')).toBe('01712345678');
@@ -148,7 +148,7 @@ describe('FarmerDirectorySection', () => {
 
     typeInto('directory-search-phone', phone);
     fixture.detectChanges();
-    click('directory-search-phone-go');
+    click('directory-search-go');
     await answer(pageOf([row('f-1', 'রহিম উদ্দিন')]));
 
     // The typed value lives on in the input's `value` property, which is the officer's own
@@ -176,7 +176,7 @@ describe('FarmerDirectorySection', () => {
 
     typeInto('directory-search-name', 'নেই');
     fixture.detectChanges();
-    click('directory-search-name-go');
+    click('directory-search-go');
     await answer(pageOf([]));
 
     expect(el().textContent).toContain(farmersFragment['farmers.directory.noMatches.title'].bn);

@@ -82,6 +82,15 @@
        a transcription and a typed one is not, and an officer needs to know which before
        trusting a dose (WEB-UX-042). -->
   <dl class="case-meta" data-testid="case-metrics">
+    <!-- Whose case this is, first in the band. The heading above already carries the name, but
+         it reads as a title; an officer scanning the metrics row for "who am I deciding about"
+         was finding status and timestamps and no person. `—` when the server sent no name:
+         `CaseDetail` has no farmer field (D-05), so this is null on a deep link into a case that
+         is not on the loaded queue page. -->
+    <div>
+      <dt>{{ 'officer.case.farmer' | translate }}</dt>
+      <dd data-testid="case-farmer">{{ facade.farmerName() || '—' }}</dd>
+    </div>
     <div>
       <dt>{{ 'officer.case.status' | translate }}</dt>
       <dd>{{ 'badge.status.' + detail.status | translate }}</dd>
@@ -375,7 +384,7 @@
       <dl class="model-meta">
         <div>
           <dt>{{ 'officer.case.model.id' | translate }}</dt>
-          <dd class="font-latin">
+          <dd class="font-latin id">
             {{ analysis()?.visionModelId ?? ('officer.case.model.none' | translate) }}
           </dd>
         </div>
