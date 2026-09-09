@@ -353,6 +353,10 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     draft.setFieldArea(FIELD_AREA);
     fixture.detectChanges();
     await fixture.whenStable();
+
+    // Send unlocks only on the review step, so every submission test starts where a farmer
+    // would actually press it.
+    await showStep(fixture, 'review');
   }
 
   afterEach(() => {
@@ -402,22 +406,36 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
    * whichever card is showing, the moment the draft is submittable. The review card offers the
    * same action a second time, where a farmer following the guided path expects to find it.
    */
-  it('keeps Send available from every step, not only the last', async () => {
+  it('enables Send only on the review step, however valid the draft is', async () => {
     await setUpWithOneImage();
+    // The draft is submittable from here on; only the step gates the button.
+    expect(activeStep(fixture)).toBe('review');
     expect(submitButton().disabled).toBe(false);
 
-    await showStep(fixture, 'crop');
-    expect(activeStep(fixture)).toBe('crop');
-    expect(submitButton().disabled).toBe(false);
+    for (const step of ['crop', 'photos', 'land', 'describe']) {
+      await showStep(fixture, step);
+      expect(activeStep(fixture)).toBe(step);
+      expect(submitButton().disabled).toBe(true);
+    }
 
     await showStep(fixture, 'review');
-    expect(activeStep(fixture)).toBe('review');
     expect(submitButton().disabled).toBe(false);
     const review = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
       '[data-testid="capture-review-submit"]',
     );
     expect(review).not.toBeNull();
     expect(review!.disabled).toBe(false);
+  });
+
+  it('does not send when the button is bypassed from a non-review step', async () => {
+    await setUpWithOneImage();
+    await showStep(fixture, 'crop');
+
+    submitButton().click();
+    await fixture.whenStable();
+
+    // `afterEach`'s http.verify() would fail on a stray request; this states the intent.
+    http.expectNone(SUBMIT_URL);
   });
 
   it('refuses to send without a field area, and says why', async () => {
@@ -582,6 +600,9 @@ describe('CapturePage — cancel (WEB-DATA-022, WEB-FR-145)', () => {
     draft.setFieldArea(FIELD_AREA);
     fixture.detectChanges();
     await fixture.whenStable();
+
+    // Send unlocks only on the review step; a content-bearing draft starts where it is pressed.
+    await showStep(fixture, 'review');
   }
 
   afterEach(() => {
