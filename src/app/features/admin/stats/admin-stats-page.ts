@@ -120,13 +120,8 @@ const PERIOD_TILES: readonly PeriodTile[] = [
       titleKey="admin.stats.title"
       subtitleKey="admin.stats.subtitle"
     >
-      <span
-        class="rounded-pill border border-surface-3 bg-surface-0 px-3 py-1 text-xs font-semibold tracking-wide text-ink-muted uppercase"
-        data-testid="read-only-chip"
-        >{{ 'admin.stats.readOnly' | translate }}</span
-      >
-
-      <!-- WEB-FR-304 — the manual refresh. Three GETs, on a press, and nothing else. -->
+      <!-- WEB-FR-304 — the manual refresh. Three GETs, on a press, and nothing else. It is the
+           only action this heading carries; the KPI route is reached from the left nav. -->
       <button
         type="button"
         class="touch-target inline-flex items-center gap-2 rounded-control bg-console px-4 font-semibold text-on-console shadow-stamp transition-colors duration-1 ease-settle hover:bg-slate-700"
@@ -146,25 +141,6 @@ const PERIOD_TILES: readonly PeriodTile[] = [
         </svg>
         {{ 'admin.stats.refresh' | translate }}
       </button>
-
-      <!-- The KPI dashboard is a separate route with its own endpoints and its own store, so
-           this is a link rather than a section: nothing it loads can affect this page. -->
-      <a
-        class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-semibold text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
-        [routerLink]="kpiPath"
-        data-testid="kpi-link"
-      >
-        {{ 'admin.kpi.linkFromStats' | translate }}
-        <svg viewBox="0 0 16 16" class="h-4 w-4 shrink-0" aria-hidden="true" fill="none">
-          <path
-            d="M6 3.5 10.5 8 6 12.5"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </a>
     </foshol-page-heading>
 
     <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
@@ -404,7 +380,6 @@ export class AdminStatsPage {
   protected readonly placeholders = ['casesToday', 'approvalRate', 'medianReview', 'agreement'];
   protected readonly periodTiles = PERIOD_TILES;
 
-  protected readonly kpiPath = ADMIN_PATHS.kpis;
   protected readonly casesPath = ADMIN_PATHS.cases;
 
   /**

@@ -36,11 +36,15 @@ import { QueueRowActions, type QueuePopoverKind } from './queue-row-actions';
  *
  * **`WEB-FR-200` is the requirement this screen exists to protect.** Rows render in exactly
  * the order the server returned them, and **no column header is interactive**: there is no
- * sort control, no clickable `<th>`, no comparator anywhere in this feature. `REVIEW-FR-030`
- * fixes the order to least-confident-first, and that ordering *is* the triage argument the
- * console demonstrates. A sortable header lets an officer — or a judge — destroy it in one
- * click, so the affordance does not exist. `QueueStore` exposes no comparator either; between
- * the two, the requirement cannot be violated by a later edit.
+ * sort control, no clickable `<th>`, no comparator anywhere in this feature. The order is the
+ * server's alone — **newest submission first**, as `officer.queue.orderNote` now says — and
+ * this client neither reproduces it nor second-guesses it. A sortable header lets an officer —
+ * or a judge — destroy it in one click, so the affordance does not exist. `QueueStore` exposes
+ * no comparator either; between the two, the requirement cannot be violated by a later edit.
+ *
+ * That the rule itself is server-owned is why the strings could move ahead of the backend: the
+ * UI never encoded the old least-confident-first rule in code, only in prose, so changing the
+ * prose is the whole change. `DEVIATIONS.md` D-24.
  *
  * `WEB-FR-202` — the sentence explaining the order sits next to the table, at the top, in the
  * reading path. It is the point of the screen, not a footnote.

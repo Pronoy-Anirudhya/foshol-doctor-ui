@@ -80,8 +80,8 @@ carries **both** languages:
 ```json
 {
   "officer.queue.orderNote": {
-    "bn": "সবচেয়ে কম আত্মবিশ্বাসের কেস আগে",
-    "en": "Least-confident cases first"
+    "bn": "সবচেয়ে নতুন কেস আগে।",
+    "en": "Newest cases first."
   }
 }
 ```

@@ -26,12 +26,20 @@
   color: var(--color-dawn-700);
 }
 
+/* The one metadata band under the header. `auto-fit` with an 11rem floor is what reflows it —
+   one column at 360 px, two at 768 px, five at 1280 px — and it is a property of the box's own
+   width, so WEB-UX-034 holds: still not a media query. */
 .case-meta {
   margin: 1rem 0 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 0.6rem 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.85rem 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-0);
+  padding: 0.9rem 1rem;
   font-size: 0.8125rem;
+  box-shadow: var(--shadow-card);
 }
 
 .case-meta dt,

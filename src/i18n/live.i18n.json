@@ -1,6 +1,6 @@
 {
   "live.case.statusChanged": {
-    "bn": "কেসের অবস্থা হালনাগাদ হয়েছে",
+    "bn": "কেসের অবস্থা বদলেছে",
     "en": "Case status updated"
   },
   "live.case.rejected": {
@@ -8,15 +8,15 @@
     "en": "A case was returned"
   },
   "live.advisory.published": {
-    "bn": "পরামর্শ প্রকাশিত হয়েছে",
+    "bn": "পরামর্শ পাঠানো হয়েছে",
     "en": "An advisory has been published"
   },
   "live.advisory.revised": {
-    "bn": "পরামর্শ সংশোধিত হয়েছে",
+    "bn": "পরামর্শ সংশোধন করা হয়েছে",
     "en": "An advisory has been revised"
   },
   "live.queue.updated": {
-    "bn": "সারিতে পরিবর্তন হয়েছে",
+    "bn": "সারি বদলেছে",
     "en": "The queue has changed"
   },
   "live.stream.resynced": {
@@ -24,23 +24,23 @@
     "en": "Refreshing data"
   },
   "live.stream.connecting": {
-    "bn": "লাইভ সংযোগ তৈরি হচ্ছে…",
+    "bn": "সরাসরি সংযোগ তৈরি হচ্ছে…",
     "en": "Connecting live updates…"
   },
   "live.stream.open": {
-    "bn": "লাইভ সংযোগ সচল",
+    "bn": "সরাসরি সংযোগ চালু",
     "en": "Live updates connected"
   },
   "live.stream.retrying": {
-    "bn": "পুনরায় সংযোগের চেষ্টা চলছে…",
+    "bn": "আবার সংযোগের চেষ্টা চলছে…",
     "en": "Reconnecting…"
   },
   "live.stream.closed": {
-    "bn": "লাইভ সংযোগ বন্ধ",
+    "bn": "সরাসরি সংযোগ বন্ধ",
     "en": "Live updates disconnected"
   },
   "live.stream.offline": {
-    "bn": "আপনি এখন অফলাইনে আছেন",
+    "bn": "আপনি এখন অফলাইন",
     "en": "You are offline"
   },
   "live.draft.imageLimit": {

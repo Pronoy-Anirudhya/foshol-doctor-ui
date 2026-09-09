@@ -89,8 +89,12 @@ const QUEUE_BODY = {
 
 const EMPTY_QUEUE = { page: 0, size: APP_CONFIG.admin.sampleSize, totalElements: 0, totalPages: 0, content: [] };
 
+/** The dashboard's KPI section reads this third endpoint; see `AdminStatsPage.refresh()`. */
+const KPI_BODY = { assignmentFailures: 0, resolutionFailures: 0, officers: [] };
+
 const STATS_URL = `${APP_CONFIG.api.origin}${AdminService.GetAdminStatsPath}`;
 const QUEUE_URL = `${APP_CONFIG.api.origin}${ReviewService.GetReviewQueuePath}`;
+const KPI_URL = `${APP_CONFIG.api.origin}${AdminService.GetAdminKpisPath}`;
 
 interface Answer {
   readonly body: object;
@@ -152,11 +156,13 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
   }
 
   /**
-   * The page now reads TWO endpoints, and both are fired together — so nothing here can use
-   * `expectOne`. Every open request is walked and answered by URL, which also means an
-   * unexpected request fails loudly rather than being handed the wrong body.
+   * The page reads THREE endpoints — stats, the queue sample and the KPI summary — and all
+   * three are fired together, so nothing here can use `expectOne`. Every open request is walked
+   * and answered by URL, which also means an unexpected request fails loudly rather than being
+   * handed the wrong body. The KPI answer defaults, because most cases here are about the other
+   * two and only care that its widget does not blow up.
    */
-  async function answer(stats: Answer, queue: Answer): Promise<void> {
+  async function answer(stats: Answer, queue: Answer, kpi: Answer = { body: KPI_BODY }): Promise<void> {
     const pending = http.match(() => true);
     expect(pending.length).toBeGreaterThan(0);
     for (const request of pending) {
@@ -166,7 +172,9 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
           ? stats
           : request.request.url === QUEUE_URL
             ? queue
-            : null;
+            : request.request.url === KPI_URL
+              ? kpi
+              : null;
       expect(answerFor).not.toBeNull();
       if (answerFor?.options) request.flush(answerFor.body, answerFor.options);
       else request.flush(answerFor?.body ?? {});
@@ -189,15 +197,19 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
   it('fetches the stats through the generated client on arrival', async () => {
     await load();
 
-    expect(text('[data-testid="stat-grid"] foshol-stat-tile [data-testid="stat-value"]')).toBe('12');
+    expect(text('[data-testid="volume-tile-TODAY"]')).toContain('12');
   });
 
   it('displays all four figures (WEB-FR-301)', async () => {
     await load();
 
+    // Today's volume is its own tile above the rate row, and is a link into the case list.
+    expect(text('[data-testid="volume-tile-TODAY"]')).toContain('12');
+    // The rate row is approval, rejection, median review time and the acceptance rate. This
+    // fixture carries no rejectionRate, so that one tile correctly reports no data instead.
     const values = all('[data-testid="stat-value"]').map((v) => v.textContent?.trim());
-    // Cases today, approval rate, median review time, model–officer agreement rate.
-    expect(values).toEqual(['12', '50%', '3.5 মিনিট', '75%']);
+    expect(values).toEqual(['50%', '3.5 মিনিট', '75%']);
+    expect(all('[data-testid="quality-grid"] [data-testid="stat-no-data"]').length).toBe(1);
     // The sample size always travels with the agreement rate.
     expect(text('[data-testid="stat-caption"]')).toContain('4');
   });
@@ -219,8 +231,6 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
     expect(el().textContent).toContain(BN_CATALOGUE['admin.stats.thresholds.title']);
     expect(el().textContent).toContain(BN_CATALOGUE['admin.stats.thresholds.low']);
     expect(el().textContent).toContain(BN_CATALOGUE['admin.stats.thresholds.high']);
-    // Read-only is stated on screen, not merely implied by the absence of a control.
-    expect(text('[data-testid="read-only-chip"]')).toBe(BN_CATALOGUE['admin.stats.readOnly']);
   });
 
   it('names all three routing bands in text, once, page-wide (WEB-FR-302, WEB-UX-044)', async () => {
@@ -254,13 +264,14 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
     await load(EMPTY_BODY);
 
     const empties = all('[data-testid="stat-no-data"]');
-    // Approval rate, median review time and agreement rate are all null before there is data.
-    expect(empties.length).toBe(3);
+    // Approval, rejection, median review time and the acceptance rate are all null before
+    // there is any data to compute them from.
+    expect(empties.length).toBe(4);
     expect(empties[0]?.textContent?.trim()).toBe(BN_CATALOGUE['admin.stats.noData']);
     // A measured count of zero IS a fact, and is still shown as a number.
-    expect(text('[data-testid="stat-value"]')).toBe('0');
+    expect(text('[data-testid="volume-tile-TODAY"]')).toContain('0');
     // …but no rate is ever reported as 0%, which would claim a measurement nobody made.
-    expect(text('[data-testid="stat-grid"]')).not.toContain('0%');
+    expect(text('[data-testid="quality-grid"]')).not.toContain('0%');
     // No published advisories means the agreement rate rests on nothing, and says so.
     expect(text('[data-testid="stat-caption"]')).toBe(
       BN_CATALOGUE['admin.stats.agreement.noSample'],
@@ -274,7 +285,7 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
 
     await refreshWith({ body: { ...LIVE_BODY, casesToday: 13 } });
 
-    expect(text('[data-testid="stat-value"]')).toBe('13');
+    expect(text('[data-testid="volume-tile-TODAY"]')).toContain('13');
   });
 
   it('keeps the last values under a stale marker when a refresh fails (WEB-FR-305)', async () => {
@@ -289,9 +300,9 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
     expect(el().querySelector('[data-testid="stale-marker"]')).not.toBeNull();
     expect(el().querySelector('foshol-error-panel [role="alert"]')).not.toBeNull();
     // The page is not blanked: the last good values are still there, and marked.
-    expect(text('[data-testid="stat-value"]')).toBe('12');
+    expect(text('[data-testid="volume-tile-TODAY"]')).toContain('12');
     expect(text('[data-testid="threshold-low"]')).toBe('45%');
-    expect(el().querySelector('[data-testid="stat-grid"]')?.getAttribute('data-stale')).toBe(
+    expect(el().querySelector('[data-testid="volume-grid"]')?.getAttribute('data-stale')).toBe(
       'true',
     );
     expect(all('[data-testid="tile-stale-marker"]').length).toBe(4);
@@ -373,7 +384,8 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
         { body: { status: 500 }, options: { status: 500, statusText: 'x' } },
       );
 
-      expect(all('[data-testid="stat-value"]').length).toBe(4);
+      expect(all('[data-testid="stat-value"]').length).toBe(3);
+      expect(all('[data-testid="volume-tile-TODAY"]').length).toBe(1);
       expect(text('[data-testid="threshold-low"]')).toBe('45%');
       expect(el().querySelector('[data-testid="queue-unavailable"]')).not.toBeNull();
       // The bands still stand: they come from the thresholds, which came from /admin/stats.
@@ -387,7 +399,7 @@ describe('AdminStatsPage (WEB-FR-300…305)', () => {
         { body: QUEUE_BODY },
       );
 
-      expect(el().querySelector('[data-testid="stat-grid"]')).toBeNull();
+      expect(el().querySelector('[data-testid="quality-grid"]')).toBeNull();
       expect(el().querySelector('[data-testid="thresholds-unavailable"]')).not.toBeNull();
       expect(all('[data-testid="sla-band"]').length).toBe(4);
       expect(all('[data-testid="qc-state"]').length).toBe(4);

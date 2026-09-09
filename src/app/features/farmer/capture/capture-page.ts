@@ -23,6 +23,8 @@ import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 import { CropGrid } from '../crop-picker/crop-grid';
+import type { ParsedLandSpeech } from './bangla-quantity';
+import { CaptureStep, CaptureStepper } from './capture-stepper';
 import { FARMER_PATHS } from './farmer-paths';
 import { ImagePipeline } from './image-pipeline';
 import {
@@ -31,22 +33,27 @@ import {
   type ServerImageRejection,
   type StripTile,
 } from './image-strip';
+import { LandSpeech } from './land-speech';
+import { LandStep } from './land-step';
 import { NoteBox } from './note-box';
 import { QualityReject } from './quality-reject';
 import { QUALITY_ACCEPTED, unreadableVerdict, type QualityVerdict } from './quality-gate';
+import { ReviewSummary } from './review-summary';
 import { CameraPanel } from './camera-panel';
-import { FieldMetricsPanel } from './field-metrics-panel';
+import { VoiceGuide } from './voice-guide';
 import { VoicePanel } from './voice-panel';
 import { VoiceRecorder } from './voice-recorder';
 
 /**
  * The farmer's evidence-capture screen — demo beats 2 and 3.
  *
- * One screen, three steps, no wizard: crop, photographs, description. A wizard would put the
- * always-available text box (`WEB-FR-140`/`141`) behind a "next", and a degraded path that must
+ * Five guided steps in a card deck (`DEVIATIONS.md` D-22), and **not a wizard**. `CaptureStepper`
+ * keeps every step reachable from an always-visible rail and Send live from every step, which is
+ * what lets the screen guide a farmer through the order the requirements name while keeping the
+ * free-text description available at all times (`WEB-FR-140`/`141`) — a degraded path that must
  * be found is not a degraded path.
  *
- * The order of everything on this page is the order of the requirements: preview first
+ * The order of the pipeline is unchanged and is the order of the requirements: preview first
  * (`WEB-FR-111`), local verdict second (`WEB-FR-120`–`124`), re-encode third (`WEB-FR-112`),
  * network last (`WEB-FR-150`). `WEB-TEST-002` asserts the third and fourth never happen for a
  * rejected image.
@@ -68,27 +75,41 @@ const NO_SLOTS = 0;
 const SINGLE = 1;
 const SKELETON_TILES = 3;
 
+/** The deck, in order. Ids are the rail's `data-testid` suffixes and the cards' heading ids. */
+const STEP_CROP = 'crop';
+const STEP_PHOTOS = 'photos';
+const STEP_LAND = 'land';
+const STEP_DESCRIBE = 'describe';
+const STEP_REVIEW = 'review';
+
 @Component({
   selector: 'foshol-capture-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // WEB-FR-145 — the recorder is scoped to this page, so leaving it stops every track.
-  providers: [VoiceRecorder],
+  /**
+   * WEB-FR-145 — the recorder is scoped to this page, so leaving it stops every track. The two
+   * speech services join it for the same reason: guidance must not carry on talking over the
+   * next screen, and the land step's recogniser must not keep a microphone the farmer has left.
+   */
+  providers: [VoiceRecorder, VoiceGuide, LandSpeech],
   host: { class: 'block' },
   imports: [
+    BackLink,
     CameraPanel,
+    CaptureStep,
+    CaptureStepper,
     CropGrid,
     ErrorPanel,
-    FieldMetricsPanel,
     Icon,
     ImageStrip,
+    LandStep,
     NoteBox,
     PageHeading,
     QualityReject,
+    ReviewSummary,
     Skeleton,
     Spinner,
     TranslatePipe,
     VoicePanel,
-    BackLink,
   ],
   template: `
     <div class="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 md:pt-10 xl:max-w-4xl">
@@ -104,122 +125,111 @@ const SKELETON_TILES = 3;
         subtitleKey="farmer.capture.subtitle"
       />
 
-      <!-- Step 1 — crop. WEB-FR-100: icon tiles, and AC-02 checks this screen for a <select>. -->
-      <section class="step" aria-labelledby="step-crop">
-        <h2 class="step-title" id="step-crop">
-          <span class="step-number" aria-hidden="true">১</span>
-          {{ 'farmer.capture.crop.stepTitle' | translate }}
-        </h2>
-        @if (crops.isLoading()) {
-          <foshol-skeleton variant="media" [count]="skeletonTiles" />
-        } @else if (cropProblem(); as failure) {
-          <foshol-error-panel [problem]="failure" (retry)="crops.reload()" />
-        } @else {
-          <foshol-crop-grid
-            [crops]="availableCrops()"
-            [selectedId]="draft.cropId()"
-            (cropChosen)="draft.chooseCrop($event)"
-          />
-        }
-      </section>
-
-      <!-- Step 2 — photographs. -->
-      <section class="step" aria-labelledby="step-images">
-        <h2 class="step-title" id="step-images">
-          <span class="step-number" aria-hidden="true">২</span>
-          {{ 'farmer.capture.images.stepTitle' | translate }}
-        </h2>
-        <p class="step-help">{{ 'farmer.capture.images.help' | translate }}</p>
-
-        @if (tiles().length > 0) {
-          <div class="mt-3">
-            <foshol-image-strip
-              [tiles]="tiles()"
-              (removed)="removeImage($event)"
-              (moved)="moveImage($event)"
+      <foshol-capture-stepper
+        class="mt-6"
+        [activeId]="activeStepId()"
+        (stepSelected)="showStep($event)"
+      >
+        <!-- Step 1 — crop. WEB-FR-100: icon tiles, and AC-02 checks this screen for a <select>. -->
+        <ng-template
+          fosholCaptureStep
+          [stepId]="stepIds.crop"
+          titleKey="farmer.capture.crop.stepTitle"
+          guideKey="farmer.capture.crop.help"
+          [complete]="draft.cropId() !== null"
+        >
+          @if (crops.isLoading()) {
+            <foshol-skeleton variant="media" [count]="skeletonTiles" />
+          } @else if (cropProblem(); as failure) {
+            <foshol-error-panel [problem]="failure" (retry)="crops.reload()" />
+          } @else {
+            <foshol-crop-grid
+              [crops]="availableCrops()"
+              [selectedId]="draft.cropId()"
+              (cropChosen)="draft.chooseCrop($event)"
             />
+          }
+        </ng-template>
+
+        <!-- Step 2 — photographs. -->
+        <ng-template
+          fosholCaptureStep
+          [stepId]="stepIds.photos"
+          titleKey="farmer.capture.images.stepTitle"
+          guideKey="farmer.capture.images.help"
+          [complete]="hasEnoughPhotos()"
+        >
+          @if (tiles().length > 0) {
+            <div class="mb-3">
+              <foshol-image-strip
+                [tiles]="tiles()"
+                (removed)="removeImage($event)"
+                (moved)="moveImage($event)"
+              />
+            </div>
+          }
+
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <!-- WEB-FR-110 — a live camera where the browser can open one (camera-panel.ts
+                 requests getUserMedia directly, since a laptop browser never honours the
+                 capture attribute below and would otherwise just show a file browser), the
+                 mobile capture hint as its own fallback where it cannot. -->
+            <foshol-camera-panel [disabled]="!canAddMore()" (captured)="onLivePhoto($event)" />
+
+            <label class="pick touch-target">
+              <input
+                class="sr-only"
+                type="file"
+                data-testid="capture-file-input"
+                [attr.accept]="acceptTypes"
+                [attr.multiple]="canPickMany() ? true : null"
+                [disabled]="!canAddMore()"
+                (change)="onFilesChosen($event)"
+              />
+              <foshol-icon class="shrink-0" name="gallery" />
+              {{ 'farmer.capture.images.chooseFile' | translate }}
+            </label>
           </div>
-        }
 
-        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <!-- WEB-FR-110 — a live camera where the browser can open one (camera-panel.ts
-               requests getUserMedia directly, since a laptop browser never honours the
-               capture attribute below and would otherwise just show a file browser), the
-               mobile capture hint as its own fallback where it cannot. -->
-          <foshol-camera-panel [disabled]="!canAddMore()" (captured)="onLivePhoto($event)" />
+          @if (analysing()) {
+            <p class="mt-2">
+              <foshol-spinner
+                size="sm"
+                [showLabel]="true"
+                labelKey="farmer.capture.images.checking"
+              />
+            </p>
+          }
 
-          <label class="pick touch-target">
-            <input
-              class="sr-only"
-              type="file"
-              data-testid="capture-file-input"
-              [attr.accept]="acceptTypes"
-              [attr.multiple]="canPickMany() ? true : null"
-              [disabled]="!canAddMore()"
-              (change)="onFilesChosen($event)"
-            />
-            <foshol-icon class="shrink-0" name="gallery" />
-            {{ 'farmer.capture.images.chooseFile' | translate }}
-          </label>
-        </div>
+          @if (refusalKey(); as key) {
+            <p class="refusal" role="status" data-testid="capture-refusal">
+              {{ key | translate: { max: maxImages } }}
+            </p>
+          }
 
-        @if (analysing()) {
-          <p class="mt-2">
-            <foshol-spinner
-              size="sm"
-              [showLabel]="true"
-              labelKey="farmer.capture.images.checking"
-            />
-          </p>
-        }
+          <!-- Demo beat 3. WEB-FR-123 — rendered from a local verdict; no request was made. -->
+          @for (rejection of rejections(); track rejection.id) {
+            <div class="mt-4">
+              <foshol-quality-reject
+                [previewUrl]="rejection.previewUrl"
+                [verdict]="rejection.verdict"
+                (dismissed)="dismissRejection(rejection.id)"
+                (overridden)="overrideRejection(rejection.id)"
+              />
+            </div>
+          }
+        </ng-template>
 
-        @if (refusalKey(); as key) {
-          <p class="refusal" role="status" data-testid="capture-refusal">
-            {{ key | translate: { max: maxImages } }}
-          </p>
-        }
-
-        <!-- Demo beat 3. WEB-FR-123 — rendered from a local verdict; no request was made. -->
-        @for (rejection of rejections(); track rejection.id) {
-          <div class="mt-4">
-            <foshol-quality-reject
-              [previewUrl]="rejection.previewUrl"
-              [verdict]="rejection.verdict"
-              (dismissed)="dismissRejection(rejection.id)"
-              (overridden)="overrideRejection(rejection.id)"
-            />
-          </div>
-        }
-      </section>
-
-      <!-- Step 3 — describe it. The text box is unconditional (WEB-FR-140/141). -->
-      <section class="step" aria-labelledby="step-describe">
-        <h2 class="step-title" id="step-describe">
-          <span class="step-number" aria-hidden="true">৩</span>
-          {{ 'farmer.capture.describe.stepTitle' | translate }}
-        </h2>
-        <p class="step-help">{{ 'farmer.capture.describe.help' | translate }}</p>
-
-        <div class="mt-3">
-          <foshol-voice-panel />
-        </div>
-
-        <div class="mt-5">
-          <foshol-note-box [value]="draft.noteBn()" (changed)="draft.setNote($event)" />
-        </div>
-      </section>
-
-      <!-- Step 4 — the field. Required by the multipart contract, because the officer's remedy
-           dose is reckoned from it. -->
-      <section class="step" aria-labelledby="step-field">
-        <h2 class="step-title" id="step-field">
-          <span class="step-number" aria-hidden="true">৪</span>
-          {{ 'farmer.capture.field.stepTitle' | translate }}
-        </h2>
-        <p class="step-help">{{ 'farmer.capture.field.help' | translate }}</p>
-
-        <div class="mt-3">
-          <foshol-field-metrics-panel
+        <!-- Step 3 — the field. Required by the multipart contract, because the officer's remedy
+             dose is reckoned from it. Speech-first, typing always (DEVIATIONS.md D-23). -->
+        <ng-template
+          fosholCaptureStep
+          [stepId]="stepIds.land"
+          titleKey="farmer.capture.field.stepTitle"
+          guideKey="farmer.capture.field.help"
+          [complete]="draft.hasFieldArea()"
+        >
+          <foshol-land-step
             [fieldArea]="draft.fieldArea()"
             [fieldAreaUnit]="draft.fieldAreaUnit()"
             [cropQuantity]="draft.cropQuantity()"
@@ -229,9 +239,49 @@ const SKELETON_TILES = 3;
             (areaUnitChanged)="draft.setFieldAreaUnit($event)"
             (quantityChanged)="draft.setCropQuantity($event)"
             (quantityUnitChanged)="draft.setCropQuantityUnit($event)"
+            (prefilled)="applyPrefill($event)"
           />
-        </div>
-      </section>
+        </ng-template>
+
+        <!-- Step 4 — describe it. The text box is unconditional (WEB-FR-140/141), and the rail
+             above reaches this step from anywhere, at any time. -->
+        <ng-template
+          fosholCaptureStep
+          [stepId]="stepIds.describe"
+          titleKey="farmer.capture.describe.stepTitle"
+          guideKey="farmer.capture.describe.help"
+          [complete]="hasDescription()"
+        >
+          <foshol-voice-panel />
+          <div class="mt-5">
+            <foshol-note-box [value]="draft.noteBn()" (changed)="draft.setNote($event)" />
+          </div>
+        </ng-template>
+
+        <!-- Step 5 — what is about to be sent, and the control that sends it. -->
+        <ng-template
+          fosholCaptureStep
+          [stepId]="stepIds.review"
+          titleKey="farmer.capture.review.stepTitle"
+          guideKey="farmer.capture.review.help"
+          [complete]="canSubmit()"
+        >
+          <foshol-review-summary
+            [crop]="chosenCrop()"
+            [imageCount]="draft.imageCount()"
+            [fieldArea]="draft.fieldArea()"
+            [fieldAreaUnit]="draft.fieldAreaUnit()"
+            [cropQuantity]="draft.cropQuantity()"
+            [cropQuantityUnit]="draft.cropQuantityUnit()"
+            [hasAudio]="draft.audio() !== null"
+            [hasNote]="hasNote()"
+            [canSubmit]="canSubmit()"
+            [submitting]="draft.isSubmitting()"
+            [retryable]="draft.canRetry()"
+            (send)="submit()"
+          />
+        </ng-template>
+      </foshol-capture-stepper>
 
       @if (problem(); as failure) {
         <div class="mt-6">
@@ -241,7 +291,9 @@ const SKELETON_TILES = 3;
       }
     </div>
 
-    <!-- Within thumb reach at 360 px, and out of the way of the note box's own keyboard. -->
+    <!-- Within thumb reach at 360 px, and out of the way of the note box's own keyboard. Send
+         lives here as well as on the review card, so it is available from every step the moment
+         the draft is submittable — the stepper guides, it does not gate. -->
     <div class="submit-bar">
       <!-- The confirm step lives above the row so the two buttons below never swap places
            under a thumb that is already moving towards one of them. -->
@@ -312,42 +364,6 @@ const SKELETON_TILES = 3;
     </div>
   `,
   styles: `
-    .step {
-      margin-block-start: 1.75rem;
-      padding: 1.1rem;
-      border: 1px solid var(--color-surface-3);
-      border-radius: 1.25rem;
-      background: var(--color-surface-0);
-      box-shadow: var(--shadow-card);
-    }
-
-    .step-title {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-block-end: 0.5rem;
-      font-size: 1.125rem;
-    }
-
-    .step-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      inline-size: 1.9rem;
-      block-size: 1.9rem;
-      flex: none;
-      border-radius: 999px;
-      background: var(--color-paddy-100);
-      color: var(--color-paddy-700);
-      font-size: 0.9375rem;
-      font-weight: 700;
-    }
-
-    .step-help {
-      font-size: 0.9375rem;
-      color: var(--color-ink-muted);
-    }
-
     .pick {
       display: inline-flex;
       align-items: center;
@@ -368,16 +384,6 @@ const SKELETON_TILES = 3;
     .pick:hover {
       border-color: var(--color-paddy-600);
       box-shadow: var(--shadow-card);
-    }
-
-    .pick-primary {
-      background: var(--color-paddy-600);
-      border-color: var(--color-paddy-600);
-      color: var(--color-ink-invert);
-    }
-
-    .pick-primary:hover {
-      background: var(--color-paddy-700);
     }
 
     /* WEB-UX-041 — the visible input is hidden, so the label must show the focus ring. */
@@ -521,7 +527,18 @@ export class CapturePage {
   private readonly _problem = signal<ProblemView | null>(null);
   private readonly overflow = signal<string | null>(null);
   private readonly _confirmingCancel = signal(false);
+  /** Which card the deck is showing. The step rail may move it to any of them at any time. */
+  private readonly _activeStepId = signal<string>(STEP_CROP);
 
+  protected readonly activeStepId = this._activeStepId.asReadonly();
+  /** The deck's order, named once so the template and the class cannot drift apart. */
+  protected readonly stepIds = {
+    crop: STEP_CROP,
+    photos: STEP_PHOTOS,
+    land: STEP_LAND,
+    describe: STEP_DESCRIBE,
+    review: STEP_REVIEW,
+  } as const;
   protected readonly confirmingCancel = this._confirmingCancel.asReadonly();
 
   protected readonly rejections = this._rejections.asReadonly();
@@ -530,6 +547,21 @@ export class CapturePage {
 
   /** WEB-DATA-004 — the store's own refusal wins; the pre-check only covers a multi-select. */
   protected readonly refusalKey = computed(() => this.draft.refusalKey() ?? this.overflow());
+
+  /** Rail ticks. Each is the step's own definition of answered, never a proxy for `canSubmit`. */
+  protected readonly hasEnoughPhotos = computed(
+    () => this.draft.imageCount() >= APP_CONFIG.intake.minImages,
+  );
+  protected readonly hasNote = computed(() => this.draft.noteBn().trim().length > NO_SLOTS);
+  protected readonly hasDescription = computed(
+    () => this.draft.audio() !== null || this.hasNote(),
+  );
+
+  protected readonly chosenCrop = computed(() => {
+    const cropId = this.draft.cropId();
+    if (cropId === null) return null;
+    return this.availableCrops().find((crop) => crop.id === cropId) ?? null;
+  });
 
   /**
    * WEB-FR-150 / LIVE-API-NOTES §4 — `rejectedImages[].position` is **0-based** on the wire
@@ -578,6 +610,28 @@ export class CapturePage {
   protected readonly areaMissing = computed(
     () => this.draft.imageCount() > NO_SLOTS && !this.draft.hasFieldArea(),
   );
+
+  protected showStep(stepId: string): void {
+    this._activeStepId.set(stepId);
+  }
+
+  /**
+   * The land step's dictation, applied through the store's own setters and nothing else. Each
+   * setter invalidates the idempotency key exactly as typing into the box would
+   * (`WEB-DATA-005`), because a changed area is a changed body either way.
+   *
+   * Only the fields the parser was sure about are touched. It never writes a unit it did not
+   * hear and never writes a value outside the intake bounds, so an unset field stays exactly as
+   * the farmer left it.
+   */
+  protected applyPrefill(parsed: ParsedLandSpeech): void {
+    if (parsed.fieldArea !== undefined) this.draft.setFieldArea(parsed.fieldArea);
+    if (parsed.fieldAreaUnit !== undefined) this.draft.setFieldAreaUnit(parsed.fieldAreaUnit);
+    if (parsed.cropQuantity !== undefined) this.draft.setCropQuantity(parsed.cropQuantity);
+    if (parsed.cropQuantityUnit !== undefined) {
+      this.draft.setCropQuantityUnit(parsed.cropQuantityUnit);
+    }
+  }
 
   protected onFilesChosen(event: Event): void {
     const input = event.target as HTMLInputElement;

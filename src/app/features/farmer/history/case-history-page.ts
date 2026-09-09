@@ -184,10 +184,36 @@ export class CaseHistoryPage {
       ? 'grid gap-6 xl:grid-cols-[26rem_minmax(0,1fr)] xl:items-start xl:gap-8'
       : 'grid gap-6',
   );
+  /**
+   * Beside an open case the list is capped and scrolls in its own right, so the column stops
+   * growing to the height of the detail pane and a farmer can still scan cases without first
+   * scrolling past the whole advisory (`WEB-UX-030`, `WEB-UX-032`).
+   *
+   * The `14rem` reserve assumes the chrome above and below the list at `xl`: the sticky app
+   * header (~3.75rem), `main`'s `md:py-10` band (2.5rem top and bottom), the paginator pinned
+   * beneath the scroll area (~3.75rem with its rule and margin) and a little breathing room.
+   * Change that assumption — a taller header, say — and this is the one number to retune.
+   *
+   * The padding is not decoration: `overflow-y-auto` clips on every axis, so without it the
+   * 3px focus ring (plus its 2px offset, `styles.css`) on the first, last and left edge of a
+   * row would be sliced off exactly when a keyboard user needs to see it (`WEB-UX-041`).
+   */
   protected readonly listClass = computed(() =>
     this.detailOpen()
-      ? 'm-0 grid list-none gap-3 p-0'
+      ? 'm-0 grid list-none gap-3 p-0 xl:max-h-[calc(100dvh-14rem)] xl:overflow-y-auto xl:overscroll-contain xl:py-1.5 xl:pl-1.5 xl:pr-2'
       : 'm-0 grid list-none gap-4 p-0 sm:grid-cols-2 xl:grid-cols-3',
+  );
+
+  /**
+   * The paginator stays *outside* the scrolling list on purpose: page controls that scroll away
+   * with their own rows are unreachable exactly when someone has read to the bottom and wants
+   * the next page. Beside an open case it gains a hairline so it reads as pinned beneath the
+   * scroll area rather than as one more row inside it (`WEB-API-003` supplies the numbers).
+   */
+  protected readonly paginatorClass = computed(() =>
+    this.detailOpen()
+      ? 'mt-4 block xl:mt-3 xl:border-t xl:border-surface-3 xl:pt-3'
+      : 'mt-4 block',
   );
 
   /** WEB-UX-044 — colour is never the only carrier of meaning; the status text stays in the pill. */

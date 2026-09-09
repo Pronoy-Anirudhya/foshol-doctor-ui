@@ -3,7 +3,7 @@
   "media.image.unavailable": { "bn": "ছবিটি দেখানো গেল না", "en": "This image could not be shown" },
 
   "media.zoom.region": {
-    "bn": "ছবি বড় করে দেখার এলাকা। প্লাস ও মাইনাস দিয়ে ছোট-বড় করুন, তীর চিহ্ন দিয়ে সরান, শূন্য চাপলে আগের অবস্থায় ফিরবে।",
+    "bn": "ছবি বড় করে দেখার এলাকা। প্লাস ও মাইনাস দিয়ে ছোট-বড় করুন, তীর চিহ্ন দিয়ে সরান, শূন্য চাপলে আগের মাপে ফিরবে।",
     "en": "Image zoom area. Plus and minus to zoom, arrow keys to pan, zero to reset."
   },
   "media.zoom.in": { "bn": "বড় করুন", "en": "Zoom in" },
@@ -29,13 +29,13 @@
   },
 
   "media.audio.label": { "bn": "কেসের কণ্ঠবার্তা", "en": "Case voice note" },
-  "media.audio.play": { "bn": "চালু করুন", "en": "Play" },
+  "media.audio.play": { "bn": "শুনুন", "en": "Play" },
   "media.audio.pause": { "bn": "থামান", "en": "Pause" },
   "media.audio.seek": { "bn": "কণ্ঠবার্তার অবস্থান", "en": "Audio position" },
   "media.audio.position": { "bn": "{{elapsed}} / {{total}}", "en": "{{elapsed}} / {{total}}" },
   "media.audio.loading": { "bn": "কণ্ঠবার্তা আসছে…", "en": "Loading audio…" },
   "media.audio.unavailable": {
-    "bn": "এখন কণ্ঠবার্তাটি চালানো যাচ্ছে না।",
+    "bn": "কণ্ঠবার্তাটি এখন শোনানো যাচ্ছে না।",
     "en": "The voice note cannot be played right now."
   },
   "media.audio.transcript": { "bn": "কণ্ঠবার্তার লিখিত রূপ", "en": "Voice note transcript" },

@@ -71,6 +71,10 @@
     "bn": "ফসলের তালিকা",
     "en": "Crops"
   },
+  "farmer.capture.crop.help": {
+    "bn": "আপনার ফসলের ছবিতে চাপ দিয়ে বেছে নিন।",
+    "en": "Tap the picture of your crop to choose it."
+  },
   "farmer.capture.crop.required": {
     "bn": "এগোনোর আগে একটি ফসল বেছে নিন।",
     "en": "Choose a crop before you continue."
@@ -112,8 +116,8 @@
     "en": "Unit"
   },
   "farmer.capture.field.help": {
-    "bn": "জমির পরিমাণ লিখুন। মাঠ কর্মকর্তা এই মাপ দেখেই ওষুধের মাত্রা ঠিক করেন। আপনি কথায়ও বলতে পারেন, তবে এখানে লিখলে মাপটি নিশ্চিত থাকে।",
-    "en": "Enter how much land this is. The field officer works out the remedy amount from this measurement. You may also say it in your voice note, but writing it here makes the figure certain."
+    "bn": "মাইক চেপে বলুন আপনার জমি কতটুকু, অথবা নিচে নিজে লিখে দিন। মাঠ কর্মকর্তা এই মাপ দেখেই ওষুধের মাত্রা ঠিক করেন।",
+    "en": "Press the microphone and say how much land you have, or type it in below. The field officer works out the remedy amount from this measurement."
   },
   "farmer.capture.field.quantityLabel": {
     "bn": "ফসলের পরিমাণ",
@@ -178,6 +182,50 @@
   "farmer.capture.images.takePhoto": {
     "bn": "ছবি তুলুন",
     "en": "Take a photo"
+  },
+  "farmer.capture.land.applied": {
+    "bn": "শোনা কথা থেকে ঘরগুলো ভরা হয়েছে। মিলিয়ে নিন, দরকার হলে বদলে দিন।",
+    "en": "The boxes were filled in from what was heard. Check them, and change them if needed."
+  },
+  "farmer.capture.land.diagnostic.UNSUPPORTED": {
+    "bn": "এই ফোনে কথা থেকে ঘর ভরার সুবিধা নেই। নিচে নিজে লিখে দিন।",
+    "en": "This device cannot fill the boxes in from speech. Please type them in below."
+  },
+  "farmer.capture.land.error.FAILED": {
+    "bn": "কথা বোঝা গেল না। নিচে নিজে লিখে দিন।",
+    "en": "The speech could not be recognised. Please type it in below."
+  },
+  "farmer.capture.land.error.NOT_ALLOWED": {
+    "bn": "মাইক্রোফোনের অনুমতি পাওয়া যায়নি। নিচে নিজে লিখে দিন।",
+    "en": "Microphone permission was not given. Please type it in below."
+  },
+  "farmer.capture.land.error.NO_SPEECH": {
+    "bn": "কিছু শোনা গেল না। আবার চেষ্টা করুন, অথবা নিচে লিখুন।",
+    "en": "Nothing was heard. Try again, or type it in below."
+  },
+  "farmer.capture.land.example": {
+    "bn": "যেমন — দশ শতক জমি, দুইশ কেজি ফসল।",
+    "en": "For example — ten decimals of land, two hundred kilograms of crop."
+  },
+  "farmer.capture.land.heard": {
+    "bn": "যা শুনলাম: {{text}}",
+    "en": "Heard: {{text}}"
+  },
+  "farmer.capture.land.listening": {
+    "bn": "শুনছি…",
+    "en": "Listening…"
+  },
+  "farmer.capture.land.notUnderstood": {
+    "bn": "কোনো মাপ বোঝা গেল না। নিচে নিজে লিখে দিন।",
+    "en": "No measurement was understood. Please type it in below."
+  },
+  "farmer.capture.land.speak": {
+    "bn": "মাইক চেপে বলুন",
+    "en": "Press the microphone and speak"
+  },
+  "farmer.capture.land.transient": {
+    "bn": "এই কথা কেসের সঙ্গে পাঠানো হয় না — শুধু নিচের ঘর ভরতে কাজে লাগে।",
+    "en": "This speech is not sent with the case — it only fills in the boxes below."
   },
   "farmer.capture.note.hint": {
     "bn": "কবে থেকে সমস্যা, কোন অংশে দেখা যাচ্ছে — যা জানেন লিখুন। এটি সবসময় খোলা থাকে।",
@@ -263,6 +311,50 @@
     "bn": "একটি ছবি সর্বোচ্চ {{megabytes}} মেগাবাইট হতে পারে।",
     "en": "A photo may be at most {{megabytes}} MB."
   },
+  "farmer.capture.review.area": {
+    "bn": "জমির পরিমাণ",
+    "en": "Land area"
+  },
+  "farmer.capture.review.crop": {
+    "bn": "ফসল",
+    "en": "Crop"
+  },
+  "farmer.capture.review.help": {
+    "bn": "সব ঠিক আছে কিনা দেখে নিন, তারপর পাঠান। কিছু বদলাতে চাইলে উপরের ধাপে চাপ দিন।",
+    "en": "Check that everything is right, then send. To change anything, tap a step above."
+  },
+  "farmer.capture.review.missing": {
+    "bn": "এখনো বাকি",
+    "en": "Still needed"
+  },
+  "farmer.capture.review.none": {
+    "bn": "দেওয়া হয়নি",
+    "en": "Not given"
+  },
+  "farmer.capture.review.note": {
+    "bn": "লেখা বর্ণনা",
+    "en": "Written description"
+  },
+  "farmer.capture.review.photos": {
+    "bn": "ছবি",
+    "en": "Photos"
+  },
+  "farmer.capture.review.present": {
+    "bn": "দেওয়া হয়েছে",
+    "en": "Given"
+  },
+  "farmer.capture.review.quantity": {
+    "bn": "ফসলের পরিমাণ",
+    "en": "Crop quantity"
+  },
+  "farmer.capture.review.stepTitle": {
+    "bn": "মিলিয়ে দেখে পাঠান",
+    "en": "Check and send"
+  },
+  "farmer.capture.review.voice": {
+    "bn": "কণ্ঠবার্তা",
+    "en": "Voice note"
+  },
   "farmer.capture.serverReason.BLURRY": {
     "bn": "ঝাপসা",
     "en": "Blurry"
@@ -286,6 +378,38 @@
   "farmer.capture.serverReason.UNREADABLE": {
     "bn": "পড়া যায়নি",
     "en": "Could not be read"
+  },
+  "farmer.capture.stepper.back": {
+    "bn": "আগের ধাপ",
+    "en": "Previous step"
+  },
+  "farmer.capture.stepper.done": {
+    "bn": "সম্পন্ন",
+    "en": "Done"
+  },
+  "farmer.capture.stepper.listen": {
+    "bn": "শুনুন",
+    "en": "Listen"
+  },
+  "farmer.capture.stepper.mute": {
+    "bn": "শব্দ বন্ধ",
+    "en": "Sound off"
+  },
+  "farmer.capture.stepper.next": {
+    "bn": "পরের ধাপ",
+    "en": "Next step"
+  },
+  "farmer.capture.stepper.progress": {
+    "bn": "ধাপ {{position}} / {{total}}",
+    "en": "Step {{position}} of {{total}}"
+  },
+  "farmer.capture.stepper.railLabel": {
+    "bn": "ধাপগুলো",
+    "en": "Steps"
+  },
+  "farmer.capture.stepper.unmute": {
+    "bn": "শব্দ চালু",
+    "en": "Sound on"
   },
   "farmer.capture.submit.hint": {
     "bn": "কমপক্ষে {{min}}টি ছবি দরকার।",

@@ -101,6 +101,20 @@ export const APP_CONFIG = {
     cataloguePath: '/i18n/',
   },
 
+  /**
+   * The browser's own Web Speech API, used only on the farmer's capture stepper: spoken
+   * step guidance, and the land step's dictation pre-fill (`DEVIATIONS.md` D-23). No server
+   * property defines these — they are presentation, and both features degrade to silence
+   * where the platform has no Bangla voice or no recogniser.
+   */
+  speech: {
+    recognitionLang: 'bn-BD',
+    guideRate: 0.95, //                  a shade under natural pace; the guidance is instructional
+    guidePitch: 1.0,
+    listenTimeoutMs: 12_000, //          give the microphone back rather than holding it open
+    maxAlternatives: 1,
+  },
+
   storage: {
     presignTtlMs: 600_000, //            foshol.storage.presign-ttl (PT10M)
     /** Re-presign this far ahead of expiry so an <img> never loads a dead URL. */

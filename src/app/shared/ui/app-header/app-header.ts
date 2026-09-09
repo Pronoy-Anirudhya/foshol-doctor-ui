@@ -20,13 +20,28 @@ import { SseIndicator } from '../sse-indicator/sse-indicator';
  * Identity, region and sign-out used to be three separate elements in this bar; they are now
  * `AccountMenu`, one trigger with everything verbose behind a click — see that component's own
  * doc comment for the reasoning. `WEB-SEC-004`/`WEB-SEC-006` still apply, just inside it.
+ *
+ * The bar is pinned to the top of the viewport on every route and for every persona, so the
+ * account menu, the language toggle and the live-connection state are never a scroll away —
+ * a farmer half way down an advisory can still see whether the stream is alive, and an officer
+ * deep in a queue can still switch language without scrolling back.
+ *
+ * The pin lives on the HOST rather than on the inner `<header>` on purpose. `sticky` is
+ * resolved against the nearest scrolling ancestor but constrained by its own containing block:
+ * a `<header>` inside a host box exactly its own height has nowhere to travel, so it never
+ * moves. The host is a child of the shell's full-page column, which is the box the bar must be
+ * free to slide down. Keeping it here also keeps it tone-agnostic — nothing about being pinned
+ * belongs in the light/dark class computation below.
  */
 @Component({
   selector: 'foshol-app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, LangToggle, SseIndicator, NotificationBell, AccountMenu, Icon, RouterLink],
   templateUrl: './app-header.html',
-  host: { class: 'block' },
+  styleUrl: './app-header.css',
+  // z-30 sits under the mobile nav drawer (z-45) and the skip link (z-50), both of which must
+  // be able to cover the bar, and over ordinary page content, which must not.
+  host: { class: 'sticky top-0 z-30 block' },
 })
 export class AppHeader {
   private readonly session = inject(SessionStore);
@@ -45,10 +60,15 @@ export class AppHeader {
   /** Item 3 — the brand mark is a link home, home being whichever surface this role owns. */
   protected readonly homePath = computed(() => homePathForRole(this.role()));
 
+  /**
+   * The Tailwind background is the opaque floor; `hd-bar*` in app-header.css only lightens it
+   * where `backdrop-filter` exists to blur what shows through. Order matters — a browser
+   * without the filter keeps the solid colour rather than an unreadable wash.
+   */
   protected readonly barClass = computed(() =>
     this.tone() === 'dark'
-      ? 'bg-slate-800 text-ink-invert'
-      : 'bg-surface-0 text-ink border-b border-surface-2',
+      ? 'hd-bar hd-bar-dark bg-slate-800 text-ink-invert'
+      : 'hd-bar hd-bar-light bg-surface-0 text-ink border-b border-surface-2',
   );
 
   protected readonly mutedClass = computed(() =>

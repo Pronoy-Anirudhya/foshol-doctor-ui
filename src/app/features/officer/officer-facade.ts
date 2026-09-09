@@ -197,9 +197,26 @@ export class OfficerFacade {
     return this.queue.rows().find((row) => row.caseId === caseId) ?? null;
   });
 
+  /**
+   * The farmer's name for the open case — **`null` is a real answer here, not a bug.**
+   *
+   * `DEVIATIONS.md` D-05: the workspace is composed from several sources because the live
+   * `GET /review/tasks/{taskId}` does not match the frozen `ReviewCaseDetail`, and `CaseDetail`
+   * itself carries no farmer identity at all. So the name only ever arrives with the queue row
+   * or with the flat review-task body — and `openRow()` matches against the currently loaded
+   * queue *page*. Open a case from a link, from a stale tab, or after paging past it, and there
+   * is no row to match; if the review task has not resolved either, this is genuinely `null`.
+   *
+   * The workspace heading answers that with `farmerDistrictCode` and the case id rather than a
+   * generic word, so an unnamed case still says *which* case it is. Fetching the name from
+   * somewhere else would be inventing an endpoint, which D-05 exists to avoid.
+   */
   readonly farmerName = computed(
     () => this.openRow()?.farmerName ?? this._summary()?.farmerName ?? null,
   );
+
+  /** Only the queue row carries a district, so this is `null` on exactly the same paths. */
+  readonly farmerDistrictCode = computed(() => this.openRow()?.districtCode ?? null);
 
   readonly slaDueAt = computed(
     () => this.openRow()?.slaDueAt ?? this.workspace.task()?.slaDueAt ?? null,

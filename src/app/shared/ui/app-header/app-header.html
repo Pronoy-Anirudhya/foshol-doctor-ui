@@ -1,5 +1,7 @@
+<!-- No `sticky` here: the pin lives on the component host, which is the only box with room to
+     travel. See app-header.ts. -->
 <header
-  class="sticky top-0 z-40 w-full shadow-card"
+  class="w-full shadow-card"
   [class]="barClass()"
   [attr.aria-label]="'shared.header.label' | translate"
 >

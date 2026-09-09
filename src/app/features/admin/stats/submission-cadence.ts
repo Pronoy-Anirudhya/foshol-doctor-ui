@@ -9,12 +9,13 @@ import type { CadenceView } from '../queue-insight.adapter';
  * When the loaded cases arrived — the one graphic on this page that earns an `<svg>`, because
  * CSS cannot draw a polyline and a bar chart of twelve buckets says less than a line does.
  *
- * **The honesty problem this widget is mostly made of.** Queue page 0 is ordered by state, then
- * least-confident, then oldest. That is neither chronological nor random, so the rows loaded are
- * a *biased* sample of submissions and the shape drawn from them is not the arrival rate of the
- * system. The caption therefore always states three things: how many rows were loaded, how many
- * exist, and the ends of the OBSERVED window in Dhaka time. Bucketing across a fixed clock
- * window instead would invent empty buckets for hours there is no evidence about.
+ * **The honesty problem this widget is mostly made of.** Queue page 0 returns the newest
+ * submissions first. That order is chronological, but a single page of it is still only the most
+ * recent slice of the queue — never a census — so the rows loaded remain a *biased* sample of
+ * submissions and the shape drawn from them is not the arrival rate of the system. The caption
+ * therefore always states three things: how many rows were loaded, how many exist, and the ends
+ * of the OBSERVED window in Dhaka time. Bucketing across a fixed clock window instead would
+ * invent empty buckets for hours there is no evidence about.
  *
  * Below `APP_CONFIG.admin.cadenceMinRows` timestamps, or across a window of zero width, the
  * adapter returns no buckets at all and this component draws **no line** — a polyline through

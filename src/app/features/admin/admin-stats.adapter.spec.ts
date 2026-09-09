@@ -68,12 +68,19 @@ describe('toAdminStatsView (D-06, WEB-FR-301/302)', () => {
   });
 
   it('does not model the three fields the server never sends', () => {
+    // The three absentees this guards against are `advisoriesPublished`, `casesRejected` and
+    // `pathCounts`: they exist on the generated contract but never on the wire (D-06), so the
+    // view must not carry them. Everything the live body does send is modelled.
     expect(Object.keys(toAdminStatsView(live())).sort()).toEqual([
       'agreementRate',
       'agreementSampleSize',
       'approvalRate',
+      'casesLifetime',
+      'casesThisMonth',
+      'casesThisYear',
       'casesToday',
       'medianReviewMinutes',
+      'rejectionRate',
       'thresholds',
     ]);
   });
