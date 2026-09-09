@@ -21,7 +21,22 @@ import { APP_CONFIG } from '../../../core/config/app-config';
  */
 const VOICES_CHANGED = 'voiceschanged';
 const BANGLA_LANG_PREFIX = 'bn';
+/** Bangladeshi Bangla. `bn-IN` is West Bengal — intelligible, but audibly not local. */
+const BANGLADESH_LANG = 'bn-bd';
 const EMPTY = 0;
+
+/**
+ * Name fragments that mark a platform's *good* voice, lower-cased for comparison.
+ *
+ * Every major platform ships two tiers under the same language and distinguishes them only in
+ * the voice's NAME: Chrome's network "Google বাংলা", Apple's "Enhanced"/"Premium" downloads and
+ * Siri voices, Microsoft's "Natural"/"Neural" ones. `SpeechSynthesisVoice` exposes no quality
+ * field, so the name is the only signal available.
+ */
+const GOOD_VOICE_HINTS = ['google', 'natural', 'neural', 'enhanced', 'premium', 'siri'];
+
+/** The low-tier formant voices — the robotic ones this ranking exists to avoid. */
+const POOR_VOICE_HINTS = ['compact', 'eloquence'];
 
 /** `window.speechSynthesis` is typed non-optional by lib.dom, but is absent in plenty of runtimes. */
 interface SpeechCapableWindow {
@@ -116,6 +131,20 @@ export class VoiceGuide {
     if (next) this.cancel();
   }
 
+  /**
+   * Picks the most natural Bangla voice the platform has, in order of preference.
+   *
+   * `getVoices()` returns platform order, not quality order, so taking the first `bn` match —
+   * which is what this did — reliably selected the low-tier compact voice on both macOS and
+   * Android. That is the robotic delivery this ranking replaces.
+   *
+   * Preference runs dialect first, then quality: a Bangladeshi farmer hears `bn-IN` as a
+   * foreign accent, so a plain `bn-BD` voice beats an enhanced West Bengal one. Within a
+   * dialect, a named good voice beats an unmarked one, which beats a known-poor one.
+   *
+   * Falls through to the platform default (`null`) when there is no Bangla voice at all — it
+   * reads Bangla badly, but is still better than silence for someone who cannot read the card.
+   */
   #chooseVoice(): void {
     const synth = this.#synth;
     if (synth === null) return;
@@ -125,8 +154,39 @@ export class VoiceGuide {
     } catch {
       return;
     }
-    // A Bangla voice if the platform has one; otherwise the platform default, which reads
-    // Bangla text badly but is still better than nothing for a farmer who cannot read it.
-    this.#voice = voices.find((voice) => voice.lang.startsWith(BANGLA_LANG_PREFIX)) ?? null;
+
+    const bangla = voices.filter((voice) => voice.lang.toLowerCase().startsWith(BANGLA_LANG_PREFIX));
+    if (bangla.length === EMPTY) {
+      this.#voice = null;
+      return;
+    }
+
+    const local = (voice: SpeechSynthesisVoice): boolean =>
+      voice.lang.toLowerCase().replace('_', '-') === BANGLADESH_LANG;
+    const named = (voice: SpeechSynthesisVoice, hints: readonly string[]): boolean => {
+      const name = voice.name.toLowerCase();
+      return hints.some((hint) => name.includes(hint));
+    };
+    const good = (voice: SpeechSynthesisVoice): boolean => named(voice, GOOD_VOICE_HINTS);
+    const poor = (voice: SpeechSynthesisVoice): boolean => named(voice, POOR_VOICE_HINTS);
+
+    // Ordered predicates rather than a numeric score, so the ranking reads as the sentence it
+    // is and no weights need justifying (WEB-NFR-009).
+    const preference: readonly ((voice: SpeechSynthesisVoice) => boolean)[] = [
+      (voice) => local(voice) && good(voice),
+      (voice) => local(voice) && !poor(voice),
+      (voice) => local(voice),
+      (voice) => good(voice),
+      (voice) => !poor(voice),
+      () => true,
+    ];
+
+    for (const matches of preference) {
+      const found = bangla.find(matches);
+      if (found !== undefined) {
+        this.#voice = found;
+        return;
+      }
+    }
   }
 }
