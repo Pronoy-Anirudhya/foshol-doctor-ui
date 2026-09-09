@@ -71,6 +71,19 @@ const TENS: ReadonlyMap<string, number> = new Map([
 /** Longest first, so `একশো` is not read as `একশ` plus a stray `ো`. */
 const HUNDRED_SUFFIXES: readonly string[] = ['শো', 'শত', 'শ'];
 
+/**
+ * Bangla numeral classifiers. "দশটা গাছ" is *ten plants* — `টা` is how a number is SPOKEN
+ * before a countable noun, not part of the number word, so it has to come off before the
+ * lexicon is consulted. Without this the whole quantity is dropped: `দশটা` matches nothing,
+ * `runBefore` finds no number in front of `গাছ`, and the field is left empty.
+ *
+ * Longest first, so `একখানা` loses `খানা` rather than being left as `একখা`.
+ *
+ * Stripping is only ever *attempted* — the stem still has to be a number the lexicon knows, so
+ * an ordinary word that happens to end in these letters cannot become a measurement.
+ */
+const CLASSIFIER_SUFFIXES: readonly string[] = ['খানা', 'খানি', 'গুলো', 'গুলি', 'জন', 'টা', 'টি', 'টে'];
+
 const PLUS_HALF_WORD = 'সাড়ে';
 const THOUSAND_WORD = 'হাজার';
 const ONE_AND_A_HALF_WORD = 'দেড়';
@@ -132,7 +145,25 @@ function hundredsOf(token: string): number | null {
   return null;
 }
 
+/** The stem of a classified numeral (`দশটা` → `দশ`, `১০টি` → `10`), or `null` if there is none. */
+function withoutClassifier(token: string): string | null {
+  for (const suffix of CLASSIFIER_SUFFIXES) {
+    if (!token.endsWith(suffix) || token.length === suffix.length) continue;
+    return token.slice(NOTHING, token.length - suffix.length);
+  }
+  return null;
+}
+
 function atomOf(token: string): Atom | null {
+  const direct = atomOfBareWord(token);
+  if (direct !== null) return direct;
+
+  // One strip, then the same lookups: a classifier never stacks on another classifier.
+  const stem = withoutClassifier(token);
+  return stem === null ? null : atomOfBareWord(stem);
+}
+
+function atomOfBareWord(token: string): Atom | null {
   if (token === PLUS_HALF_WORD) return { kind: HALF_ATOM };
   if (token === THOUSAND_WORD) return { kind: THOUSAND_ATOM };
   if (token === ONE_AND_A_HALF_WORD) return { kind: VALUE_ATOM, value: ONE_AND_A_HALF };

@@ -106,6 +106,50 @@ describe('parseBanglaQuantity — a whole sentence', () => {
   it('tokenises on whitespace and punctuation, keeping an inner decimal point', () => {
     expect(tokeniseBanglaSpeech('দশ শতক, ২.৫ একর।')).toEqual(['দশ', 'শতক', '2.5', 'একর']);
   });
+
+  /**
+   * The reported failure: this sentence read its area but silently dropped its quantity,
+   * because `দশটা` matched nothing in the lexicon and `runBefore` therefore found no number in
+   * front of `গাছ`. A classifier on a spoken numeral is the norm, not an edge case.
+   */
+  it('reads a classified numeral — "দশটা গাছ" is ten plants', () => {
+    expect(parseBanglaQuantity('আমার 50 বর্গফুট জায়গায় দশটা গাছ আছে')).toEqual({
+      fieldArea: 50,
+      fieldAreaUnit: 'SQ_FT',
+      cropQuantity: 10,
+      cropQuantityUnit: 'PLANTS',
+    });
+  });
+});
+
+describe('parseBanglaQuantity — numeral classifiers', () => {
+  it('strips the classifier from a number word', () => {
+    for (const phrase of ['পাঁচটা গাছ', 'পাঁচটি গাছ', 'পাঁচখানা গাছ', 'পাঁচজন গাছ']) {
+      expect(parseBanglaQuantity(phrase)).toEqual({ cropQuantity: 5, cropQuantityUnit: 'PLANTS' });
+    }
+  });
+
+  it('strips the classifier from a digit, which is what a recogniser often emits', () => {
+    expect(parseBanglaQuantity('১০টি চারা')).toEqual({ cropQuantity: 10, cropQuantityUnit: 'PLANTS' });
+    expect(parseBanglaQuantity('25টা গাছ')).toEqual({ cropQuantity: 25, cropQuantityUnit: 'PLANTS' });
+  });
+
+  it('still reads a classified numeral inside a compound number', () => {
+    expect(parseBanglaQuantity('দুইশ কেজি')).toEqual({ cropQuantity: 200, cropQuantityUnit: 'KG' });
+  });
+
+  /**
+   * The guard that keeps stripping safe: a stem is only accepted when the lexicon knows it, so
+   * an ordinary word ending in the same letters cannot become a measurement.
+   */
+  it('does not turn an ordinary word ending in a classifier into a number', () => {
+    expect(parseBanglaQuantity('ঘটনা গাছ')).toEqual({});
+    expect(parseBanglaQuantity('কটা গাছ')).toEqual({});
+  });
+
+  it('does not strip a classifier that is the whole token', () => {
+    expect(parseBanglaQuantity('টা গাছ')).toEqual({});
+  });
 });
 
 describe('parseBanglaQuantity — everything it must refuse', () => {
