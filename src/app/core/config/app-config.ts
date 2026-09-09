@@ -198,6 +198,30 @@ export const APP_CONFIG = {
   },
 
   /**
+   * Staff farmer provision (`WEB-FR-310`…`314`). `WEB-NFR-010` — every limit here mirrors a
+   * server property or an OpenAPI constraint, and the SERVER remains the decision of record:
+   * these values shape a control and stop a request the UI already knows will be refused, in
+   * the same spirit as `review.bulkMaxSize`. A file inside these bounds may still be rejected.
+   * See `DEVIATIONS.md` D-25 for why this frozen file was amended.
+   */
+  farmers: {
+    importMaxRows: 100, //               foshol.identity.bulk.max-rows (data rows, header excluded)
+    importMaxBytes: 262_144, //          foshol.identity.bulk.max-bytes (256 KiB)
+    nameMaxLength: 120, //               OpenAPI: RegisterFarmerRequest.name maxLength
+    /** `Content-Disposition` is not CORS-exposed here, so the contract's filename is used. */
+    templateFilename: 'farmer-import-template.csv',
+    /** IDENTITY-FR-024. The UI never invents a column, and never reorders these five. */
+    templateHeader: 'name,phone,divisionCode,districtCode,preferredLanguage',
+    /**
+     * Deliberately more permissive than `auth.phonePattern`, which accepts `+8801…` only: an
+     * officer types the number as the farmer says it, so the national `017…` form must pass too.
+     * The value is sent AS TYPED — the contract accepts either form, and normalising here would
+     * re-implement a server rule (`WEB-NFR-001`). `ERR_PHONE_INVALID` remains authoritative.
+     */
+    phonePattern: /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8})$/,
+  },
+
+  /**
    * The in-session notification list. Every entry comes from an SSE frame the dispatcher already
    * parsed, so nothing here polls or fetches. Deliberately memory-only: `storageKeys` above names
    * the only two keys this application may write, and a farmer's case notifications are not one
