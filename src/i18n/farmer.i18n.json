@@ -1,14 +1,14 @@
 {
   "farmer.status.eyebrow": { "bn": "আপনার কেস", "en": "Your case" },
   "farmer.status.title": { "bn": "কেসের অবস্থা", "en": "Case status" },
-  "farmer.status.submittedAt": { "bn": "জমা দেওয়া হয়েছে", "en": "Submitted" },
+  "farmer.status.submittedAt": { "bn": "পাঠিয়েছেন", "en": "Submitted" },
   "farmer.status.refresh": { "bn": "নতুন করে দেখুন", "en": "Refresh" },
   "farmer.status.reviewingTitle": {
     "bn": "একজন মাঠ কর্মকর্তা আপনার ছবি দেখছেন",
     "en": "A field officer is looking at your photographs"
   },
   "farmer.status.reviewingBody": {
-    "bn": "প্রতিটি পরামর্শ একজন মানুষ নিজে দেখে নিশ্চিত করেন, তারপরই আপনার কাছে যায়। তাই একটু সময় লাগে — এটাই নিয়ম।",
+    "bn": "প্রতিটি পরামর্শ একজন মানুষ নিজে দেখে নিশ্চিত করেন, তারপরই সেটি আপনার কাছে পৌঁছায়। তাই একটু সময় লাগে — এটাই নিয়ম।",
     "en": "Every piece of advice is checked by a person before it reaches you. That is why it takes a little time, and it is meant to."
   },
   "farmer.status.failedTitle": {
@@ -16,7 +16,7 @@
     "en": "The analysis could not be completed"
   },
   "farmer.status.failedBody": {
-    "bn": "এই কেসটি এগোয়নি। একটু পরে আবার দেখুন, অথবা নতুন একটি কেস পাঠান।",
+    "bn": "এই কেসটি আর এগোয়নি। একটু পরে আবার দেখুন, না হলে নতুন একটি কেস পাঠান।",
     "en": "This case did not go through. Look again in a moment, or send a new one."
   },
   "farmer.status.yourPhotos": { "bn": "আপনার পাঠানো ছবি", "en": "The photographs you sent" },
@@ -24,7 +24,7 @@
     "bn": "আপনার পাঠানো {{position}} নম্বর ছবি",
     "en": "Photograph {{position}} that you submitted"
   },
-  "farmer.status.yourNote": { "bn": "আপনার লেখা", "en": "Your note" },
+  "farmer.status.yourNote": { "bn": "আপনি যা লিখেছেন", "en": "Your note" },
   "farmer.status.yourField": { "bn": "আপনার জমির তথ্য", "en": "Your field details" },
   "farmer.status.fieldArea": { "bn": "জমির পরিমাণ", "en": "Field area" },
   "farmer.status.cropQuantity": { "bn": "ফসলের পরিমাণ", "en": "Crop quantity" },
@@ -36,7 +36,7 @@
     "en": "Revised · version {{version}}"
   },
   "farmer.advisory.publishedAt": { "bn": "দেওয়া হয়েছে", "en": "Issued" },
-  "farmer.advisory.officerNote": { "bn": "কর্মকর্তার মন্তব্য", "en": "The officer's note" },
+  "farmer.advisory.officerNote": { "bn": "কর্মকর্তার কথা", "en": "The officer's note" },
   "farmer.advisory.remediesTitle": { "bn": "প্রতিকার", "en": "Remedies" },
   "farmer.advisory.dosage": { "bn": "মাত্রা", "en": "Dosage" },
   "farmer.advisory.phiLabel": {
@@ -45,22 +45,22 @@
   },
   "farmer.advisory.phiValue": { "bn": "{{days}} দিন", "en": "{{days}} days" },
   "farmer.advisory.source": { "bn": "সূত্র", "en": "Source" },
-  "farmer.advisory.previousTitle": { "bn": "আগের সংস্করণ", "en": "Previous versions" },
+  "farmer.advisory.previousTitle": { "bn": "আগের পরামর্শ", "en": "Previous versions" },
   "farmer.advisory.showPrevious": {
     "bn": "আগে যা বলা হয়েছিল দেখুন",
     "en": "See what you were told before"
   },
-  "farmer.advisory.hidePrevious": { "bn": "আগের সংস্করণ লুকান", "en": "Hide previous versions" },
+  "farmer.advisory.hidePrevious": { "bn": "আগের পরামর্শ লুকান", "en": "Hide previous versions" },
   "farmer.advisory.previousLoading": {
-    "bn": "আগের সংস্করণ আসছে…",
+    "bn": "আগের পরামর্শ আসছে…",
     "en": "Loading previous versions…"
   },
   "farmer.advisory.previousFailed": {
-    "bn": "আগের সংস্করণ এখন আনা গেল না।",
+    "bn": "আগের পরামর্শ এখন আনা গেল না।",
     "en": "The previous versions could not be loaded right now."
   },
   "farmer.advisory.previousNone": {
-    "bn": "আগের কোনো সংস্করণ নেই।",
+    "bn": "আগে দেওয়া কোনো পরামর্শ নেই।",
     "en": "There is no earlier version."
   },
   "farmer.advisory.versionLabel": { "bn": "সংস্করণ {{version}}", "en": "Version {{version}}" },
@@ -70,22 +70,25 @@
     "en": "This case could not be taken forward"
   },
   "farmer.rejection.lead": {
-    "bn": "নিরাপদে সিদ্ধান্ত নেওয়ার মতো যথেষ্ট কিছু কর্মকর্তা দেখতে পাননি।",
+    "bn": "নিশ্চিত হয়ে সিদ্ধান্ত নেওয়ার মতো যথেষ্ট কিছু কর্মকর্তা ছবিতে দেখতে পাননি।",
     "en": "The officer could not see enough to decide safely."
   },
-  "farmer.rejection.officerMessage": { "bn": "কর্মকর্তার বার্তা", "en": "The officer's message" },
+  "farmer.rejection.officerMessage": { "bn": "কর্মকর্তা যা লিখেছেন", "en": "The officer's message" },
   "farmer.rejection.reassurance": {
-    "bn": "এটি আপনার ভুল নয়। ভালো আলোতে কাছ থেকে আরেকটি ছবি তুললেই সাধারণত যথেষ্ট হয়।",
+    "bn": "এতে আপনার কোনো দোষ নেই। ভালো আলোয় কাছ থেকে আরেকটি ছবি তুললেই সাধারণত কাজ হয়ে যায়।",
     "en": "This is not your mistake. Another close photograph in good light is usually all it takes."
   },
   "farmer.rejection.newCase": { "bn": "নতুন কেস পাঠান", "en": "Submit a new case" },
 
   "farmer.history.title": { "bn": "আপনার কেসগুলো", "en": "Your cases" },
-  "farmer.history.subtitle": { "bn": "নতুনগুলো আগে", "en": "Newest first" },
+  "farmer.history.subtitle": {
+    "bn": "সবচেয়ে নতুন কেস সবার উপরে",
+    "en": "Newest cases first"
+  },
   "farmer.history.newCase": { "bn": "নতুন কেস", "en": "New case" },
   "farmer.history.emptyTitle": { "bn": "এখনো কোনো কেস নেই", "en": "No cases yet" },
   "farmer.history.emptyDetail": {
-    "bn": "একটি ছবি পাঠালে সেটি এখানে দেখা যাবে।",
+    "bn": "ফসলের একটি ছবি পাঠালে সেটি এখানে দেখতে পাবেন।",
     "en": "Send a photograph and it will appear here."
   },
   "farmer.history.listLabel": { "bn": "আপনার কেসের তালিকা", "en": "Your cases" },
@@ -94,14 +97,14 @@
     "en": "Photograph from the {{crop}} case"
   },
   "farmer.history.noPhoto": { "bn": "কোনো ছবি নেই", "en": "No photograph" },
-  "farmer.history.backToList": { "bn": "তালিকায় ফিরুন", "en": "Back to the list" },
+  "farmer.history.backToList": { "bn": "কেসের তালিকায় ফিরুন", "en": "Back to your cases" },
 
   "farmer.history.search.label": { "bn": "কেস খুঁজুন", "en": "Search your cases" },
   "farmer.history.search.placeholder": {
     "bn": "ফসল বা রোগের নাম দিয়ে খুঁজুন",
     "en": "Search by crop or disease name"
   },
-  "farmer.history.filter.status.label": { "bn": "অবস্থা অনুযায়ী ছাঁকুন", "en": "Filter by status" },
+  "farmer.history.filter.status.label": { "bn": "অবস্থা বেছে দেখুন", "en": "Filter by status" },
   "farmer.history.filter.status.all": { "bn": "সব অবস্থা", "en": "All statuses" },
   "farmer.history.filter.count": {
     "bn": "{{count}}টি কেস মিলেছে",
@@ -109,7 +112,7 @@
   },
   "farmer.history.noMatches.title": { "bn": "কোনো কেস মেলেনি", "en": "No matching cases" },
   "farmer.history.noMatches.detail": {
-    "bn": "অন্য নাম দিয়ে খুঁজুন বা অবস্থার ছাঁকনি সরিয়ে দেখুন।",
+    "bn": "অন্য নাম দিয়ে খুঁজুন, বা সব অবস্থা বেছে আবার দেখুন।",
     "en": "Try a different search term, or clear the status filter."
   }
 }

@@ -197,9 +197,11 @@
           }
         </ul>
 
-        <!-- WEB-API-003 — the four envelope numbers, read rather than inferred. -->
+        <!-- WEB-API-003 — the four envelope numbers, read rather than inferred. Deliberately a
+             sibling of the <ul> rather than a child: beside an open case the list itself is the
+             scrolling box, so the page controls stay put beneath it. -->
         <foshol-paginator
-          class="mt-4 block"
+          [class]="paginatorClass()"
           [page]="pageIndex()"
           [size]="pageSize()"
           [totalElements]="totalElements()"
@@ -211,7 +213,12 @@
 
     <div class="min-w-0">
       @if (detailOpen()) {
-        <foshol-back-link class="mb-4 block xl:hidden" to="." labelKey="farmer.history.backToList" />
+        <!-- WEB-UX-040 — the way out of an open case has to exist at every width, not only where
+             the list is off screen: at xl the list is beside this pane but nothing in the page
+             said so, which left the browser's own back button as the only in-app route back.
+             The wording is deliberately about returning to the list rather than "closing", so it
+             reads the same whether the list is a route away or already sitting alongside. -->
+        <foshol-back-link class="mb-4 block" to="." labelKey="farmer.history.backToList" />
       }
 
       <router-outlet (activate)="setDetailOpen(true)" (deactivate)="setDetailOpen(false)" />
