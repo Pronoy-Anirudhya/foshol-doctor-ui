@@ -114,9 +114,9 @@ export class ReviewService extends BaseService {
   static readonly GetReviewQueuePath = '/api/v1/review/queue';
 
   /**
-   * Officer queue, ordered least-confident first (role OFFICER, ADMIN).
+   * Officer queue, ordered newest submitted_at first (role OFFICER, ADMIN).
    *
-   * Ordering is fixed by the server (state, top_confidence ASC NULLS FIRST, submitted_at ASC) and is not client-controllable.
+   * Ordering is fixed by the server (submitted_at DESC, newest case first) and is not client-controllable. Client `sort` and `order` query parameters are rejected.
    *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `getReviewQueue()` instead.
@@ -129,9 +129,9 @@ export class ReviewService extends BaseService {
   }
 
   /**
-   * Officer queue, ordered least-confident first (role OFFICER, ADMIN).
+   * Officer queue, ordered newest submitted_at first (role OFFICER, ADMIN).
    *
-   * Ordering is fixed by the server (state, top_confidence ASC NULLS FIRST, submitted_at ASC) and is not client-controllable.
+   * Ordering is fixed by the server (submitted_at DESC, newest case first) and is not client-controllable. Client `sort` and `order` query parameters are rejected.
    *
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `getReviewQueue$Response()` instead.

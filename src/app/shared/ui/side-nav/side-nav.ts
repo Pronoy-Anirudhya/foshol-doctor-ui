@@ -35,12 +35,16 @@ const FARMER_ITEMS: readonly NavItem[] = [
   { key: 'newCase', path: '/farmer/new', icon: 'camera' },
 ];
 
-const OFFICER_ITEMS: readonly NavItem[] = [{ key: 'queue', path: '/officer/queue', icon: 'inbox' }];
+const OFFICER_ITEMS: readonly NavItem[] = [
+  { key: 'queue', path: '/officer/queue', icon: 'inbox' },
+  { key: 'farmers', path: '/officer/farmers', icon: 'user' },
+];
 
 const ADMIN_ITEMS: readonly NavItem[] = [
   { key: 'dashboard', path: '/admin/stats', icon: 'home' },
   { key: 'cases', path: '/admin/cases', icon: 'list' },
   { key: 'kpis', path: '/admin/kpis', icon: 'warning' },
+  { key: 'farmers', path: '/admin/farmers', icon: 'user' },
 ];
 
 const ITEMS_BY_ROLE: Readonly<Record<Role, readonly NavItem[]>> = {

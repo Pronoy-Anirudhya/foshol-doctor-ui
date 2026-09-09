@@ -27,5 +27,11 @@ export const officerRoutes: Routes = [
       },
     ],
   },
+  {
+    // WEB-FR-310 — the SAME page the admin surface mounts at `/admin/farmers`. Lazy, so the
+    // queue's first paint does not carry the provision screens or their dialogs.
+    path: 'farmers',
+    loadComponent: () => import('../farmers/farmers-page').then((m) => m.FarmersPage),
+  },
   { path: '**', redirectTo: 'queue' },
 ];

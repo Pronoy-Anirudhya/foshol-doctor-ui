@@ -1,0 +1,199 @@
+<foshol-modal-dialog
+  [open]="open()"
+  titleKey="farmers.import.title"
+  headingId="farmer-import-title"
+  (closed)="close()"
+>
+  <div class="flex flex-col gap-5">
+    <!-- 1 — The template. Downloading it first is what stops a home-made header reaching the
+         server, so it leads rather than sitting at the bottom as a footnote. -->
+    <section class="rounded-card border border-surface-3 bg-surface-1 p-4">
+      <h3 class="text-base font-bold text-ink">{{ 'farmers.import.template.title' | translate }}</h3>
+      <p class="mt-1 text-sm text-ink-muted">{{ 'farmers.import.template.detail' | translate }}</p>
+
+      <!-- The five columns, stated exactly. WEB-FR-313: the UI never invents a sixth. -->
+      <p class="mt-2 overflow-x-auto text-sm">
+        <code class="font-mono text-ink select-all">{{ templateHeader }}</code>
+      </p>
+
+      <button
+        type="button"
+        class="touch-target mt-3 inline-flex items-center gap-2 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1 disabled:cursor-not-allowed disabled:opacity-60"
+        data-testid="import-download-template"
+        [disabled]="downloading()"
+        (click)="downloadTemplate()"
+      >
+        {{ (downloading() ? 'farmers.import.template.downloading' : 'farmers.import.template.download') | translate }}
+      </button>
+
+      @if (downloadFailed()) {
+        <p class="mt-2 text-sm font-semibold text-clay-700" role="alert" data-testid="import-template-failed">
+          {{ 'farmers.import.template.failed' | translate }}
+        </p>
+      }
+    </section>
+
+    <!-- 2 — The rules, stated before the file picker rather than as an error afterwards. -->
+    <section>
+      <h3 class="text-base font-bold text-ink">{{ 'farmers.import.rules.title' | translate }}</h3>
+      <ul class="mt-2 flex list-disc flex-col gap-1 ps-5 text-sm text-ink-muted">
+        <li>{{ 'farmers.import.rules.rows' | translate: { max: maxRows } }}</li>
+        <li>{{ 'farmers.import.rules.size' | translate: { kib: maxKib } }}</li>
+        <li>{{ 'farmers.import.rules.encoding' | translate }}</li>
+        <!-- The same district rule the single-farmer form locks (WEB-FR-314). -->
+        <li>{{ 'farmers.import.rules.district' | translate }}</li>
+      </ul>
+    </section>
+
+    <!-- 3 — The file. Only its name, size and row count are ever shown: the file itself holds
+         phone numbers and its contents never reach the screen (WEB-SEC-002). -->
+    <section class="flex flex-col gap-2">
+      <label for="farmer-import-file" class="text-sm font-semibold text-ink">
+        {{ 'farmers.import.file.label' | translate }}
+      </label>
+      <input
+        id="farmer-import-file"
+        type="file"
+        accept=".csv,text/csv"
+        class="touch-target w-full rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink file:me-3 file:rounded-control file:border-0 file:bg-surface-2 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
+        data-testid="import-file"
+        [disabled]="store.importing()"
+        (change)="onFile($event)"
+      />
+
+      @if (fileName(); as name) {
+        <p class="text-sm text-ink-muted" data-testid="import-file-summary">
+          <span class="font-latin break-all">{{ name }}</span>
+          @if (rejection() === null) {
+            · {{ 'farmers.import.file.rows' | translate: { count: dataRows() } }}
+          }
+        </p>
+      }
+
+      @if (rejection(); as reason) {
+        <p class="text-sm font-semibold text-clay-700" role="alert" data-testid="import-rejection">
+          @switch (reason) {
+            @case ('TOO_LARGE') { {{ 'farmers.import.reject.tooLarge' | translate: { kib: maxKib } }} }
+            @case ('TOO_MANY_ROWS') { {{ 'farmers.import.reject.tooManyRows' | translate: { max: maxRows, count: dataRows() } }} }
+            @case ('BAD_HEADER') { {{ 'farmers.import.reject.badHeader' | translate }} }
+            @case ('EMPTY') { {{ 'farmers.import.reject.empty' | translate }} }
+          }
+        </p>
+      }
+    </section>
+
+    @if (store.importProblem(); as problem) {
+      @if (problemKey(); as key) {
+        <div class="rounded-card border border-clay-600 bg-surface-1 p-3" data-testid="import-error">
+          <p class="text-sm font-bold text-ink">{{ key | translate }}</p>
+          @if (problem.correlationId; as correlationId) {
+            <p class="mt-1 text-sm text-ink-faint">
+              {{ 'errors.correlationId.label' | translate }}
+              <code class="font-mono break-all select-all">{{ correlationId }}</code>
+            </p>
+          }
+        </div>
+      } @else {
+        <foshol-error-panel [problem]="problem" [retryable]="false" />
+      }
+    }
+
+    <!-- 4 — Per-row results. A failed row never suppresses the rest (WEB-FR-313). -->
+    @if (results(); as outcome) {
+      <section data-testid="import-results">
+        <h3 class="text-base font-bold text-ink">{{ 'farmers.import.results.title' | translate }}</h3>
+        <p class="mt-1 text-sm text-ink-muted" data-testid="import-summary">
+          {{
+            'farmers.import.results.summary'
+              | translate: { succeeded: outcome.succeeded, failed: outcome.failed }
+          }}
+        </p>
+
+        <!-- Wide content scrolls inside its own box, so the page never scrolls at 360px
+             (WEB-UX-031). -->
+        <div class="mt-3 overflow-x-auto">
+          <table class="w-full min-w-[32rem] border-collapse text-sm">
+            <caption class="sr-only">{{ 'farmers.import.results.caption' | translate }}</caption>
+            <thead>
+              <tr class="border-b border-surface-3 text-start">
+                <th scope="col" class="px-2 py-2 text-start font-semibold text-ink">
+                  {{ 'farmers.import.results.col.row' | translate }}
+                </th>
+                <th scope="col" class="px-2 py-2 text-start font-semibold text-ink">
+                  {{ 'farmers.import.results.col.status' | translate }}
+                </th>
+                <th scope="col" class="px-2 py-2 text-start font-semibold text-ink">
+                  {{ 'farmers.import.results.col.name' | translate }}
+                </th>
+                <th scope="col" class="px-2 py-2 text-start font-semibold text-ink">
+                  {{ 'farmers.import.results.col.detail' | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of outcome.results; track row.row) {
+                <tr class="border-b border-surface-3 align-top">
+                  <td class="px-2 py-2 tabular text-ink-muted">{{ row.row }}</td>
+                  <td class="px-2 py-2">
+                    <!-- WEB-UX-044 — the status is TEXT. Colour only reinforces it. -->
+                    <span
+                      class="inline-flex items-center rounded-chip px-2 py-0.5 text-sm font-semibold"
+                      [class]="row.status === 'OK' ? 'bg-paddy-100 text-paddy-900' : 'bg-clay-100 text-clay-700'"
+                    >
+                      {{ 'farmers.import.results.status.' + row.status | translate }}
+                    </span>
+                  </td>
+                  <td class="px-2 py-2 text-ink">{{ row.name || '—' }}</td>
+                  <td class="px-2 py-2 text-ink-muted">
+                    @if (row.errorCode) {
+                      <span class="font-latin">{{ row.errorCode }}</span>
+                    }
+                    <!-- Server-supplied safe display text, rendered verbatim AS TEXT
+                         (WEB-SEC-005). It never contains a phone number. -->
+                    @if (row.message) {
+                      <span class="block">{{ row.message }}</span>
+                    }
+                    @if (!row.errorCode && !row.message) {
+                      —
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="touch-target inline-flex items-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary shadow-card transition-colors duration-1 ease-settle hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+        data-testid="import-submit"
+        [disabled]="!ready() || store.importing()"
+        (click)="upload()"
+      >
+        {{ (store.importing() ? 'farmers.import.uploading' : 'farmers.import.upload') | translate }}
+      </button>
+      @if (results() !== null) {
+        <button
+          type="button"
+          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+          data-testid="import-another"
+          (click)="reset()"
+        >
+          {{ 'farmers.import.another' | translate }}
+        </button>
+      }
+      <button
+        type="button"
+        class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+        data-testid="import-close"
+        [disabled]="store.importing()"
+        (click)="close()"
+      >
+        {{ 'farmers.import.close' | translate }}
+      </button>
+    </div>
+  </div>
+</foshol-modal-dialog>

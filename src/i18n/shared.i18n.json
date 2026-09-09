@@ -1,41 +1,124 @@
 {
-  "shared.skipToContent": { "bn": "মূল অংশে যান", "en": "Skip to main content" },
-  "shared.mainLandmark": { "bn": "মূল অংশ", "en": "Main content" },
-
-  "shared.header.label": { "bn": "উপরের বার", "en": "Application header" },
-  "shared.header.menuToggle": { "bn": "নেভিগেশন মেনু খুলুন বা বন্ধ করুন", "en": "Open or close the navigation menu" },
-  "shared.header.signedInAs": { "bn": "লগইন করেছেন", "en": "Signed in as" },
-  "shared.header.signOut": { "bn": "লগআউট", "en": "Sign out" },
-  "shared.header.role.FARMER": { "bn": "কৃষক", "en": "Farmer" },
-  "shared.header.role.OFFICER": { "bn": "মাঠ কর্মকর্তা", "en": "Field officer" },
-  "shared.header.role.ADMIN": { "bn": "প্রশাসক", "en": "Administrator" },
+  "shared.skipToContent": {
+    "bn": "মূল অংশে যান",
+    "en": "Skip to main content"
+  },
+  "shared.mainLandmark": {
+    "bn": "মূল অংশ",
+    "en": "Main content"
+  },
+  "shared.header.label": {
+    "bn": "উপরের বার",
+    "en": "Application header"
+  },
+  "shared.header.menuToggle": {
+    "bn": "নেভিগেশন মেনু খুলুন বা বন্ধ করুন",
+    "en": "Open or close the navigation menu"
+  },
+  "shared.header.signedInAs": {
+    "bn": "লগইন করেছেন",
+    "en": "Signed in as"
+  },
+  "shared.header.signOut": {
+    "bn": "লগআউট",
+    "en": "Sign out"
+  },
+  "shared.header.role.FARMER": {
+    "bn": "কৃষক",
+    "en": "Farmer"
+  },
+  "shared.header.role.OFFICER": {
+    "bn": "মাঠ কর্মকর্তা",
+    "en": "Field officer"
+  },
+  "shared.header.role.ADMIN": {
+    "bn": "প্রশাসক",
+    "en": "Administrator"
+  },
   "shared.header.accountAria": {
     "bn": "অ্যাকাউন্ট মেনু — {{name}}",
     "en": "Account menu — {{name}}"
   },
-  "shared.header.name": { "bn": "নাম", "en": "Name" },
-  "shared.header.roleLabel": { "bn": "ভূমিকা", "en": "Role" },
-  "shared.header.location": { "bn": "এলাকা", "en": "Location" },
-  "shared.brand.homeAria": { "bn": "হোমে যান — ফসল ডক্টর", "en": "Go to home — Foshol Doctor" },
-
-  "shared.nav.label": { "bn": "প্রধান নেভিগেশন", "en": "Main navigation" },
-  "shared.nav.collapse": { "bn": "মেনু ছোট করুন", "en": "Collapse navigation" },
-  "shared.nav.expand": { "bn": "মেনু বড় করুন", "en": "Expand navigation" },
-  "shared.nav.FARMER.cases": { "bn": "আমার কেস", "en": "My cases" },
-  "shared.nav.FARMER.newCase": { "bn": "নতুন কেস", "en": "New case" },
-  "shared.nav.OFFICER.queue": { "bn": "সারি", "en": "Queue" },
-  "shared.nav.ADMIN.dashboard": { "bn": "ড্যাশবোর্ড", "en": "Dashboard" },
-  "shared.nav.ADMIN.cases": { "bn": "কেসের তালিকা", "en": "Case list" },
-  "shared.nav.ADMIN.kpis": { "bn": "কেপিআই ব্যর্থতা", "en": "KPI failures" },
+  "shared.header.name": {
+    "bn": "নাম",
+    "en": "Name"
+  },
+  "shared.header.roleLabel": {
+    "bn": "ভূমিকা",
+    "en": "Role"
+  },
+  "shared.header.location": {
+    "bn": "এলাকা",
+    "en": "Location"
+  },
+  "shared.brand.homeAria": {
+    "bn": "হোমে যান — ফসল ডক্টর",
+    "en": "Go to home — Foshol Doctor"
+  },
+  "shared.nav.label": {
+    "bn": "প্রধান নেভিগেশন",
+    "en": "Main navigation"
+  },
+  "shared.nav.collapse": {
+    "bn": "মেনু ছোট করুন",
+    "en": "Collapse navigation"
+  },
+  "shared.nav.expand": {
+    "bn": "মেনু বড় করুন",
+    "en": "Expand navigation"
+  },
+  "shared.nav.FARMER.cases": {
+    "bn": "আমার কেস",
+    "en": "My cases"
+  },
+  "shared.nav.FARMER.newCase": {
+    "bn": "নতুন কেস",
+    "en": "New case"
+  },
+  "shared.nav.OFFICER.queue": {
+    "bn": "সারি",
+    "en": "Queue"
+  },
+  "shared.nav.OFFICER.farmers": {
+    "bn": "কৃষক",
+    "en": "Farmers"
+  },
+  "shared.nav.ADMIN.dashboard": {
+    "bn": "ড্যাশবোর্ড",
+    "en": "Dashboard"
+  },
+  "shared.nav.ADMIN.cases": {
+    "bn": "কেসের তালিকা",
+    "en": "Case list"
+  },
+  "shared.nav.ADMIN.kpis": {
+    "bn": "কেপিআই ব্যর্থতা",
+    "en": "KPI failures"
+  },
+  "shared.nav.ADMIN.farmers": {
+    "bn": "কৃষক",
+    "en": "Farmers"
+  },
   "shared.region.aria": {
     "bn": "আপনার নিবন্ধিত এলাকা",
     "en": "Your registered region"
   },
-
-  "shared.sse.OPEN": { "bn": "সরাসরি", "en": "Live" },
-  "shared.sse.CONNECTING": { "bn": "সংযোগ হচ্ছে…", "en": "Connecting…" },
-  "shared.sse.RETRYING": { "bn": "আবার সংযোগ হচ্ছে…", "en": "Reconnecting…" },
-  "shared.sse.CLOSED": { "bn": "সংযোগ নেই", "en": "Not connected" },
+  "shared.sse.OPEN": {
+    "bn": "সরাসরি",
+    "en": "Live"
+  },
+  "shared.sse.CONNECTING": {
+    "bn": "সংযোগ হচ্ছে…",
+    "en": "Connecting…"
+  },
+  "shared.sse.RETRYING": {
+    "bn": "আবার সংযোগ হচ্ছে…",
+    "en": "Reconnecting…"
+  },
+  "shared.sse.CLOSED": {
+    "bn": "সংযোগ নেই",
+    "en": "Not connected"
+  },
   "shared.sse.aria.OPEN": {
     "bn": "সরাসরি সংযোগ চালু আছে, হালনাগাদ নিজে থেকেই আসছে",
     "en": "Live connection is open; updates arrive on their own"
@@ -52,11 +135,18 @@
     "bn": "সরাসরি সংযোগ নেই, হালনাগাদ পেতে নিজে রিফ্রেশ করুন",
     "en": "No live connection; refresh manually for updates"
   },
-
-  "shared.toast.region": { "bn": "বিজ্ঞপ্তি", "en": "Notifications" },
-  "shared.toast.dismiss": { "bn": "বন্ধ করুন", "en": "Dismiss" },
-
-  "shared.notifications.title": { "bn": "বিজ্ঞপ্তি", "en": "Notifications" },
+  "shared.toast.region": {
+    "bn": "বিজ্ঞপ্তি",
+    "en": "Notifications"
+  },
+  "shared.toast.dismiss": {
+    "bn": "বন্ধ করুন",
+    "en": "Dismiss"
+  },
+  "shared.notifications.title": {
+    "bn": "বিজ্ঞপ্তি",
+    "en": "Notifications"
+  },
   "shared.notifications.aria.none": {
     "bn": "বিজ্ঞপ্তি — নতুন কিছু নেই",
     "en": "Notifications — nothing new"
@@ -73,26 +163,62 @@
     "bn": "সব বিজ্ঞপ্তি পড়া হয়েছে বলে চিহ্নিত করা হলো",
     "en": "All notifications marked as read"
   },
-  "shared.notifications.markAllRead": { "bn": "সব পড়া হয়েছে", "en": "Mark all read" },
-  "shared.notifications.close": { "bn": "বিজ্ঞপ্তির তালিকা বন্ধ করুন", "en": "Close notifications" },
-  "shared.notifications.dismiss": { "bn": "এই বিজ্ঞপ্তিটি সরান", "en": "Dismiss this notification" },
-  "shared.notifications.unreadMark": { "bn": "নতুন", "en": "New" },
-  "shared.notifications.openCase": { "bn": "কেসটি খুলুন", "en": "Open the case" },
-  "shared.notifications.receivedAt": { "bn": "এসেছে {{time}}", "en": "Arrived {{time}}" },
-  "shared.notifications.empty": { "bn": "এখনো কোনো বিজ্ঞপ্তি নেই", "en": "No notifications yet" },
+  "shared.notifications.markAllRead": {
+    "bn": "সব পড়া হয়েছে",
+    "en": "Mark all read"
+  },
+  "shared.notifications.close": {
+    "bn": "বিজ্ঞপ্তির তালিকা বন্ধ করুন",
+    "en": "Close notifications"
+  },
+  "shared.notifications.dismiss": {
+    "bn": "এই বিজ্ঞপ্তিটি সরান",
+    "en": "Dismiss this notification"
+  },
+  "shared.notifications.unreadMark": {
+    "bn": "নতুন",
+    "en": "New"
+  },
+  "shared.notifications.openCase": {
+    "bn": "কেসটি খুলুন",
+    "en": "Open the case"
+  },
+  "shared.notifications.receivedAt": {
+    "bn": "এসেছে {{time}}",
+    "en": "Arrived {{time}}"
+  },
+  "shared.notifications.empty": {
+    "bn": "এখনো কোনো বিজ্ঞপ্তি নেই",
+    "en": "No notifications yet"
+  },
   "shared.notifications.emptyHint": {
     "bn": "কেসের অবস্থা বদলালে বা পরামর্শ এলে সেটি এখানে জমা থাকবে।",
     "en": "Case updates and advisories are kept here as they arrive."
   },
-  "shared.notifications.kind.STATUS": { "bn": "অবস্থার পরিবর্তন", "en": "Status change" },
-  "shared.notifications.kind.ADVISORY": { "bn": "পরামর্শ", "en": "Advisory" },
-  "shared.notifications.kind.REVISION": { "bn": "সংশোধিত পরামর্শ", "en": "Revised advisory" },
-  "shared.notifications.kind.REJECTION": { "bn": "ফেরত পাঠানো হয়েছে", "en": "Returned" },
+  "shared.notifications.kind.STATUS": {
+    "bn": "অবস্থার পরিবর্তন",
+    "en": "Status change"
+  },
+  "shared.notifications.kind.ADVISORY": {
+    "bn": "পরামর্শ",
+    "en": "Advisory"
+  },
+  "shared.notifications.kind.REVISION": {
+    "bn": "সংশোধিত পরামর্শ",
+    "en": "Revised advisory"
+  },
+  "shared.notifications.kind.REJECTION": {
+    "bn": "ফেরত পাঠানো হয়েছে",
+    "en": "Returned"
+  },
   "shared.notifications.kind.KPI_WARNING": {
     "bn": "সময়সীমার সতর্কতা",
     "en": "Deadline warning"
   },
-  "shared.notifications.openTask": { "bn": "কাজটি খুলুন", "en": "Open the review task" },
+  "shared.notifications.openTask": {
+    "bn": "কাজটি খুলুন",
+    "en": "Open the review task"
+  },
   "shared.notifications.dueBy": {
     "bn": "নিষ্পত্তির সময়সীমা {{time}}",
     "en": "Due by {{time}}"
@@ -105,37 +231,70 @@
     "bn": "{{count}}টি সময়সীমার সতর্কতা আবার তালিকায় আনা হয়েছে",
     "en": "Recovered {{count}} open deadline warnings"
   },
-
-  "shared.offline.title": { "bn": "আপনি এখন অফলাইন", "en": "You are offline" },
+  "shared.offline.title": {
+    "bn": "আপনি এখন অফলাইন",
+    "en": "You are offline"
+  },
   "shared.offline.detail": {
     "bn": "আপনার লেখা ও ছবি এই পাতাতেই রাখা আছে। সংযোগ ফিরলে আবার পাঠাতে পারবেন।",
     "en": "Your draft is kept on this page. You can send it again when the connection returns."
   },
-
-  "shared.error.region": { "bn": "সমস্যা", "en": "Error" },
-  "shared.error.retry": { "bn": "আবার চেষ্টা করুন", "en": "Try again" },
-  "shared.error.correlationLabel": { "bn": "রেফারেন্স নম্বর", "en": "Reference id" },
+  "shared.error.region": {
+    "bn": "সমস্যা",
+    "en": "Error"
+  },
+  "shared.error.retry": {
+    "bn": "আবার চেষ্টা করুন",
+    "en": "Try again"
+  },
+  "shared.error.correlationLabel": {
+    "bn": "রেফারেন্স নম্বর",
+    "en": "Reference id"
+  },
   "shared.error.correlationHint": {
     "bn": "সহায়তার জন্য এই নম্বরটি জানালে সমস্যাটি খুঁজে বের করা সহজ হয়।",
     "en": "Share this reference and the problem can be traced."
   },
-  "shared.error.fieldErrors": { "bn": "যেসব ঘর ঠিক করতে হবে", "en": "Fields to correct" },
-
-  "shared.copy.action": { "bn": "কপি করুন", "en": "Copy" },
-  "shared.copy.done": { "bn": "কপি হয়েছে", "en": "Copied" },
+  "shared.error.fieldErrors": {
+    "bn": "যেসব ঘর ঠিক করতে হবে",
+    "en": "Fields to correct"
+  },
+  "shared.copy.action": {
+    "bn": "কপি করুন",
+    "en": "Copy"
+  },
+  "shared.copy.done": {
+    "bn": "কপি হয়েছে",
+    "en": "Copied"
+  },
   "shared.copy.failed": {
     "bn": "কপি করা গেল না — লেখাটি হাতে নির্বাচন করুন",
     "en": "Could not copy — select the text instead"
   },
-
-  "shared.loading.label": { "bn": "লোড হচ্ছে…", "en": "Loading…" },
-  "shared.skeleton.label": { "bn": "বিষয়বস্তু আসছে…", "en": "Content is loading…" },
-
-  "shared.empty.title": { "bn": "এখানে এখনো কিছু নেই", "en": "Nothing here yet" },
-
-  "shared.paginator.label": { "bn": "পাতা নির্বাচন", "en": "Pagination" },
-  "shared.paginator.previous": { "bn": "আগের পাতা", "en": "Previous page" },
-  "shared.paginator.next": { "bn": "পরের পাতা", "en": "Next page" },
+  "shared.loading.label": {
+    "bn": "লোড হচ্ছে…",
+    "en": "Loading…"
+  },
+  "shared.skeleton.label": {
+    "bn": "বিষয়বস্তু আসছে…",
+    "en": "Content is loading…"
+  },
+  "shared.empty.title": {
+    "bn": "এখানে এখনো কিছু নেই",
+    "en": "Nothing here yet"
+  },
+  "shared.paginator.label": {
+    "bn": "পাতা নির্বাচন",
+    "en": "Pagination"
+  },
+  "shared.paginator.previous": {
+    "bn": "আগের পাতা",
+    "en": "Previous page"
+  },
+  "shared.paginator.next": {
+    "bn": "পরের পাতা",
+    "en": "Next page"
+  },
   "shared.paginator.status": {
     "bn": "পাতা {{page}} / {{totalPages}} · মোট {{totalElements}}",
     "en": "Page {{page}} of {{totalPages}} · {{totalElements}} in total"
@@ -144,43 +303,116 @@
     "bn": "{{page}} নম্বর পাতায় যান",
     "en": "Go to page {{page}}"
   },
-
-  "shared.bnFallback.marker": { "bn": "(bn)", "en": "(bn)" },
+  "shared.bnFallback.marker": {
+    "bn": "(bn)",
+    "en": "(bn)"
+  },
   "shared.bnFallback.description": {
     "bn": "এই লেখার ইংরেজি অনুবাদ নেই, তাই বাংলা দেখানো হচ্ছে।",
     "en": "No English translation exists for this text, so the Bangla is shown."
   },
-
-  "shared.pictogram.crop.crop-rice": { "bn": "ধানের শীষ", "en": "Rice panicle" },
-  "shared.pictogram.crop.crop-tomato": { "bn": "টমেটো", "en": "Tomato" },
-  "shared.pictogram.crop.crop-potato": { "bn": "আলু", "en": "Potato" },
-  "shared.pictogram.crop.generic": { "bn": "ফসল", "en": "Crop" },
+  "shared.pictogram.crop.crop-rice": {
+    "bn": "ধানের শীষ",
+    "en": "Rice panicle"
+  },
+  "shared.pictogram.crop.crop-tomato": {
+    "bn": "টমেটো",
+    "en": "Tomato"
+  },
+  "shared.pictogram.crop.crop-potato": {
+    "bn": "আলু",
+    "en": "Potato"
+  },
+  "shared.pictogram.crop.generic": {
+    "bn": "ফসল",
+    "en": "Crop"
+  },
   "shared.pictogram.remedyType": {
     "bn": "প্রতিকারের ধরন: {{type}}",
     "en": "Remedy type: {{type}}"
   },
-  "shared.pictogram.severity": { "bn": "তীব্রতা: {{severity}}", "en": "Severity: {{severity}}" },
-
-  "shared.unit.area.DECIMAL": { "bn": "শতক", "en": "Decimals" },
-  "shared.unit.area.SQ_M": { "bn": "বর্গমিটার", "en": "Square metres" },
-  "shared.unit.area.SQ_FT": { "bn": "বর্গফুট", "en": "Square feet" },
-  "shared.unit.area.HECTARE": { "bn": "হেক্টর", "en": "Hectares" },
-  "shared.unit.area.ACRE": { "bn": "একর", "en": "Acres" },
-
-  "shared.unit.quantity.KG": { "bn": "কেজি", "en": "Kilograms" },
-  "shared.unit.quantity.TON": { "bn": "টন", "en": "Tonnes" },
-  "shared.unit.quantity.PLANTS": { "bn": "গাছ", "en": "Plants" },
-  "shared.unit.quantity.BIGHAS_EQUIV": { "bn": "বিঘা সমতুল্য", "en": "Bigha equivalent" },
-
-  "shared.unit.dose.ML": { "bn": "মিলিলিটার", "en": "Millilitres" },
-  "shared.unit.dose.G": { "bn": "গ্রাম", "en": "Grams" },
-  "shared.unit.dose.KG": { "bn": "কেজি", "en": "Kilograms" },
-  "shared.unit.dose.L": { "bn": "লিটার", "en": "Litres" },
-
-  "shared.unit.basis.PER_DECIMAL": { "bn": "প্রতি শতক", "en": "Per decimal" },
-  "shared.unit.basis.PER_SQ_M": { "bn": "প্রতি বর্গমিটার", "en": "Per square metre" },
-  "shared.unit.basis.PER_HECTARE": { "bn": "প্রতি হেক্টর", "en": "Per hectare" },
-  "shared.unit.basis.PER_ACRE": { "bn": "প্রতি একর", "en": "Per acre" },
-  "shared.unit.basis.PER_SQ_FT": { "bn": "প্রতি বর্গফুট", "en": "Per square foot" },
-  "shared.unit.basis.FIXED": { "bn": "নির্দিষ্ট পরিমাণ", "en": "Fixed amount" }
+  "shared.pictogram.severity": {
+    "bn": "তীব্রতা: {{severity}}",
+    "en": "Severity: {{severity}}"
+  },
+  "shared.unit.area.DECIMAL": {
+    "bn": "শতক",
+    "en": "Decimals"
+  },
+  "shared.unit.area.SQ_M": {
+    "bn": "বর্গমিটার",
+    "en": "Square metres"
+  },
+  "shared.unit.area.SQ_FT": {
+    "bn": "বর্গফুট",
+    "en": "Square feet"
+  },
+  "shared.unit.area.HECTARE": {
+    "bn": "হেক্টর",
+    "en": "Hectares"
+  },
+  "shared.unit.area.ACRE": {
+    "bn": "একর",
+    "en": "Acres"
+  },
+  "shared.unit.quantity.KG": {
+    "bn": "কেজি",
+    "en": "Kilograms"
+  },
+  "shared.unit.quantity.TON": {
+    "bn": "টন",
+    "en": "Tonnes"
+  },
+  "shared.unit.quantity.PLANTS": {
+    "bn": "গাছ",
+    "en": "Plants"
+  },
+  "shared.unit.quantity.BIGHAS_EQUIV": {
+    "bn": "বিঘা সমতুল্য",
+    "en": "Bigha equivalent"
+  },
+  "shared.unit.dose.ML": {
+    "bn": "মিলিলিটার",
+    "en": "Millilitres"
+  },
+  "shared.unit.dose.G": {
+    "bn": "গ্রাম",
+    "en": "Grams"
+  },
+  "shared.unit.dose.KG": {
+    "bn": "কেজি",
+    "en": "Kilograms"
+  },
+  "shared.unit.dose.L": {
+    "bn": "লিটার",
+    "en": "Litres"
+  },
+  "shared.unit.basis.PER_DECIMAL": {
+    "bn": "প্রতি শতক",
+    "en": "Per decimal"
+  },
+  "shared.unit.basis.PER_SQ_M": {
+    "bn": "প্রতি বর্গমিটার",
+    "en": "Per square metre"
+  },
+  "shared.unit.basis.PER_HECTARE": {
+    "bn": "প্রতি হেক্টর",
+    "en": "Per hectare"
+  },
+  "shared.unit.basis.PER_ACRE": {
+    "bn": "প্রতি একর",
+    "en": "Per acre"
+  },
+  "shared.unit.basis.PER_SQ_FT": {
+    "bn": "প্রতি বর্গফুট",
+    "en": "Per square foot"
+  },
+  "shared.unit.basis.FIXED": {
+    "bn": "নির্দিষ্ট পরিমাণ",
+    "en": "Fixed amount"
+  },
+  "shared.modal.close": {
+    "bn": "বন্ধ করুন",
+    "en": "Close"
+  }
 }

@@ -486,3 +486,157 @@ before this reaches anyone relying on it.
 
 **Requirement.** `WEB-FR-200` — ordering stays server-owned and un-recomputed. `WEB-NFR-001`
 preserved.
+
+---
+
+## D-25 · `app-config.ts` amended for farmer provision
+
+**What.** `APP_CONFIG.farmers` was added after Wave 0 — `importMaxRows`, `importMaxBytes`,
+`nameMaxLength`, `templateFilename`, `templateHeader` and `phonePattern`. `app-config.ts` is
+frozen and a change to it is an amendment request rather than an edit. Same shape of amendment as
+**D-13**, and for the same underlying reason.
+
+**Why.** `WEB-FR-313` requires the bulk-import screen to state its caps as help text and to stop
+an officer who has picked a file that cannot succeed. Those caps are numbers, and `WEB-NFR-009`
+forbids a numeric literal in a component or service, so they had nowhere else to live.
+
+`farmers.phonePattern` exists because `auth.phonePattern` could not be reused: it accepts
+`+8801…` only, while `WEB-FR-311` requires the register form to accept the national `017…` form
+as well — an officer types the number as the farmer says it.
+
+**How we cope.** `importMaxRows` and `importMaxBytes` mirror `foshol.identity.bulk.*` and are
+fallbacks in the `WEB-NFR-010` sense: the server validates every row and its answer is the
+decision of record. A file inside these bounds may still be refused, and the UI shows the
+server's per-row result when it is. The phone is likewise sent **as typed** — the contract
+accepts either form, so normalising client-side would re-implement a server rule
+(`WEB-NFR-001`), and `ERR_PHONE_INVALID` remains authoritative.
+
+**Unblock.** If `foshol.identity.bulk.*` is ever published to the client, mirror it at runtime and
+mark these constants fallback-only, as `analysis.confidence*Fallback` already is.
+
+---
+
+## D-26 · The farmer directory offers no sorting
+
+**What.** The directory was asked for with "relevant filters/sorting options". It ships with the
+filters and the pagination, and with **no sort control at all**.
+
+**Why.** `listFarmers` has exactly four parameters — `page`, `size`, `q`, `phone`. There is no
+`sort`, and the operation is specified as "farmers in the caller's district, **newest first**".
+A client-side comparator was considered and rejected: it would reorder only the twenty rows
+already fetched while presenting itself as having ordered the district, which is worse than
+honest absence. It would also recompute a rule the server owns (`WEB-NFR-001`).
+
+**How we cope.** `FarmerDirectoryStore` has no comparator, not even a private one — the same
+enforcement-by-absence `QueueStore` uses. The screen states the order in words
+(`farmers.directory.orderNote`) so that nobody hunts for a control that is deliberately missing.
+
+**Unblock.** A `sort` parameter on `listFarmers` would be a contract change; until then this
+stays as it is. The requester has been told.
+
+---
+
+## D-27 · A new shared primitive: `modal-dialog`
+
+**What.** Register and bulk-import are modal dialogs, and the design system had no dialog. One
+was added at `shared/ui/modal-dialog/`, built on the native `<dialog>` element and `showModal()`.
+
+**Why.** The platform element supplies the focus trap, `Escape`-to-close, background inertness,
+the top layer and focus restoration to the invoking control. A hand-rolled overlay would have to
+re-implement all five and would plausibly get one wrong; `WEB-NFR-007` forbids reaching for a
+library. `WEB-UX-040`/`041` are therefore met by construction rather than by vigilance.
+
+**The one wrinkle.** jsdom implements neither `showModal()` nor, on this version, `close()`, so
+the component falls back to toggling the `open` attribute when they are absent. That path exists
+only for the test environment — both methods have been browser-baseline since 2022 — and it
+degrades to a non-modal dialog rather than throwing.
+
+**Not done.** No media query was added: the sheet-to-panel switch is Tailwind variants on the
+elements themselves (`WEB-UX-034`). The component's stylesheet contains exactly one rule,
+`::backdrop`, because a top-layer pseudo-element is unreachable by any utility class.
+
+---
+
+## D-28 · The import template is rebuilt client-side, BOM and filename included
+
+**What.** `downloadFarmerImportTemplate` is declared `text/csv` with `type: string` and no
+`format: binary`, so `ng-openapi-gen` generates a `responseType: 'text'` operation returning a
+`string` rather than a `Blob`. The download is therefore assembled in the browser: the leading
+BOM is stripped if present and exactly one is prepended, and the file is named from
+`APP_CONFIG.farmers.templateFilename`.
+
+**Why.** `IDENTITY-FR-024` requires the file to carry a UTF-8 BOM — without it Excel renders the
+Bangla column values as mojibake, which is the whole reason the BOM is specified. A text-typed
+response cannot preserve it as bytes, so it is re-applied. Stripping first is what stops a
+double BOM (`ï»¿ï»¿`) appearing in the first column heading.
+
+The filename comes from the constant rather than from `Content-Disposition` because that header
+is not CORS-exposed on this origin, so the client genuinely cannot read it. The value is the
+contract's own, quoted in the operation description.
+
+**Verification note.** `Blob.text()` decodes as UTF-8 and the decode step **strips a leading
+BOM**, so a text-based assertion cannot distinguish a file with a BOM from one without.
+`farmer-csv.spec.ts` therefore asserts on the raw bytes (`EF BB BF`).
+
+**Unblock.** Declaring the response `format: binary` upstream would generate a `Blob` and make
+all of this unnecessary.
+
+---
+
+## D-24 update · the backend ordering has landed
+
+`npm run api:sync` on 2026-09-10 brought in the queue ordering change D-24 was waiting for. The
+frozen contract now reads *"Ordering is fixed by the server (submitted_at DESC, newest case
+first) and is not client-controllable. Client `sort` and `order` query parameters are rejected."*
+
+The officer queue's order strings and the backend therefore now agree, and **D-24 is closed** —
+no string needs reverting. The generated `ReviewService` doc comments changed with the sync; that
+is the whole of the diff, and no client behaviour changed. Still no comparator anywhere.
+
+---
+
+## D-29 · The phone lookup puts a phone number in a query string — `WEB-SEC-002` conflict
+
+**BLOCKER-CLASS. Read this before shipping the farmer directory.**
+
+**What.** `WEB-SEC-002` says the frontend *"SHALL NOT place a token, phone number, OTP code or
+object key in a URL, query parameter or route fragment."* The frozen contract's own farmer
+lookup is a query parameter:
+
+```yaml
+- name: phone
+  in: query
+  description: Exact phone lookup after E.164 normalisation. Never echoed. Must not be combined with q.
+```
+
+`WEB-FR-312` then requires the directory to offer that lookup. So a requirement and the contract
+it is written against contradict each other, and `listFarmers` offers no other way to ask — there
+is no search POST to fall back to.
+
+**What we did.** Followed the generated client, as `WEB-API-005` directs (*"IF the generated
+client and this table disagree, THEN THE frontend SHALL follow the generated client and THE agent
+SHALL record the discrepancy as a blocker"*). This entry is that record.
+
+**The exposure, stated precisely rather than reassuringly.** The number appears in the query
+string of one `XHR`. It therefore reaches: the server's access log, the browser's devtools
+network panel, and any intermediary proxy log. It does **not** reach the address bar, browser
+history, a bookmark, a `Referer` header from a page navigation, or `localStorage` — the Angular
+route carries no phone segment and no phone query parameter, and nothing persists it. That is a
+narrower exposure than `WEB-SEC-002` is written to prevent, but it is not zero, and it is a real
+deviation rather than a technicality.
+
+**What was NOT relaxed.** No phone is ever rendered from a response — `FarmerRecord` has no phone
+field, so the possibility was removed at the contract rather than left to the UI. The register
+form's number is cleared the instant a submit succeeds. Nothing is logged (`check-architecture`
+forbids `console.*`) and nothing is stored (`WEB-DATA-020` names the only two localStorage keys,
+neither of which is this).
+
+**Unblock — two ways, both backend-side.**
+1. Accept the lookup as `POST /api/v1/farmers/search` with the number in a body, which is what
+   `WEB-SEC-002` implies the shape should have been; or
+2. Amend `WEB-SEC-002` to carve out the district-scoped staff lookup explicitly, so the
+   requirement and the contract stop disagreeing.
+
+Until one of those happens, the alternative available to the UI alone is to **drop the phone
+lookup entirely**, which would forfeit the duplicate check `WEB-FR-312` added it for. The
+requester chose to keep the lookup with this deviation recorded.

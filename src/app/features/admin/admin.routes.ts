@@ -55,6 +55,12 @@ export const adminRoutes: Routes = [
     path: 'kpis',
     loadComponent: () => import('./kpi/admin-kpi-page').then((m) => m.AdminKpiPage),
   },
+  {
+    // WEB-FR-310 — the district's farmer directory and provision screens, the SAME component
+    // the officer console mounts at `/officer/farmers`. One feature, two mounts.
+    path: 'farmers',
+    loadComponent: () => import('../farmers/farmers-page').then((m) => m.FarmersPage),
+  },
   // Anything else under /admin lands on the stats page.
   { path: '**', redirectTo: 'stats' },
 ];

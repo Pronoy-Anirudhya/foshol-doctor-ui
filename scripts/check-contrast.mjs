@@ -129,6 +129,13 @@ const PAIRS = [
   ['on-primary', 'sage-600', 4.5, 'count on the neutral queue-state segment'],
   ['sage-400', 'surface-0', 3.0, 'neutral divider'],
   ['clay-700', 'surface-0', 4.5, 'KPI failure scope label'],
+  // Farmer bulk-import row status. The chips are belt-and-braces: the OK/FAILED word carries the
+  // meaning on its own (WEB-UX-044), so these ratios are about legibility, not about the colour
+  // being the signal.
+  ['paddy-900', 'paddy-100', 4.5, 'succeeded row status on its chip'],
+  ['clay-700', 'clay-100', 4.5, 'failed row status on its chip'],
+  ['ink', 'surface-2', 4.5, 'farmer source chip, and the locked district field'],
+  ['ink-muted', 'surface-2', 4.5, 'the locked district value itself'],
   ['danger', 'surface-2', 3.0, 'officer failure bar on its track'],
   ['clay-300', 'console', 3.0, 'unread-count badge on the dark header'],
   ['ink', 'clay-300', 4.5, 'the unread count itself'],

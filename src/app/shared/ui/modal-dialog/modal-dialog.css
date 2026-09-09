@@ -1,0 +1,10 @@
+/*
+ * `::backdrop` is the ONLY rule here, and the only reason this component has a stylesheet at
+ * all: it is a pseudo-element in the top layer, so no utility class can ever reach it. Every
+ * breakpoint-dependent choice lives on the elements themselves as Tailwind variants, which is
+ * what `WEB-UX-034` asks for — there is deliberately no media query in this file.
+ */
+.md-dialog::backdrop {
+  /* `ink` at 55% — deep enough that the console's slate chrome still reads as "behind". */
+  background-color: rgb(20 33 27 / 0.55);
+}
