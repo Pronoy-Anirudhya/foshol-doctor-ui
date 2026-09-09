@@ -1,24 +1,52 @@
 {
-  "media.image.loading": { "bn": "ছবি আসছে…", "en": "Loading image…" },
-  "media.image.unavailable": { "bn": "ছবিটি দেখানো গেল না", "en": "This image could not be shown" },
-
+  "media.image.loading": {
+    "bn": "ছবি আসছে…",
+    "en": "Loading image…"
+  },
+  "media.image.unavailable": {
+    "bn": "ছবিটি দেখানো গেল না",
+    "en": "This image could not be shown"
+  },
   "media.zoom.region": {
     "bn": "ছবি বড় করে দেখার এলাকা। প্লাস ও মাইনাস দিয়ে ছোট-বড় করুন, তীর চিহ্ন দিয়ে সরান, শূন্য চাপলে আগের মাপে ফিরবে।",
     "en": "Image zoom area. Plus and minus to zoom, arrow keys to pan, zero to reset."
   },
-  "media.zoom.in": { "bn": "বড় করুন", "en": "Zoom in" },
-  "media.zoom.out": { "bn": "ছোট করুন", "en": "Zoom out" },
-  "media.zoom.reset": { "bn": "আগের মাপে ফিরুন", "en": "Reset zoom" },
-  "media.zoom.level": { "bn": "মাপ {{level}}×", "en": "Zoom {{level}}×" },
+  "media.zoom.in": {
+    "bn": "বড় করুন",
+    "en": "Zoom in"
+  },
+  "media.zoom.out": {
+    "bn": "ছোট করুন",
+    "en": "Zoom out"
+  },
+  "media.zoom.reset": {
+    "bn": "আগের মাপে ফিরুন",
+    "en": "Reset zoom"
+  },
+  "media.zoom.level": {
+    "bn": "মাপ {{level}}×",
+    "en": "Zoom {{level}}×"
+  },
   "media.zoom.hint": {
     "bn": "কীবোর্ডে + − ০ ও তীর চিহ্ন; মাউসে দুইবার ক্লিক",
     "en": "Keyboard + − 0 and arrow keys; double-click with a mouse"
   },
-
-  "media.gradcam.show": { "bn": "তাপচিত্র দেখুন", "en": "Show heat map" },
-  "media.gradcam.hide": { "bn": "তাপচিত্র সরান", "en": "Hide heat map" },
-  "media.gradcam.state.on": { "bn": "তাপচিত্র চালু", "en": "Heat map on" },
-  "media.gradcam.state.off": { "bn": "তাপচিত্র বন্ধ", "en": "Heat map off" },
+  "media.gradcam.show": {
+    "bn": "তাপচিত্র দেখুন",
+    "en": "Show heat map"
+  },
+  "media.gradcam.hide": {
+    "bn": "তাপচিত্র সরান",
+    "en": "Hide heat map"
+  },
+  "media.gradcam.state.on": {
+    "bn": "তাপচিত্র চালু",
+    "en": "Heat map on"
+  },
+  "media.gradcam.state.off": {
+    "bn": "তাপচিত্র বন্ধ",
+    "en": "Heat map off"
+  },
   "media.gradcam.hint": {
     "bn": "চেপে ধরে রাখলে মিলিয়ে দেখা যায়",
     "en": "Press and hold to compare"
@@ -27,18 +55,38 @@
     "bn": "গ্র্যাড-ক্যাম তাপচিত্র: ছবির যে অংশগুলোতে মডেল সবচেয়ে বেশি নজর দিয়েছে, মূল ছবির উপরে স্তর হিসেবে বসানো।",
     "en": "Grad-CAM heat map: the parts of the photograph the model attended to most, layered over the original image."
   },
-
-  "media.audio.label": { "bn": "কেসের কণ্ঠবার্তা", "en": "Case voice note" },
-  "media.audio.play": { "bn": "শুনুন", "en": "Play" },
-  "media.audio.pause": { "bn": "থামান", "en": "Pause" },
-  "media.audio.seek": { "bn": "কণ্ঠবার্তার অবস্থান", "en": "Audio position" },
-  "media.audio.position": { "bn": "{{elapsed}} / {{total}}", "en": "{{elapsed}} / {{total}}" },
-  "media.audio.loading": { "bn": "কণ্ঠবার্তা আসছে…", "en": "Loading audio…" },
+  "media.audio.label": {
+    "bn": "কেসের ভয়েস মেসেজ",
+    "en": "Case voice note"
+  },
+  "media.audio.play": {
+    "bn": "শুনুন",
+    "en": "Play"
+  },
+  "media.audio.pause": {
+    "bn": "থামান",
+    "en": "Pause"
+  },
+  "media.audio.seek": {
+    "bn": "ভয়েস মেসেজের অবস্থান",
+    "en": "Audio position"
+  },
+  "media.audio.position": {
+    "bn": "{{elapsed}} / {{total}}",
+    "en": "{{elapsed}} / {{total}}"
+  },
+  "media.audio.loading": {
+    "bn": "ভয়েস মেসেজ লোড হচ্ছে…",
+    "en": "Loading audio…"
+  },
   "media.audio.unavailable": {
-    "bn": "কণ্ঠবার্তাটি এখন শোনানো যাচ্ছে না।",
+    "bn": "ভয়েস মেসেজটি এখন চালানো যাচ্ছে না।",
     "en": "The voice note cannot be played right now."
   },
-  "media.audio.transcript": { "bn": "কণ্ঠবার্তার লিখিত রূপ", "en": "Voice note transcript" },
+  "media.audio.transcript": {
+    "bn": "ভয়েস মেসেজের লিখিত রূপ",
+    "en": "Voice note transcript"
+  },
   "media.audio.transcriptMissing": {
     "bn": "কোনো লিখিত রূপ নেই",
     "en": "No transcript available"
