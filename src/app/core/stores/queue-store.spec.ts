@@ -14,9 +14,9 @@ const row = (caseId: string, topConfidence: number): OfficerQueueRow => ({
 });
 
 /**
- * Deliberately NOT in confidence order and NOT in id order: the server's order is
- * least-confident-first among a mix of states, so any client-side comparator would visibly
- * rearrange this fixture.
+ * Deliberately NOT in confidence order and NOT in id order: the server owns the order and this
+ * fixture does not follow any rule a client could reproduce, so any client-side comparator would
+ * visibly rearrange it.
  */
 const SERVER_ORDER: readonly OfficerQueueRow[] = [
   row('c-mid', 0.51),

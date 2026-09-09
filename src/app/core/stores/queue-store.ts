@@ -8,10 +8,11 @@ import { APP_CONFIG } from '../config/app-config';
  * The officer queue.
  *
  * **The invariant this store exists to protect** (`REVIEW-FR-030`, `WEB-FR-200`): rows are held
- * in exactly the order the server returned them and are NEVER re-sorted client-side. The server
- * orders by state, then least confident, then oldest — that ordering *is* the triage argument
- * the console is built to demonstrate. So there is no `sort` method on this class at all, not
- * even a private one; the absence is the enforcement.
+ * in exactly the order the server returned them and are NEVER re-sorted client-side. The order
+ * the server chooses is the order the console shows — re-deriving it here would recompute a
+ * backend rule, and a client sort would in any case only reorder the page in hand. So there is
+ * no `sort` method on this class at all, not even a private one; the absence is the enforcement.
+ * See `DEVIATIONS.md` D-24 for the ordering change this prose was updated for.
  *
  * WEB-FR-204 — an SSE frame patches the affected row in place. A change that would move a row
  * (or add or remove one) sets `needsReload` instead, because the only correct new order is the
