@@ -303,6 +303,10 @@
     "bn": "কেসের অবস্থা",
     "en": "Case status"
   },
+  "officer.case.farmer": {
+    "bn": "কৃষক",
+    "en": "Farmer"
+  },
   "officer.case.submitted": {
     "bn": "জমা পড়েছে",
     "en": "Submitted"
