@@ -92,23 +92,37 @@ export class FarmerDirectorySection {
     );
   }
 
+  /**
+   * The two boxes clear each other AS YOU TYPE, not merely when a search is committed.
+   *
+   * That is what lets a single button be unambiguous: at most one box ever holds text, so
+   * "search" never has to guess which of two filled fields the officer meant. It also makes
+   * the contract's `q`-XOR-`phone` rule visible while typing rather than surprising on submit.
+   */
   protected onNameInput(event: Event): void {
     this.nameDraft.set((event.target as HTMLInputElement).value);
+    this.phoneDraft.set('');
   }
 
   protected onPhoneInput(event: Event): void {
     this.phoneDraft.set((event.target as HTMLInputElement).value);
-  }
-
-  /** Searching by name abandons any phone lookup — the request may carry only one of them. */
-  protected searchByName(): void {
-    this.phoneDraft.set('');
-    this.store.setQuery(this.nameDraft());
-  }
-
-  protected searchByPhone(): void {
     this.nameDraft.set('');
-    this.store.setPhoneLookup(this.phoneDraft());
+  }
+
+  /**
+   * The one search control, reached by the button or by Enter in either box.
+   *
+   * A phone in hand wins, because it is the exact lookup; otherwise the name is searched. With
+   * both boxes empty this commits an empty query, which the store normalises to "no filter" —
+   * so pressing search on a cleared form returns the full list rather than doing nothing.
+   */
+  protected search(): void {
+    const phone = this.phoneDraft().trim();
+    if (phone.length > NONE) {
+      this.store.setPhoneLookup(phone);
+      return;
+    }
+    this.store.setQuery(this.nameDraft());
   }
 
   protected clearSearch(): void {

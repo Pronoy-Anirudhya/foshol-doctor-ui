@@ -1,5 +1,6 @@
 <!-- Search. Two boxes, ONE choice: the contract refuses a request carrying both `q` and `phone`
-     (400 ERR_BAD_REQUEST), so committing either one clears the other (WEB-FR-312). -->
+     (400 ERR_BAD_REQUEST), so the two boxes clear each other AS YOU TYPE and a single button
+     commits whichever one holds text (WEB-FR-312). -->
 <section class="rounded-panel border border-surface-3 bg-surface-0 p-4 shadow-card">
   <h2 class="sr-only">{{ 'farmers.directory.search.heading' | translate }}</h2>
 
@@ -8,25 +9,15 @@
       <label for="farmer-search-name" class="text-sm font-semibold text-ink">
         {{ 'farmers.directory.search.name.label' | translate }}
       </label>
-      <div class="flex flex-wrap gap-2">
-        <input
-          id="farmer-search-name"
-          type="search"
-          class="touch-target min-w-0 flex-1 rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
-          data-testid="directory-search-name"
-          [value]="nameDraft()"
-          (input)="onNameInput($event)"
-          (keydown.enter)="searchByName()"
-        />
-        <button
-          type="button"
-          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
-          data-testid="directory-search-name-go"
-          (click)="searchByName()"
-        >
-          {{ 'farmers.directory.search.go' | translate }}
-        </button>
-      </div>
+      <input
+        id="farmer-search-name"
+        type="search"
+        class="touch-target w-full rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+        data-testid="directory-search-name"
+        [value]="nameDraft()"
+        (input)="onNameInput($event)"
+        (keydown.enter)="search()"
+      />
       <p class="text-sm text-ink-faint">{{ 'farmers.directory.search.name.hint' | translate }}</p>
     </div>
 
@@ -34,33 +25,32 @@
       <label for="farmer-search-phone" class="text-sm font-semibold text-ink">
         {{ 'farmers.directory.search.phone.label' | translate }}
       </label>
-      <div class="flex flex-wrap gap-2">
-        <input
-          id="farmer-search-phone"
-          type="tel"
-          inputmode="tel"
-          autocomplete="off"
-          class="touch-target font-latin min-w-0 flex-1 rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
-          data-testid="directory-search-phone"
-          [value]="phoneDraft()"
-          (input)="onPhoneInput($event)"
-          (keydown.enter)="searchByPhone()"
-        />
-        <button
-          type="button"
-          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
-          data-testid="directory-search-phone-go"
-          (click)="searchByPhone()"
-        >
-          {{ 'farmers.directory.search.go' | translate }}
-        </button>
-      </div>
+      <input
+        id="farmer-search-phone"
+        type="tel"
+        inputmode="tel"
+        autocomplete="off"
+        class="touch-target font-latin w-full rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+        data-testid="directory-search-phone"
+        [value]="phoneDraft()"
+        (input)="onPhoneInput($event)"
+        (keydown.enter)="search()"
+      />
       <!-- Says plainly that the number is used to ask, and is never shown back. -->
       <p class="text-sm text-ink-faint">{{ 'farmers.directory.search.phone.hint' | translate }}</p>
     </div>
   </div>
 
   <div class="mt-3 flex flex-wrap items-center gap-2">
+    <button
+      type="button"
+      class="touch-target inline-flex items-center gap-1.5 rounded-control bg-primary px-5 text-sm font-semibold text-on-primary shadow-card transition-colors duration-1 ease-settle hover:bg-primary-hover"
+      data-testid="directory-search-go"
+      (click)="search()"
+    >
+      {{ 'farmers.directory.search.go' | translate }}
+    </button>
+
     @if (store.searchActive()) {
       <button
         type="button"
