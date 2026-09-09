@@ -87,10 +87,14 @@ src/app/
   (`COMMON-CON-003`). A wrong dosage is not a bug, it is harm.
 - **The confidence bar is protected.** Both threshold lines render on every bar at every
   confidence, positioned from `analysis.thresholds` — never from local config.
-- **Queue order is the server's.** `QueueStore` exposes no comparator at all, so
-  least-confident-first cannot be destroyed by a later edit.
+- **Queue order is the server's.** `QueueStore` exposes no comparator at all, so the server's
+  order cannot be destroyed by a later edit.
 - **The JWT lives in memory only** — a refresh is a new login, by design (`WEB-SEC-001`).
   `localStorage` holds the language preference and a draft crop id and note, nothing else.
+- **The capture stepper never speaks before you touch it.** Browsers refuse speech synthesis
+  until a user gesture, so a silent first step is deliberate, not a broken demo: press
+  **শুনুন** once and every later step speaks on arrival (`DEVIATIONS.md` D-23). The spoken
+  guidance is always a second channel — the same words are printed on the card.
 
 ## Companion documents
 

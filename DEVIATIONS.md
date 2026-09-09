@@ -393,3 +393,96 @@ nothing a farmer does would load it.
 `ng build --configuration production` aborts with SIGABRT in this environment — see the note in
 `README.md` — so the fix could not be verified at the time of writing, and an unverified bundle
 optimisation is a guess.
+
+---
+
+## D-22 · The farmer's capture screen is now a guided stepper
+
+**What.** `features/farmer/capture/capture-page.ts` used to be one scrolling screen with four
+numbered sections all visible at once. It is now a five-step guided deck — crop, photographs,
+your field, describe it, review and send — rendered as a stack of cards by
+`features/farmer/capture/capture-stepper.ts`.
+
+**Why the old comment said not to.** The page's own doc comment argued: *"One screen, three
+steps, no wizard: crop, photographs, description. A wizard would put the always-available text
+box (`WEB-FR-140`/`141`) behind a 'next', and a degraded path that must be found is not a
+degraded path."* That reasoning is still correct, and it is the constraint this change had to
+satisfy rather than overrule. The user asked for a guided flow because the farmers using this
+app may not read well enough to navigate a long form unaided — guidance is an accessibility
+requirement here, not decoration.
+
+**How `WEB-FR-140`/`141` stays true.** Navigation is not linear-only. An always-visible step
+rail makes **every** step directly reachable at any point, and Send is enabled the moment the
+draft is valid regardless of which card is showing. The description box is therefore never
+behind a "next" — it is one tap away from anywhere, which is a shorter path than the scroll it
+replaced. The stepper carries a comment stating this so the constraint is not quietly lost in a
+later refactor.
+
+**Requirement.** `WEB-FR-140`/`141` preserved by the free-navigation rail. `WEB-FR-100`/`110`–`146`
+unchanged — the same panels, the same local quality gate, the same submit path.
+
+---
+
+## D-23 · Client-side speech: dictation pre-fill and spoken step guidance
+
+**What.** Two uses of the browser's own Web Speech API on the capture stepper, both new:
+
+- `capture/voice-guide.ts` — `speechSynthesis` reads each step's Bangla instruction aloud.
+- `capture/land-speech.ts` + `capture/bangla-quantity.ts` — `SpeechRecognition` (`bn-BD`)
+  transcribes the farmer describing their plot, and a local parser pre-fills `fieldArea`,
+  `fieldAreaUnit`, `cropQuantity` and `cropQuantityUnit`.
+
+**Why this departs from what was written.** `voice-recorder.ts` states plainly: *"There is **no
+client-side ASR here**. Whisper runs server-side in the Python sidecar."* And
+`field-metrics-panel.ts` notes that the farmer may state the figures in the voice note, that the
+**server** decides which source it used, and that the panel *"never merges, overrides or
+second-guesses the spoken value"*. Both statements were right about the submission path and both
+remain true of it.
+
+**Why this is not a re-implementation of a backend rule (`WEB-NFR-001`).** The pre-fill never
+reaches the wire as a claim. It types into the same four inputs the farmer would have typed into
+themselves, they can edit or clear every one of them, and the request body is unchanged — so the
+server still receives ordinary form values and still decides `CaseDetail.metricsSource` entirely
+on its own. Nothing about routing, severity, queue order or confidence is computed here. The
+land recognition is transient: no audio from that step is attached to the submission, because
+the case has a single audio slot and it belongs to the describe step's recording.
+
+**Why client-side at all.** The frozen OpenAPI has no transcription operation — the transcript
+only comes back on `AnalysisDetail` *after* a case is submitted, which is far too late to help
+someone fill the form. A round trip does not exist to be used.
+
+**How it fails safely.** Both features degrade to silence. Where `speechSynthesis` has no Bangla
+voice, or `SpeechRecognition` is absent (it is Chromium-only and needs a network), the mic and
+the listen control simply are not shown and the step is the ordinary typed form it was before.
+The parser refuses rather than guesses: an unrecognised unit yields no unit, an out-of-range
+value is dropped rather than clamped, and ambiguity yields nothing. `bangla-quantity.spec.ts`
+covers those refusals, because a wrong pre-filled area would feed a wrong remedy dose.
+
+**Requirement.** `WEB-NFR-001` preserved (no backend rule recomputed). `WEB-NFR-007` preserved —
+the Web Speech API is a browser API, not a dependency. `WEB-FR-913` (client-side ASR) remains
+formally out of scope; this is an input aid on one form, not a transcription feature.
+
+---
+
+## D-24 · The officer queue's order strings run ahead of the backend
+
+**What.** `officer.queue.orderNote` and `officer.queue.orderNoteDetail` now tell the officer that
+the newest cases come first. The frozen OpenAPI still says the opposite: *"Ordering is fixed by
+the server (state, top_confidence ASC NULLS FIRST, submitted_at ASC) and is not
+client-controllable."* The same applies to the admin submission-cadence caveat, which explained
+the old ordering.
+
+**Why.** The user is changing the ordering in the backend so that every persona's list reads
+newest-first, and asked for the UI text to be brought in line now.
+
+**What was deliberately NOT done.** No client-side comparator was added. `QueueStore` still has
+no sort method, and the rows render in exactly the order received — re-sorting a server-paginated
+list in the browser would reorder one page and quietly mislead about the rest, and it would
+recompute a rule the server owns (`WEB-NFR-001`).
+
+**Open until the backend lands.** Between this change and the backend change, the officer queue's
+order note and its actual order disagree. Revert these two strings, or ship the backend ordering,
+before this reaches anyone relying on it.
+
+**Requirement.** `WEB-FR-200` — ordering stays server-owned and un-recomputed. `WEB-NFR-001`
+preserved.
