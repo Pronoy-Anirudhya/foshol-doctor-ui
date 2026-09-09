@@ -8,11 +8,11 @@
     "en": "Farmer registration"
   },
   "farmers.subtitle": {
-    "bn": "{{district}} জেলার কৃষকদের তালিকা। আপনি শুধু নিজের জেলাতেই নতুন কৃষক নিবন্ধন করতে পারবেন।",
+    "bn": "{{district}} জেলার নিবন্ধিত কৃষকদের তালিকা। নতুন কৃষক শুধুমাত্র নিজের জেলাতেই নিবন্ধন করা যাবে।",
     "en": "Farmers in {{district}} district. You can register new farmers in your own district only."
   },
   "farmers.subtitleNoDistrict": {
-    "bn": "আপনার জেলার কৃষকদের তালিকা। আপনি শুধু নিজের জেলাতেই নতুন কৃষক নিবন্ধন করতে পারবেন।",
+    "bn": "আপনার জেলার নিবন্ধিত কৃষকদের তালিকা। নতুন কৃষক শুধুমাত্র নিজের জেলাতেই নিবন্ধন করা যাবে।",
     "en": "Farmers in your district. You can register new farmers in your own district only."
   },
   "farmers.action.register": {
@@ -20,10 +20,9 @@
     "en": "Register a farmer"
   },
   "farmers.action.import": {
-    "bn": "সিএসভি দিয়ে একসাথে নিবন্ধন",
+    "bn": "CSV থেকে একসাথে নিবন্ধন",
     "en": "Bulk register from CSV"
   },
-
   "farmers.language.bn": {
     "bn": "বাংলা",
     "en": "Bangla"
@@ -33,20 +32,19 @@
     "en": "English"
   },
   "farmers.source.MANUAL": {
-    "bn": "একক নিবন্ধন",
-    "en": "Registered singly"
+    "bn": "ম্যানুয়াল",
+    "en": "Manual"
   },
   "farmers.source.CSV": {
-    "bn": "সিএসভি",
-    "en": "CSV import"
+    "bn": "CSV",
+    "en": "CSV"
   },
   "farmers.source.MIGRATION": {
-    "bn": "পুরোনো তথ্য",
-    "en": "Migrated record"
+    "bn": "মাইগ্রেটেড",
+    "en": "Migrated"
   },
-
   "farmers.directory.search.heading": {
-    "bn": "কৃষক খুঁজুন",
+    "bn": "কৃষক অনুসন্ধান",
     "en": "Search farmers"
   },
   "farmers.directory.search.name.label": {
@@ -54,7 +52,7 @@
     "en": "Search by name"
   },
   "farmers.directory.search.name.hint": {
-    "bn": "নামের অংশ লিখলেই হবে।",
+    "bn": "নামের অংশবিশেষ দিয়েও খোঁজা যাবে।",
     "en": "Part of the name is enough."
   },
   "farmers.directory.search.phone.label": {
@@ -62,7 +60,7 @@
     "en": "Look up by mobile number"
   },
   "farmers.directory.search.phone.hint": {
-    "bn": "নম্বরটি হুবহু মিলতে হবে। নম্বর শুধু খোঁজার জন্য পাঠানো হয় — কোথাও দেখানো বা সংরক্ষণ করা হয় না।",
+    "bn": "সম্পূর্ণ নম্বর দিয়ে খুঁজুন। নম্বরটি শুধু অনুসন্ধানে ব্যবহৃত হয়, কোথাও সংরক্ষণ বা প্রদর্শন করা হয় না।",
     "en": "The number must match exactly. It is used only to search, and is never displayed or stored."
   },
   "farmers.directory.search.go": {
@@ -70,7 +68,7 @@
     "en": "Search"
   },
   "farmers.directory.search.clear": {
-    "bn": "খোঁজা বাতিল",
+    "bn": "অনুসন্ধান বাতিল",
     "en": "Clear search"
   },
   "farmers.directory.refresh": {
@@ -82,11 +80,11 @@
     "en": "Refreshing…"
   },
   "farmers.directory.orderNote": {
-    "bn": "সবচেয়ে নতুন নিবন্ধন আগে — সার্ভার যে ক্রমে পাঠিয়েছে ঠিক সেই ক্রমে দেখানো হচ্ছে।",
+    "bn": "সর্বশেষ নিবন্ধিত কৃষক সবার উপরে দেখানো হচ্ছে।",
     "en": "Newest registrations first, in exactly the order the server returned them."
   },
   "farmers.directory.stale": {
-    "bn": "হালনাগাদ করা যায়নি। নিচের তালিকাটি আগের।",
+    "bn": "তালিকা হালনাগাদ করা যায়নি। নিচে পূর্ববর্তী তথ্য দেখানো হচ্ছে।",
     "en": "Could not refresh. The list below is the previous one."
   },
   "farmers.directory.caption": {
@@ -110,11 +108,11 @@
     "en": "Preferred language"
   },
   "farmers.directory.col.source": {
-    "bn": "যেভাবে যুক্ত হয়েছে",
-    "en": "Added by"
+    "bn": "উৎস",
+    "en": "Source"
   },
   "farmers.directory.col.registeredBy": {
-    "bn": "নিবন্ধন করেছেন",
+    "bn": "নিবন্ধনকারী",
     "en": "Registered by"
   },
   "farmers.directory.col.createdAt": {
@@ -122,36 +120,35 @@
     "en": "Registered at"
   },
   "farmers.directory.empty.title": {
-    "bn": "এখনও কোনও কৃষক নিবন্ধিত হয়নি",
+    "bn": "এখনো কোনো কৃষক নিবন্ধিত হয়নি",
     "en": "No farmers registered yet"
   },
   "farmers.directory.empty.detail": {
-    "bn": "প্রথম কৃষককে নিবন্ধন করতে উপরের বোতামটি ব্যবহার করুন।",
+    "bn": "নতুন কৃষক নিবন্ধনের মাধ্যমে শুরু করুন।",
     "en": "Use the button above to register the first farmer."
   },
   "farmers.directory.noMatches.title": {
-    "bn": "কোনও কৃষক পাওয়া যায়নি",
+    "bn": "কোনো কৃষক পাওয়া যায়নি",
     "en": "No farmers found"
   },
   "farmers.directory.noMatches.detail": {
-    "bn": "অন্য নাম বা নম্বর দিয়ে খুঁজে দেখুন, অথবা খোঁজা বাতিল করে পুরো তালিকা দেখুন।",
+    "bn": "অন্য নাম বা নম্বর দিয়ে চেষ্টা করুন, অথবা অনুসন্ধান বাতিল করে সম্পূর্ণ তালিকা দেখুন।",
     "en": "Try a different name or number, or clear the search to see the whole list."
   },
   "farmers.directory.notLoaded.title": {
-    "bn": "তালিকা এখনও আসেনি",
+    "bn": "তালিকা লোড করা হয়নি",
     "en": "The list has not loaded"
   },
   "farmers.directory.notLoaded.detail": {
-    "bn": "তালিকা আনতে হালনাগাদ বোতামে চাপ দিন।",
+    "bn": "তালিকা দেখতে হালনাগাদ করুন।",
     "en": "Press refresh to fetch the list."
   },
-
   "farmers.register.title": {
     "bn": "নতুন কৃষক নিবন্ধন",
     "en": "Register a farmer"
   },
   "farmers.register.intro": {
-    "bn": "কৃষকের কাছ থেকে নেওয়া তথ্য এই ক্রমে লিখুন। নিবন্ধনের পর তিনি নিজের মোবাইল নম্বর দিয়ে ওটিপি নিয়ে লগইন করতে পারবেন।",
+    "bn": "কৃষকের তথ্য নিচের ক্রম অনুযায়ী পূরণ করুন। নিবন্ধনের পর তিনি মোবাইল নম্বর ও OTP ব্যবহার করে লগইন করতে পারবেন।",
     "en": "Enter what you collected from the farmer, in this order. Once registered, they can sign in with an OTP sent to their mobile number."
   },
   "farmers.field.phone.label": {
@@ -159,8 +156,8 @@
     "en": "Mobile number"
   },
   "farmers.field.phone.hint": {
-    "bn": "০১৭… অথবা +৮৮০১৭… — দুই ভাবেই লেখা যায়।",
-    "en": "Either 017… or +88017… is accepted."
+    "bn": "017… অথবা +88017… — যেকোনো ফরম্যাটে লিখতে পারেন।",
+    "en": "017… or +88017… — either format is accepted."
   },
   "farmers.field.phone.invalid": {
     "bn": "সঠিক বাংলাদেশি মোবাইল নম্বর লিখুন।",
@@ -171,7 +168,7 @@
     "en": "Farmer's name"
   },
   "farmers.field.name.invalid": {
-    "bn": "নাম লিখুন — সর্বোচ্চ {{max}} অক্ষর।",
+    "bn": "নাম লিখুন। সর্বোচ্চ {{max}} অক্ষর।",
     "en": "Enter a name, up to {{max}} characters."
   },
   "farmers.field.language.label": {
@@ -191,11 +188,11 @@
     "en": "District"
   },
   "farmers.field.geo.locked": {
-    "bn": "আপনার নিজের বিভাগ ও জেলা স্বয়ংক্রিয়ভাবে বসানো হয়েছে, পরিবর্তন করা যাবে না। অন্য জেলার কৃষক নিবন্ধন করা যায় না।",
+    "bn": "আপনার বিভাগ ও জেলা স্বয়ংক্রিয়ভাবে নির্ধারিত, পরিবর্তনযোগ্য নয়। অন্য জেলার কৃষক এখান থেকে নিবন্ধন করা যাবে না।",
     "en": "Your own division and district are filled in automatically and cannot be changed. Farmers in another district cannot be registered here."
   },
   "farmers.register.noScope": {
-    "bn": "আপনার অ্যাকাউন্টে কোনও জেলা যুক্ত নেই, তাই এখন নিবন্ধন করা যাচ্ছে না। প্রশাসকের সঙ্গে যোগাযোগ করুন।",
+    "bn": "আপনার অ্যাকাউন্টে কোনো জেলা নির্ধারিত নেই, তাই নিবন্ধন করা যাচ্ছে না। অনুগ্রহ করে প্রশাসকের সঙ্গে যোগাযোগ করুন।",
     "en": "Your account has no district assigned, so registration is unavailable. Please contact an administrator."
   },
   "farmers.register.submit": {
@@ -211,15 +208,15 @@
     "en": "Cancel"
   },
   "farmers.register.success.title": {
-    "bn": "কৃষক নিবন্ধিত হয়েছে",
+    "bn": "নিবন্ধন সম্পন্ন হয়েছে",
     "en": "Farmer registered"
   },
   "farmers.register.success.detail": {
-    "bn": "{{district}} জেলায় {{name}}-কে নিবন্ধন করা হয়েছে। তিনি এখন নিজের মোবাইল নম্বর দিয়ে লগইন করতে পারবেন।",
+    "bn": "{{name}}-কে {{district}} জেলায় নিবন্ধন করা হয়েছে। তিনি এখন মোবাইল নম্বর দিয়ে লগইন করতে পারবেন।",
     "en": "{{name}} has been registered in {{district}} district, and can now sign in with their mobile number."
   },
   "farmers.register.success.replayed": {
-    "bn": "এই নিবন্ধনটি আগেই পৌঁছেছিল, তাই নতুন করে কিছু তৈরি হয়নি — কৃষক একবারই নিবন্ধিত আছেন।",
+    "bn": "এই নিবন্ধনটি পূর্বেই সম্পন্ন হয়েছে। কৃষক একবারই নিবন্ধিত রয়েছেন।",
     "en": "This registration had already reached the server, so nothing new was created — the farmer is registered exactly once."
   },
   "farmers.register.another": {
@@ -227,60 +224,59 @@
     "en": "Register another"
   },
   "farmers.register.done": {
-    "bn": "শেষ",
+    "bn": "সম্পন্ন",
     "en": "Done"
   },
   "farmers.register.announced": {
     "bn": "{{name}} নিবন্ধিত হয়েছেন।",
     "en": "{{name}} has been registered."
   },
-
   "farmers.import.title": {
-    "bn": "সিএসভি দিয়ে একসাথে নিবন্ধন",
+    "bn": "CSV থেকে একসাথে নিবন্ধন",
     "en": "Bulk register from CSV"
   },
   "farmers.import.template.title": {
-    "bn": "প্রথমে টেমপ্লেটটি নামিয়ে নিন",
+    "bn": "প্রথমে টেমপ্লেট ডাউনলোড করুন",
     "en": "Start by downloading the template"
   },
   "farmers.import.template.detail": {
-    "bn": "ফাইলের প্রথম সারিতে ঠিক এই কলামগুলোই থাকতে হবে — কম বা বেশি নয়, ক্রমও বদলানো যাবে না।",
+    "bn": "ফাইলের প্রথম সারিতে ঠিক এই কলামগুলো থাকতে হবে। কলাম যোগ, বাদ বা ক্রম পরিবর্তন করা যাবে না।",
     "en": "The first row must carry exactly these columns — no more, no fewer, and in this order."
   },
   "farmers.import.template.download": {
-    "bn": "টেমপ্লেট নামান",
+    "bn": "টেমপ্লেট ডাউনলোড",
     "en": "Download template"
   },
   "farmers.import.template.downloading": {
-    "bn": "নামানো হচ্ছে…",
+    "bn": "ডাউনলোড হচ্ছে…",
     "en": "Downloading…"
   },
   "farmers.import.template.failed": {
-    "bn": "টেমপ্লেটটি নামানো যায়নি। আবার চেষ্টা করুন।",
+    "bn": "টেমপ্লেট ডাউনলোড করা যায়নি। আবার চেষ্টা করুন।",
     "en": "The template could not be downloaded. Please try again."
   },
   "farmers.import.rules.title": {
-    "bn": "যা মনে রাখতে হবে",
+    "bn": "আপলোডের নিয়মাবলি",
     "en": "Before you upload"
   },
   "farmers.import.rules.rows": {
-    "bn": "শিরোনামের সারি বাদে সর্বোচ্চ {{max}}টি সারি দেওয়া যাবে।",
+    "bn": "হেডার বাদে সর্বোচ্চ {{max}}টি সারি আপলোড করা যাবে।",
     "en": "At most {{max}} data rows, not counting the header row."
   },
   "farmers.import.rules.size": {
-    "bn": "ফাইলের আকার {{kib}} কিবি-র বেশি হওয়া চলবে না।",
-    "en": "The file must be no larger than {{kib}} KiB."
+    "bn": "ফাইলের আকার সর্বোচ্চ {{kib}} KB।",
+    "en": "Maximum file size {{kib}} KB."
   },
   "farmers.import.rules.encoding": {
-    "bn": "ফাইলটি ইউটিএফ-৮ এনকোডিংয়ে সংরক্ষণ করুন, নাহলে বাংলা নাম ভেঙে যাবে।",
+    "bn": "ফাইলটি UTF-8 ফরম্যাটে সংরক্ষণ করুন, অন্যথায় বাংলা নাম বিকৃত হবে।",
     "en": "Save the file as UTF-8, otherwise Bangla names will be mangled."
   },
   "farmers.import.rules.district": {
-    "bn": "প্রতিটি সারির বিভাগ ও জেলা আপনার নিজের বিভাগ ও জেলার সঙ্গে মিলতে হবে — একক নিবন্ধনের মতোই।",
+    "bn": "প্রতিটি সারির বিভাগ ও জেলা আপনার নিজের বিভাগ ও জেলার সঙ্গে মিলতে হবে।",
     "en": "Every row's division and district must be your own, exactly as in the single-farmer form."
   },
   "farmers.import.file.label": {
-    "bn": "সিএসভি ফাইল বাছুন",
+    "bn": "CSV ফাইল নির্বাচন করুন",
     "en": "Choose a CSV file"
   },
   "farmers.import.file.rows": {
@@ -288,19 +284,19 @@
     "en": "{{count}} data rows found"
   },
   "farmers.import.reject.tooLarge": {
-    "bn": "ফাইলটি অনেক বড়। {{kib}} কিবি-র মধ্যে রাখুন।",
-    "en": "This file is too large. Keep it within {{kib}} KiB."
+    "bn": "ফাইলের আকার সীমার বেশি। সর্বোচ্চ {{kib}} KB আপলোড করা যাবে।",
+    "en": "This file is too large. The maximum is {{kib}} KB."
   },
   "farmers.import.reject.tooManyRows": {
-    "bn": "ফাইলে {{count}}টি সারি আছে, সর্বোচ্চ {{max}}টি দেওয়া যায়। ফাইলটি ভাগ করে নিন।",
+    "bn": "ফাইলে {{count}}টি সারি রয়েছে, সর্বোচ্চ {{max}}টি অনুমোদিত। ফাইলটি ভাগ করে আপলোড করুন।",
     "en": "This file has {{count}} rows but at most {{max}} are allowed. Please split it."
   },
   "farmers.import.reject.badHeader": {
-    "bn": "প্রথম সারিটি টেমপ্লেটের সঙ্গে মিলছে না। টেমপ্লেটটি নামিয়ে সেটিতেই তথ্য লিখুন।",
+    "bn": "প্রথম সারিটি টেমপ্লেটের সঙ্গে মিলছে না। টেমপ্লেট ডাউনলোড করে সেখানেই তথ্য পূরণ করুন।",
     "en": "The first row does not match the template. Download the template and fill that in instead."
   },
   "farmers.import.reject.empty": {
-    "bn": "ফাইলে শিরোনাম ছাড়া কোনও সারি নেই।",
+    "bn": "ফাইলে হেডার ছাড়া কোনো তথ্য নেই।",
     "en": "The file has no data rows, only a header."
   },
   "farmers.import.upload": {
@@ -312,7 +308,7 @@
     "en": "Uploading…"
   },
   "farmers.import.another": {
-    "bn": "আরেকটি ফাইল",
+    "bn": "নতুন ফাইল আপলোড",
     "en": "Import another file"
   },
   "farmers.import.close": {
@@ -320,7 +316,7 @@
     "en": "Close"
   },
   "farmers.import.results.title": {
-    "bn": "সারিভিত্তিক ফলাফল",
+    "bn": "সারি অনুযায়ী ফলাফল",
     "en": "Row-by-row results"
   },
   "farmers.import.results.summary": {
@@ -336,8 +332,8 @@
     "en": "Row"
   },
   "farmers.import.results.col.status": {
-    "bn": "ফল",
-    "en": "Result"
+    "bn": "স্ট্যাটাস",
+    "en": "Status"
   },
   "farmers.import.results.col.name": {
     "bn": "নাম",
@@ -356,60 +352,59 @@
     "en": "Failed"
   },
   "farmers.import.templateAnnounced": {
-    "bn": "টেমপ্লেট নামানো হয়েছে।",
+    "bn": "টেমপ্লেট ডাউনলোড হয়েছে।",
     "en": "The template has been downloaded."
   },
   "farmers.import.announced": {
-    "bn": "আপলোড শেষ — {{succeeded}}টি সফল, {{failed}}টি ব্যর্থ।",
+    "bn": "আপলোড সম্পন্ন — {{succeeded}}টি সফল, {{failed}}টি ব্যর্থ।",
     "en": "Upload finished — {{succeeded}} succeeded, {{failed}} failed."
   },
-
   "farmers.error.phoneInvalid": {
-    "bn": "মোবাইল নম্বরটি গ্রহণ করা যায়নি। নম্বরটি দেখে আবার লিখুন।",
+    "bn": "মোবাইল নম্বরটি গ্রহণযোগ্য নয়। নম্বরটি যাচাই করে আবার লিখুন।",
     "en": "That mobile number was not accepted. Please check it and try again."
   },
   "farmers.error.districtScope": {
-    "bn": "শুধু নিজের জেলার কৃষককেই নিবন্ধন করা যায়।",
+    "bn": "শুধুমাত্র নিজের জেলার কৃষক নিবন্ধন করা যাবে।",
     "en": "You can only register farmers in your own district."
   },
   "farmers.error.geoInvalid": {
-    "bn": "বিভাগ বা জেলার কোডটি সার্ভার চিনতে পারেনি। প্রশাসকের সঙ্গে যোগাযোগ করুন।",
+    "bn": "বিভাগ বা জেলার কোড শনাক্ত করা যায়নি। অনুগ্রহ করে প্রশাসকের সঙ্গে যোগাযোগ করুন।",
     "en": "The server did not recognise the division or district code. Please contact an administrator."
   },
   "farmers.error.badRequest": {
-    "bn": "দেওয়া তথ্যে কোথাও ভুল আছে। দেখে নিয়ে আবার চেষ্টা করুন।",
+    "bn": "প্রদত্ত তথ্যে ত্রুটি রয়েছে। যাচাই করে আবার চেষ্টা করুন।",
     "en": "Something in the details was not valid. Please check them and try again."
   },
   "farmers.error.idempotencyMissing": {
-    "bn": "অনুরোধটি অসম্পূর্ণ ছিল। আবার চেষ্টা করুন।",
+    "bn": "অনুরোধটি সম্পূর্ণ হয়নি। আবার চেষ্টা করুন।",
     "en": "The request was incomplete. Please try again."
   },
   "farmers.error.idempotencyInvalid": {
-    "bn": "অনুরোধটি অসম্পূর্ণ ছিল। আবার চেষ্টা করুন।",
+    "bn": "অনুরোধটি সঠিক ছিল না। আবার চেষ্টা করুন।",
     "en": "The request was malformed. Please try again."
   },
   "farmers.error.idempotencyConflict": {
-    "bn": "এই নিবন্ধনটি আগেই অন্য তথ্য নিয়ে পাঠানো হয়েছিল। ফর্মটি নতুন করে শুরু করুন।",
+    "bn": "এই নিবন্ধনটি পূর্বে ভিন্ন তথ্য নিয়ে পাঠানো হয়েছিল। ফর্মটি নতুন করে পূরণ করুন।",
     "en": "This registration was already sent with different details. Please start the form again."
   },
   "farmers.error.phoneExists": {
-    "bn": "এই মোবাইল নম্বরে একজন কৃষক আগে থেকেই নিবন্ধিত আছেন।",
+    "bn": "এই মোবাইল নম্বরে একজন কৃষক ইতিমধ্যে নিবন্ধিত রয়েছেন।",
     "en": "A farmer is already registered with this mobile number."
   },
   "farmers.error.notFound": {
-    "bn": "এই কৃষককে পাওয়া যায়নি।",
+    "bn": "কৃষকের তথ্য পাওয়া যায়নি।",
     "en": "That farmer could not be found."
   },
   "farmers.error.importInvalid": {
-    "bn": "ফাইলটি পড়া যায়নি। টেমপ্লেট অনুযায়ী ফাইলটি ঠিক করে আবার আপলোড করুন।",
+    "bn": "ফাইলটি পড়া যায়নি। টেমপ্লেট অনুযায়ী ঠিক করে আবার আপলোড করুন।",
     "en": "The file could not be read. Please correct it against the template and upload it again."
   },
   "farmers.error.bulkTooLarge": {
-    "bn": "ফাইলে অনুমোদিত সীমার চেয়ে বেশি সারি বা তথ্য আছে। ফাইলটি ভাগ করে নিন।",
+    "bn": "ফাইলে অনুমোদিত সীমার চেয়ে বেশি তথ্য রয়েছে। ফাইলটি ভাগ করে আপলোড করুন।",
     "en": "The file exceeds the allowed size or row count. Please split it into smaller files."
   },
   "farmers.error.bulkDuplicate": {
-    "bn": "একই মোবাইল নম্বর ফাইলে একাধিকবার আছে।",
+    "bn": "একই মোবাইল নম্বর ফাইলে একাধিকবার রয়েছে।",
     "en": "The same mobile number appears more than once in the file."
   },
   "farmers.error.forbidden": {
@@ -417,7 +412,7 @@
     "en": "You do not have permission to do this."
   },
   "farmers.error.unsupportedMediaType": {
-    "bn": "ফাইলের ধরনটি গ্রহণযোগ্য নয়। একটি সিএসভি ফাইল আপলোড করুন।",
+    "bn": "ফাইলের ধরন গ্রহণযোগ্য নয়। একটি CSV ফাইল আপলোড করুন।",
     "en": "That file type is not accepted. Please upload a CSV file."
   }
 }

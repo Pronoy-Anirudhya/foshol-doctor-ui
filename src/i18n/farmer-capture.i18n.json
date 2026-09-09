@@ -92,7 +92,7 @@
     "en": "Which crop?"
   },
   "farmer.capture.describe.help": {
-    "bn": "বোতাম চেপে ধরে কথা বলুন, অথবা নিচে লিখুন। দুটোর যেকোনো একটি দিলেই চলবে।",
+    "bn": "বাটন চেপে ধরে কথা বলুন অথবা নিচে লিখুন। দুটোর যেকোনো একটি দিলেই চলবে।",
     "en": "Hold the button and speak, or type below. Either one is enough."
   },
   "farmer.capture.describe.stepTitle": {
@@ -116,7 +116,7 @@
     "en": "Unit"
   },
   "farmer.capture.field.help": {
-    "bn": "মাইক চেপে বলুন আপনার জমি কতটুকু, অথবা নিচে নিজে লিখে দিন। মাঠ কর্মকর্তা এই মাপ দেখেই ওষুধের মাত্রা ঠিক করেন।",
+    "bn": "আপনার জমির পরিমাণ ভয়েসে বলুন অথবা নিচে লিখে দিন। সঠিক ওষুধের মাত্রা নির্ধারণে জমির নিখুঁত মাপ জরুরি।",
     "en": "Press the microphone and say how much land you have, or type it in below. The field officer works out the remedy amount from this measurement."
   },
   "farmer.capture.field.quantityLabel": {
@@ -152,7 +152,7 @@
     "en": "{{chosen}} of {{max}} photos"
   },
   "farmer.capture.images.help": {
-    "bn": "আক্রান্ত পাতা বা গাছের কাছ থেকে তোলা পরিষ্কার ছবি সবচেয়ে ভালো কাজ করে।",
+    "bn": "সঠিক রোগ নির্ণয়ের জন্য আক্রান্ত পাতা বা গাছের স্পষ্ট ছবি তুলুন।",
     "en": "A close, clear photo of the affected leaf or plant works best."
   },
   "farmer.capture.images.moveEarlier": {
@@ -320,7 +320,7 @@
     "en": "Crop"
   },
   "farmer.capture.review.help": {
-    "bn": "সব ঠিক আছে কিনা দেখে নিন, তারপর পাঠান। কিছু বদলাতে চাইলে উপরের ধাপে চাপ দিন।",
+    "bn": "সব তথ্য যাচাই করে নিশ্চিত করুন। কোনো তথ্য পরিবর্তন করতে চাইলে পূর্ববর্তী ধাপে ফিরে যান।",
     "en": "Check that everything is right, then send. To change anything, tap a step above."
   },
   "farmer.capture.review.missing": {
@@ -332,7 +332,7 @@
     "en": "Not given"
   },
   "farmer.capture.review.note": {
-    "bn": "লেখা বর্ণনা",
+    "bn": "লিখিত বিবরণ",
     "en": "Written description"
   },
   "farmer.capture.review.photos": {
@@ -352,7 +352,7 @@
     "en": "Check and send"
   },
   "farmer.capture.review.voice": {
-    "bn": "কণ্ঠবার্তা",
+    "bn": "ভয়েস মেসেজ",
     "en": "Voice note"
   },
   "farmer.capture.serverReason.BLURRY": {
@@ -432,7 +432,7 @@
     "en": "Sending…"
   },
   "farmer.capture.subtitle": {
-    "bn": "ছবি তুলুন, চাইলে কথা বলে বা লিখে সমস্যাটি জানান। একজন মাঠ কর্মকর্তা দেখে তবেই পরামর্শ পাঠাবেন।",
+    "bn": "ছবি তুলুন এবং প্রয়োজনে ভয়েস বা টেক্সটের মাধ্যমে সমস্যাটি বিস্তারিত জানান। আমাদের কৃষি কর্মকর্তা আপনার তথ্য যাচাই করে সঠিক পরামর্শ পাঠাবেন।",
     "en": "Take photos, then describe the problem by voice or in writing. A field officer checks every case before any advice is sent."
   },
   "farmer.capture.title": {
