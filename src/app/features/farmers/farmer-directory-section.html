@@ -1,0 +1,202 @@
+<!-- Search. Two boxes, ONE choice: the contract refuses a request carrying both `q` and `phone`
+     (400 ERR_BAD_REQUEST), so committing either one clears the other (WEB-FR-312). -->
+<section class="rounded-panel border border-surface-3 bg-surface-0 p-4 shadow-card">
+  <h2 class="sr-only">{{ 'farmers.directory.search.heading' | translate }}</h2>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="flex flex-col gap-1.5">
+      <label for="farmer-search-name" class="text-sm font-semibold text-ink">
+        {{ 'farmers.directory.search.name.label' | translate }}
+      </label>
+      <div class="flex flex-wrap gap-2">
+        <input
+          id="farmer-search-name"
+          type="search"
+          class="touch-target min-w-0 flex-1 rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+          data-testid="directory-search-name"
+          [value]="nameDraft()"
+          (input)="onNameInput($event)"
+          (keydown.enter)="searchByName()"
+        />
+        <button
+          type="button"
+          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+          data-testid="directory-search-name-go"
+          (click)="searchByName()"
+        >
+          {{ 'farmers.directory.search.go' | translate }}
+        </button>
+      </div>
+      <p class="text-sm text-ink-faint">{{ 'farmers.directory.search.name.hint' | translate }}</p>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="farmer-search-phone" class="text-sm font-semibold text-ink">
+        {{ 'farmers.directory.search.phone.label' | translate }}
+      </label>
+      <div class="flex flex-wrap gap-2">
+        <input
+          id="farmer-search-phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="off"
+          class="touch-target font-latin min-w-0 flex-1 rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+          data-testid="directory-search-phone"
+          [value]="phoneDraft()"
+          (input)="onPhoneInput($event)"
+          (keydown.enter)="searchByPhone()"
+        />
+        <button
+          type="button"
+          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+          data-testid="directory-search-phone-go"
+          (click)="searchByPhone()"
+        >
+          {{ 'farmers.directory.search.go' | translate }}
+        </button>
+      </div>
+      <!-- Says plainly that the number is used to ask, and is never shown back. -->
+      <p class="text-sm text-ink-faint">{{ 'farmers.directory.search.phone.hint' | translate }}</p>
+    </div>
+  </div>
+
+  <div class="mt-3 flex flex-wrap items-center gap-2">
+    @if (store.searchActive()) {
+      <button
+        type="button"
+        class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+        data-testid="directory-clear"
+        (click)="clearSearch()"
+      >
+        {{ 'farmers.directory.search.clear' | translate }}
+      </button>
+    }
+    <button
+      type="button"
+      class="touch-target ms-auto inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1 disabled:cursor-not-allowed disabled:opacity-60"
+      data-testid="directory-refresh"
+      [disabled]="store.loading()"
+      (click)="refresh()"
+    >
+      <foshol-icon name="refresh" size="sm" />
+      {{ (store.loading() ? 'farmers.directory.refreshing' : 'farmers.directory.refresh') | translate }}
+    </button>
+  </div>
+</section>
+
+<!-- WEB-FR-312 — the order is the server's and is stated, so nobody looks for a sort control
+     that deliberately does not exist. -->
+<p class="mt-4 text-sm text-ink-muted" data-testid="directory-order-note">
+  {{ 'farmers.directory.orderNote' | translate }}
+</p>
+
+@if (problem(); as failure) {
+  @if (store.stale()) {
+    <p class="mt-3 text-sm font-semibold text-clay-700" role="status" data-testid="directory-stale">
+      {{ 'farmers.directory.stale' | translate }}
+    </p>
+  }
+  <foshol-error-panel class="mt-3 block" [problem]="failure" (retry)="refresh()" />
+}
+
+@if (store.hasPage()) {
+  @if (store.countedEmpty()) {
+    <foshol-empty-state class="mt-4" [titleKey]="emptyTitleKey()" [detailKey]="emptyDetailKey()" />
+  } @else {
+    <!-- WEB-UX-032 — stacked cards below `md`, a table at and above it. The switch is Tailwind
+         variants in this template, never a rule in the stylesheet: a component rule outranks
+         `md:hidden` and would silently leave both visible. -->
+    <ul class="mt-4 flex list-none flex-col gap-3 p-0 md:hidden" data-testid="directory-cards">
+      @for (row of store.rows(); track row.id) {
+        <li class="card p-4">
+          <p class="text-base font-bold text-ink">{{ row.name }}</p>
+          <p class="mt-1 text-sm text-ink-muted">
+            {{ districtLabel(row) }} · {{ divisionLabel(row) }}
+          </p>
+          <dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+            <dt class="text-ink-faint">{{ 'farmers.directory.col.language' | translate }}</dt>
+            <dd class="text-ink">{{ 'farmers.language.' + row.preferredLanguage | translate }}</dd>
+
+            <dt class="text-ink-faint">{{ 'farmers.directory.col.source' | translate }}</dt>
+            <dd class="text-ink">{{ 'farmers.source.' + row.source | translate }}</dd>
+
+            <dt class="text-ink-faint">{{ 'farmers.directory.col.registeredBy' | translate }}</dt>
+            <dd class="text-ink">{{ row.registeredByName || '—' }}</dd>
+
+            <dt class="text-ink-faint">{{ 'farmers.directory.col.createdAt' | translate }}</dt>
+            <dd class="text-ink tabular">{{ row.createdAt | dhakaDateTime }}</dd>
+          </dl>
+        </li>
+      }
+    </ul>
+
+    <!-- Wide content scrolls inside its own box, so the PAGE never scrolls at 360px
+         (WEB-UX-031). -->
+    <div class="mt-4 hidden overflow-x-auto md:block">
+      <table class="w-full min-w-[52rem] border-collapse text-sm">
+        <caption class="sr-only">{{ 'farmers.directory.caption' | translate }}</caption>
+        <thead>
+          <tr class="border-b border-surface-3">
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.name' | translate }}
+            </th>
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.district' | translate }}
+            </th>
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.division' | translate }}
+            </th>
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.language' | translate }}
+            </th>
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.source' | translate }}
+            </th>
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.registeredBy' | translate }}
+            </th>
+            <th scope="col" class="px-3 py-2 text-start font-semibold text-ink">
+              {{ 'farmers.directory.col.createdAt' | translate }}
+            </th>
+          </tr>
+        </thead>
+        <tbody data-testid="directory-table">
+          @for (row of store.rows(); track row.id) {
+            <tr class="border-b border-surface-3">
+              <td class="px-3 py-2 font-semibold text-ink">{{ row.name }}</td>
+              <td class="px-3 py-2 text-ink-muted">{{ districtLabel(row) }}</td>
+              <td class="px-3 py-2 text-ink-muted">{{ divisionLabel(row) }}</td>
+              <td class="px-3 py-2 text-ink-muted">
+                {{ 'farmers.language.' + row.preferredLanguage | translate }}
+              </td>
+              <td class="px-3 py-2">
+                <!-- WEB-UX-044 — the source is text, not a colour. -->
+                <span class="inline-flex items-center rounded-chip bg-surface-2 px-2 py-0.5 text-sm font-medium text-ink">
+                  {{ 'farmers.source.' + row.source | translate }}
+                </span>
+              </td>
+              <td class="px-3 py-2 text-ink-muted">{{ row.registeredByName || '—' }}</td>
+              <td class="px-3 py-2 text-ink-muted tabular">{{ row.createdAt | dhakaDateTime }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <foshol-paginator
+    class="mt-4"
+    [page]="store.filters().page"
+    [size]="store.size()"
+    [totalElements]="store.totalElements()"
+    [totalPages]="store.totalPages()"
+    (pageChange)="goToPage($event)"
+  />
+} @else if (!store.loading() && problem() === null) {
+  <!-- Never loaded at all — distinct from "the server returned none". -->
+  <foshol-empty-state
+    class="mt-4"
+    titleKey="farmers.directory.notLoaded.title"
+    detailKey="farmers.directory.notLoaded.detail"
+  />
+}

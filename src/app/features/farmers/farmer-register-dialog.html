@@ -1,0 +1,207 @@
+<foshol-modal-dialog
+  [open]="open()"
+  titleKey="farmers.register.title"
+  headingId="farmer-register-title"
+  (closed)="close()"
+>
+  @if (succeeded()) {
+    <!-- WEB-FR-311 — the confirmation names the farmer and the district they were written into.
+         It never echoes the phone: the control was cleared the moment the request succeeded, and
+         no response carries one. -->
+    <div class="flex flex-col gap-4" data-testid="register-confirmation">
+      <div class="rounded-card border border-paddy-600 bg-surface-1 p-4">
+        <p class="text-base font-bold text-ink">
+          {{ 'farmers.register.success.title' | translate }}
+        </p>
+        <p class="mt-1 text-sm text-ink-muted">
+          {{
+            'farmers.register.success.detail'
+              | translate: { name: store.outcome()!.record.name, district: districtLabel() }
+          }}
+        </p>
+        @if (store.outcome()!.replayed) {
+          <!-- An idempotent replay is a SUCCESS, not a failure — the same attempt reached the
+               server twice and only one farmer exists. Said quietly so it does not read as an error. -->
+          <p class="mt-2 text-sm text-ink-faint" data-testid="register-replayed">
+            {{ 'farmers.register.success.replayed' | translate }}
+          </p>
+        }
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="touch-target inline-flex items-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary shadow-card transition-colors duration-1 ease-settle hover:bg-primary-hover"
+          data-testid="register-another"
+          (click)="registerAnother()"
+        >
+          {{ 'farmers.register.another' | translate }}
+        </button>
+        <button
+          type="button"
+          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+          data-testid="register-done"
+          (click)="close()"
+        >
+          {{ 'farmers.register.done' | translate }}
+        </button>
+      </div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4" novalidate>
+      <p class="text-sm text-ink-muted">{{ 'farmers.register.intro' | translate }}</p>
+
+      <!-- 1 — Mobile number. First, because it is the first thing the officer has. -->
+      <div class="flex flex-col gap-1.5">
+        <label for="farmer-phone" class="text-sm font-semibold text-ink">
+          {{ 'farmers.field.phone.label' | translate }}
+        </label>
+        <input
+          id="farmer-phone"
+          type="tel"
+          formControlName="phone"
+          autocomplete="off"
+          inputmode="tel"
+          class="touch-target font-latin w-full rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+          data-testid="register-phone"
+          [attr.aria-invalid]="phoneInvalid() ? 'true' : null"
+          [attr.aria-errormessage]="phoneInvalid() ? 'farmer-phone-error' : null"
+          [attr.aria-describedby]="phoneInvalid() ? null : 'farmer-phone-hint'"
+          (input)="onEdit()"
+        />
+        @if (phoneInvalid()) {
+          <p id="farmer-phone-error" class="text-sm font-semibold text-clay-700" data-testid="register-phone-error">
+            {{ 'farmers.field.phone.invalid' | translate }}
+          </p>
+        } @else {
+          <p id="farmer-phone-hint" class="text-sm text-ink-faint">
+            {{ 'farmers.field.phone.hint' | translate }}
+          </p>
+        }
+      </div>
+
+      <!-- 2 — Name. -->
+      <div class="flex flex-col gap-1.5">
+        <label for="farmer-name" class="text-sm font-semibold text-ink">
+          {{ 'farmers.field.name.label' | translate }}
+        </label>
+        <input
+          id="farmer-name"
+          type="text"
+          formControlName="name"
+          autocomplete="off"
+          [maxlength]="nameMaxLength"
+          class="touch-target w-full rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+          data-testid="register-name"
+          [attr.aria-invalid]="nameInvalid() ? 'true' : null"
+          [attr.aria-errormessage]="nameInvalid() ? 'farmer-name-error' : null"
+          (input)="onEdit()"
+        />
+        @if (nameInvalid()) {
+          <p id="farmer-name-error" class="text-sm font-semibold text-clay-700" data-testid="register-name-error">
+            {{ 'farmers.field.name.invalid' | translate: { max: nameMaxLength } }}
+          </p>
+        }
+      </div>
+
+      <!-- 3 — Preferred language, Bangla by default (WEB-UX-011). -->
+      <div class="flex flex-col gap-1.5">
+        <label for="farmer-language" class="text-sm font-semibold text-ink">
+          {{ 'farmers.field.language.label' | translate }}
+        </label>
+        <select
+          id="farmer-language"
+          formControlName="preferredLanguage"
+          class="touch-target w-full rounded-control border border-surface-3 bg-surface-0 px-3 py-2 text-sm text-ink transition-colors duration-1 ease-settle"
+          data-testid="register-language"
+          (change)="onEdit()"
+        >
+          @for (locale of locales; track locale) {
+            <option [value]="locale">{{ 'farmers.language.' + locale | translate }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- WEB-FR-314 — locked geography. Shown, not hidden, so the officer can see the scope
+           they are writing into; disabled, so they cannot change it. -->
+      <fieldset class="rounded-card border border-surface-3 bg-surface-1 p-3">
+        <legend class="px-1 text-sm font-semibold text-ink">
+          {{ 'farmers.field.geo.legend' | translate }}
+        </legend>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="flex flex-col gap-1.5">
+            <label for="farmer-division" class="text-sm text-ink-muted">
+              {{ 'farmers.field.division.label' | translate }}
+            </label>
+            <input
+              id="farmer-division"
+              type="text"
+              disabled
+              class="touch-target w-full rounded-control border border-surface-3 bg-surface-2 px-3 py-2 text-sm text-ink-muted"
+              data-testid="register-division"
+              [value]="divisionLabel()"
+            />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label for="farmer-district" class="text-sm text-ink-muted">
+              {{ 'farmers.field.district.label' | translate }}
+            </label>
+            <input
+              id="farmer-district"
+              type="text"
+              disabled
+              class="touch-target w-full rounded-control border border-surface-3 bg-surface-2 px-3 py-2 text-sm text-ink-muted"
+              data-testid="register-district"
+              [value]="districtLabel()"
+            />
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-ink-faint">{{ 'farmers.field.geo.locked' | translate }}</p>
+      </fieldset>
+
+      @if (!scopeKnown()) {
+        <!-- No district on the principal means there is nothing honest to submit. We refuse
+             rather than inventing a code the server would reject anyway. -->
+        <p class="text-sm font-semibold text-clay-700" role="alert" data-testid="register-no-scope">
+          {{ 'farmers.register.noScope' | translate }}
+        </p>
+      }
+
+      @if (store.registerProblem(); as problem) {
+        @if (problemKey(); as key) {
+          <div class="rounded-card border border-clay-600 bg-surface-1 p-3" data-testid="register-error">
+            <p class="text-sm font-bold text-ink">{{ key | translate }}</p>
+            @if (problem.correlationId; as correlationId) {
+              <p class="mt-1 text-sm text-ink-faint">
+                {{ 'errors.correlationId.label' | translate }}
+                <code class="font-mono break-all select-all">{{ correlationId }}</code>
+              </p>
+            }
+          </div>
+        } @else {
+          <foshol-error-panel [problem]="problem" [retryable]="false" />
+        }
+      }
+
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="submit"
+          class="touch-target inline-flex items-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary shadow-card transition-colors duration-1 ease-settle hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+          data-testid="register-submit"
+          [disabled]="store.submitting() || !scopeKnown()"
+        >
+          {{ (store.submitting() ? 'farmers.register.submitting' : 'farmers.register.submit') | translate }}
+        </button>
+        <button
+          type="button"
+          class="touch-target inline-flex items-center gap-1.5 rounded-control border border-surface-3 bg-surface-0 px-4 text-sm font-medium text-ink transition-colors duration-1 ease-settle hover:bg-surface-1"
+          data-testid="register-cancel"
+          [disabled]="store.submitting()"
+          (click)="close()"
+        >
+          {{ 'farmers.register.cancel' | translate }}
+        </button>
+      </div>
+    </form>
+  }
+</foshol-modal-dialog>
