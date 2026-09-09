@@ -20,6 +20,7 @@ servers:
 
 tags:
   - name: auth
+  - name: farmers
   - name: knowledge
   - name: cases
   - name: analysis
@@ -131,6 +132,130 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/GeoDistrict' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ── farmers (staff provision) ───────────────────────────────────────────
+  /api/v1/farmers:
+    post:
+      tags: [farmers]
+      operationId: registerFarmer
+      summary: Register one farmer in the caller's district (OFFICER or ADMIN)
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterFarmerRequest' }
+      responses:
+        '201':
+          description: Farmer created (or idempotent replay of the same request)
+          headers:
+            Idempotency-Replayed:
+              schema: { type: string, enum: ['true'] }
+              description: Present when the Idempotency-Key was replayed with an identical body
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FarmerRecord' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    get:
+      tags: [farmers]
+      operationId: listFarmers
+      summary: Farmers in the caller's district, newest first
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Size' }
+        - name: q
+          in: query
+          required: false
+          schema: { type: string }
+          description: Case-insensitive name contains. Must not be combined with phone.
+        - name: phone
+          in: query
+          required: false
+          schema: { type: string }
+          description: Exact phone lookup after E.164 normalisation. Never echoed. Must not be combined with q.
+      responses:
+        '200':
+          description: Page of farmer records for the caller's district
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PageOfFarmerRecord' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/farmers/import/template:
+    get:
+      tags: [farmers]
+      operationId: downloadFarmerImportTemplate
+      summary: UTF-8 CSV template (BOM) for bulk farmer registration
+      responses:
+        '200':
+          description: CSV template
+          headers:
+            Content-Disposition:
+              schema: { type: string }
+              description: attachment; filename="farmer-import-template.csv"
+          content:
+            text/csv:
+              schema:
+                type: string
+                example: |
+                  name,phone,divisionCode,districtCode,preferredLanguage
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/v1/farmers/import:
+    post:
+      tags: [farmers]
+      operationId: importFarmers
+      summary: Bulk-register farmers from a CSV file (per-row results)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: UTF-8 CSV matching the template header, max foshol.identity.bulk.max-bytes
+      responses:
+        '200':
+          description: Per-row results; some rows may fail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FarmerImportResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+
+  /api/v1/farmers/{farmerId}:
+    get:
+      tags: [farmers]
+      operationId: getFarmer
+      summary: Farmer detail in the caller's district
+      parameters:
+        - { $ref: '#/components/parameters/FarmerId' }
+      responses:
+        '200':
+          description: Farmer record
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FarmerRecord' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   # ── knowledge ─────────────────────────────────────────────────────────────
@@ -371,10 +496,10 @@ paths:
     get:
       tags: [review]
       operationId: getReviewQueue
-      summary: Officer queue, ordered least-confident first (role OFFICER, ADMIN)
+      summary: Officer queue, ordered newest submitted_at first (role OFFICER, ADMIN)
       description: >
-        Ordering is fixed by the server (state, top_confidence ASC NULLS FIRST, submitted_at ASC)
-        and is not client-controllable.
+        Ordering is fixed by the server (submitted_at DESC, newest case first)
+        and is not client-controllable. Client `sort` and `order` query parameters are rejected.
       parameters:
         - name: state
           in: query
@@ -759,6 +884,7 @@ components:
       bearerFormat: JWT
 
   parameters:
+    FarmerId:  { name: farmerId,  in: path, required: true, schema: { type: string, format: uuid } }
     CaseId:    { name: caseId,    in: path, required: true, schema: { type: string, format: uuid } }
     CropId:    { name: cropId,    in: path, required: true, schema: { type: string, format: uuid } }
     DiseaseId: { name: diseaseId, in: path, required: true, schema: { type: string, format: uuid } }
@@ -895,6 +1021,76 @@ components:
         divisionCode: { type: string }
         nameEn:       { type: string }
         nameBn:       { type: string }
+
+    RegisterFarmerRequest:
+      type: object
+      required: [name, phone, divisionCode, districtCode, preferredLanguage]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        phone:
+          type: string
+          description: E.164 or Bangladeshi national form; never echoed back or logged
+        divisionCode: { type: string }
+        districtCode: { type: string }
+        preferredLanguage: { type: string, enum: [bn, en] }
+
+    FarmerRecord:
+      type: object
+      description: Staff-visible farmer identity. Never includes a phone number.
+      required:
+        - id
+        - name
+        - divisionCode
+        - districtCode
+        - preferredLanguage
+        - createdAt
+        - source
+      properties:
+        id:                      { type: string, format: uuid }
+        name:                    { type: string }
+        divisionCode:           { type: string }
+        districtCode:           { type: string }
+        divisionNameBn:         { type: string, nullable: true }
+        divisionNameEn:         { type: string, nullable: true }
+        districtNameBn:         { type: string, nullable: true }
+        districtNameEn:         { type: string, nullable: true }
+        preferredLanguage:      { type: string, enum: [bn, en] }
+        createdAt:               { type: string, format: date-time }
+        registeredByOfficerId:  { type: string, format: uuid, nullable: true }
+        registeredByName:       { type: string, nullable: true }
+        source:                  { type: string, enum: [MIGRATION, MANUAL, CSV] }
+
+    PageOfFarmerRecord:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          required: [content]
+          properties:
+            content: { type: array, items: { $ref: '#/components/schemas/FarmerRecord' } }
+
+    FarmerImportResult:
+      type: object
+      required: [succeeded, failed, results]
+      properties:
+        succeeded: { type: integer }
+        failed:    { type: integer }
+        results:
+          type: array
+          items: { $ref: '#/components/schemas/FarmerImportRowResult' }
+
+    FarmerImportRowResult:
+      type: object
+      required: [row, status]
+      properties:
+        row:       { type: integer, description: 1-based including the header row }
+        status:    { type: string, enum: [OK, FAILED] }
+        farmerId:  { type: string, format: uuid, nullable: true }
+        name:      { type: string, nullable: true }
+        errorCode: { type: string, nullable: true }
+        message:   { type: string, nullable: true, description: Safe display text; never a phone number }
 
     Crop:
       type: object
