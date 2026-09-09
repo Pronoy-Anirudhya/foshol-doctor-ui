@@ -94,6 +94,7 @@ const PAIRS = [
 
   // ── Text inside a tinted chip ────────────────────────────────────────────────────────────
   ['paddy-700', 'paddy-100', 4.5, 'text inside a success chip'],
+  ['paddy-800', 'paddy-100', 4.5, 'capture stepper: speaking guide button, completed rail mark'],
   ['teal-700', 'accent-soft', 4.5, 'text inside an accent chip'],
   ['dawn-700', 'dawn-100', 4.5, 'text inside a warning chip'],
   ['clay-700', 'clay-100', 4.5, 'text inside a rejection chip'],

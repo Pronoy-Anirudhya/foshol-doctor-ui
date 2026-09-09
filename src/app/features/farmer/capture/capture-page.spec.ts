@@ -38,6 +38,32 @@ const CROPS_URL = `${APP_CONFIG.api.origin}${KnowledgeService.ListCropsPath}`;
 const SUBMIT_URL = `${APP_CONFIG.api.origin}${CasesService.SubmitCasePath}`;
 const CASE_ID = '01991f27-0000-7000-8000-0000000000aa';
 
+/**
+ * The capture screen is a five-step card deck now (`DEVIATIONS.md` D-22), so a case that acts on
+ * a control first shows the step that owns it — exactly as a farmer would. The rail reaches any
+ * step from any other in one press, which is the behaviour `WEB-FR-140`/`141` depend on and is
+ * asserted on its own below.
+ */
+async function showStep(
+  fixture: ComponentFixture<CapturePage>,
+  stepId: string,
+): Promise<void> {
+  const rail = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+    `[data-testid="step-rail-${stepId}"]`,
+  );
+  rail!.click();
+  fixture.detectChanges();
+  await fixture.whenStable();
+}
+
+/** The card the deck is actually showing — the only one that is not `inert`. */
+function activeStep(fixture: ComponentFixture<CapturePage>): string | null {
+  const card = (fixture.nativeElement as HTMLElement).querySelector(
+    '[data-testid="capture-step-card"][data-depth="0"]',
+  );
+  return card?.getAttribute('data-step') ?? null;
+}
+
 describe('CapturePage — local quality gate (WEB-TEST-002, WEB-FR-120…125)', () => {
   let fixture: ComponentFixture<CapturePage>;
   let http: HttpTestingController;
@@ -83,6 +109,7 @@ describe('CapturePage — local quality gate (WEB-TEST-002, WEB-FR-120…125)', 
   }
 
   async function choose(...images: readonly SyntheticImage[]): Promise<void> {
+    await showStep(fixture, 'photos');
     const input = el().querySelector<HTMLInputElement>('[data-testid="capture-file-input"]');
     Object.defineProperty(input, 'files', {
       value: images.map((image) => image.blob),
@@ -119,6 +146,45 @@ describe('CapturePage — local quality gate (WEB-TEST-002, WEB-FR-120…125)', 
     expect(cropStep).not.toBeNull();
     expect(cropStep!.querySelector('select')).toBeNull();
     expect(el().querySelector('[role="radiogroup"]')).not.toBeNull();
+  });
+
+  /**
+   * The screen guides, it does not gate. `WEB-FR-140`/`141` require the free-text description to
+   * be available at all times, so every step is one press away from every other step and the
+   * deck never becomes a wizard.
+   */
+  it('reaches every step directly from the rail, in any order (WEB-FR-140/141)', async () => {
+    await setUp([passingImage()]);
+
+    expect(activeStep(fixture)).toBe('crop');
+    const rail = (stepId: string): HTMLButtonElement =>
+      el().querySelector<HTMLButtonElement>(`[data-testid="step-rail-${stepId}"]`)!;
+    expect(rail('crop').getAttribute('aria-current')).toBe('step');
+
+    // Straight to the last step without touching the three in between.
+    await showStep(fixture, 'describe');
+    expect(activeStep(fixture)).toBe('describe');
+    expect(rail('describe').getAttribute('aria-current')).toBe('step');
+    expect(rail('crop').getAttribute('aria-current')).toBeNull();
+
+    // And straight back. Nothing about the draft changed on the way.
+    await showStep(fixture, 'crop');
+    expect(activeStep(fixture)).toBe('crop');
+    expect(requestsSincePick()).toEqual([]);
+  });
+
+  /** Only the card in front takes tab stops; the deck behind it must be unreachable. */
+  it('marks every card but the active one inert', async () => {
+    await setUp([passingImage()]);
+    await showStep(fixture, 'land');
+
+    const cards = [...el().querySelectorAll('[data-testid="capture-step-card"]')];
+    expect(cards.length).toBeGreaterThan(1);
+    for (const card of cards) {
+      const isActive = card.getAttribute('data-depth') === '0';
+      expect(card.hasAttribute('inert')).toBe(!isActive);
+    }
+    expect(cards.filter((card) => card.getAttribute('data-depth') === '0').length).toBe(1);
   });
 
   it('rejects a below-minimum-edge photo locally, with no request and no override', async () => {
@@ -274,6 +340,7 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     await fixture.whenStable();
 
     draft.chooseCrop(crops[0]!.id);
+    await showStep(fixture, 'photos');
     const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
       '[data-testid="capture-file-input"]',
     );
@@ -330,6 +397,29 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     await fixture.whenStable();
   });
 
+  /**
+   * Send is not the review step's private property: it sits in the sticky bar and is live from
+   * whichever card is showing, the moment the draft is submittable. The review card offers the
+   * same action a second time, where a farmer following the guided path expects to find it.
+   */
+  it('keeps Send available from every step, not only the last', async () => {
+    await setUpWithOneImage();
+    expect(submitButton().disabled).toBe(false);
+
+    await showStep(fixture, 'crop');
+    expect(activeStep(fixture)).toBe('crop');
+    expect(submitButton().disabled).toBe(false);
+
+    await showStep(fixture, 'review');
+    expect(activeStep(fixture)).toBe('review');
+    expect(submitButton().disabled).toBe(false);
+    const review = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+      '[data-testid="capture-review-submit"]',
+    );
+    expect(review).not.toBeNull();
+    expect(review!.disabled).toBe(false);
+  });
+
   it('refuses to send without a field area, and says why', async () => {
     await setUpWithOneImage();
     draft.setFieldArea(null);
@@ -343,10 +433,13 @@ describe('CapturePage — submission (WEB-FR-150, WEB-FR-403)', () => {
     // Nothing left for the server to reject: the 400 is prevented, not handled.
     expect(http.match(SUBMIT_URL)).toEqual([]);
 
+    // The hint lives in the sticky bar, which is on screen whichever step is showing.
     const hint = (fixture.nativeElement as HTMLElement).querySelector(
       '[data-testid="capture-submit-hint"]',
     );
     expect(hint?.textContent?.trim()).toBe(BN_CATALOGUE['farmer.capture.submit.needArea']);
+
+    await showStep(fixture, 'land');
     expect(
       (fixture.nativeElement as HTMLElement).querySelector('[data-testid="field-area-error"]'),
     ).not.toBeNull();
@@ -479,6 +572,7 @@ describe('CapturePage — cancel (WEB-DATA-022, WEB-FR-145)', () => {
     if (!withContent) return;
 
     draft.chooseCrop(crops[0]!.id);
+    await showStep(fixture, 'photos');
     const input = (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
       '[data-testid="capture-file-input"]',
     );
