@@ -12,12 +12,12 @@
     "en": "Every case is approved by a human here before it reaches the farmer."
   },
   "officer.queue.orderNote": {
-    "bn": "সবচেয়ে কম আত্মবিশ্বাসের কেস আগে।",
-    "en": "Least-confident cases first."
+    "bn": "সবচেয়ে নতুন কেস আগে।",
+    "en": "Newest cases first."
   },
   "officer.queue.orderNoteDetail": {
-    "bn": "ক্রম নির্ধারণ করে সার্ভার — যেখানে মডেল সবচেয়ে কম নিশ্চিত, সেখানেই মানুষের সময় সবচেয়ে বেশি দরকার। এই তালিকা ব্রাউজারে সাজানো যায় না।",
-    "en": "The server fixes this order — human time is worth most where the model is least sure. This list cannot be re-sorted in the browser."
+    "bn": "ক্রম ঠিক করে সার্ভার — যে কেস সবচেয়ে পরে জমা পড়েছে সেটিই সারির উপরে থাকে। এই তালিকা ব্রাউজারে নতুন করে সাজানো যায় না।",
+    "en": "The server fixes this order — the most recently submitted case sits at the top. This list cannot be re-sorted in the browser."
   },
   "officer.queue.refresh": {
     "bn": "সারি নতুন করে আনুন",
@@ -48,7 +48,7 @@
     "en": "Top candidate"
   },
   "officer.queue.col.confidence": {
-    "bn": "আত্মবিশ্বাস",
+    "bn": "নিশ্চয়তা",
     "en": "Confidence"
   },
   "officer.queue.col.path": {
@@ -264,11 +264,11 @@
     "en": "Dismiss report"
   },
   "officer.queue.state.PENDING": {
-    "bn": "অপেক্ষমাণ",
+    "bn": "প্রক্রিয়াধীন",
     "en": "Pending"
   },
   "officer.queue.state.CLAIMED": {
-    "bn": "নেওয়া হয়েছে",
+    "bn": "গৃহীত",
     "en": "Claimed"
   },
   "officer.queue.state.DONE": {
@@ -291,16 +291,20 @@
     "bn": "কেস আনা হচ্ছে…",
     "en": "Loading the case…"
   },
-  "officer.case.farmer": {
-    "bn": "কৃষক",
-    "en": "Farmer"
+  "officer.case.farmerUnknown": {
+    "bn": "কৃষকের নাম আসেনি — কেস {{caseId}}",
+    "en": "Farmer's name not supplied — case {{caseId}}"
+  },
+  "officer.case.farmerUnknownIn": {
+    "bn": "কৃষকের নাম আসেনি — {{district}} জেলার কেস {{caseId}}",
+    "en": "Farmer's name not supplied — case {{caseId}} in district {{district}}"
   },
   "officer.case.status": {
     "bn": "কেসের অবস্থা",
     "en": "Case status"
   },
   "officer.case.submitted": {
-    "bn": "জমা দেওয়া হয়েছে",
+    "bn": "জমা পড়েছে",
     "en": "Submitted"
   },
   "officer.case.sla": {
@@ -320,7 +324,7 @@
     "en": "Crop quantity"
   },
   "officer.case.metrics.source": {
-    "bn": "মাপ এসেছে",
+    "bn": "মাপের উৎস",
     "en": "Metrics from"
   },
   "officer.case.metrics.source.FORM": {
@@ -332,7 +336,7 @@
     "en": "From the farmer's speech"
   },
   "officer.case.metrics.source.FORM_AND_SPEECH": {
-    "bn": "লেখা ও কথা — দুটো থেকেই",
+    "bn": "লেখা ও কথা, দুটো থেকেই",
     "en": "From both the form and the speech"
   },
   "officer.case.note": {
@@ -356,7 +360,7 @@
     "en": "Symptoms"
   },
   "officer.case.section.audio": {
-    "bn": "কণ্ঠ ও প্রতিলিপি",
+    "bn": "কণ্ঠ ও লিখিত রূপ",
     "en": "Audio and transcript"
   },
   "officer.case.section.model": {
@@ -396,15 +400,15 @@
     "en": "For your consideration"
   },
   "officer.case.thresholdCaption": {
-    "bn": "দুটি খাড়া রেখা দুটি রাউটিং সীমা — প্রতিটি প্রার্থীর উপর একই জায়গায়, সার্ভারের পাঠানো মান অনুযায়ী।",
+    "bn": "খাড়া রেখা দুটি রাউটিংয়ের দুই সীমা — প্রতিটি সম্ভাব্য রোগের উপর একই জায়গায়, সার্ভারের পাঠানো মান অনুযায়ী।",
     "en": "The two vertical rules are the two routing thresholds, at the same place on every candidate, from the values the server sent."
   },
   "officer.case.thresholdLow": {
-    "bn": "নিচের সীমা {{value}}",
+    "bn": "নিম্ন সীমা {{value}}",
     "en": "Low threshold {{value}}"
   },
   "officer.case.thresholdHigh": {
-    "bn": "উপরের সীমা {{value}}",
+    "bn": "উচ্চ সীমা {{value}}",
     "en": "High threshold {{value}}"
   },
   "officer.case.model.id": {
@@ -428,15 +432,15 @@
     "en": "Margin"
   },
   "officer.case.model.unmapped": {
-    "bn": "অচিহ্নিত আউটপুট",
+    "bn": "অমিল লেবেল",
     "en": "Unmapped outputs"
   },
   "officer.case.model.unmappedValue": {
-    "bn": "{{count}} টি",
+    "bn": "{{count}}টি",
     "en": "{{count}}"
   },
   "officer.case.model.unmappedHint": {
-    "bn": "মডেল এমন লেবেল দিয়েছে যা জ্ঞানভাণ্ডারে মেলানো যায়নি। সেগুলো ফেলে দেওয়া হয়নি, গোনা হয়েছে।",
+    "bn": "মডেল এমন কিছু লেবেল দিয়েছে যেগুলো জ্ঞানভাণ্ডারের সঙ্গে মেলানো যায়নি। সেগুলো ফেলে দেওয়া হয়নি, গুনে রাখা হয়েছে।",
     "en": "The model returned labels the knowledge base could not map. They were counted, not dropped."
   },
   "officer.case.model.none": {
@@ -448,15 +452,15 @@
     "en": "Degraded analysis"
   },
   "officer.case.degraded.detail": {
-    "bn": "বিশ্লেষণ সেবা সাড়া দেয়নি ({{code}})। কেসটি তবু আপনার কাছে এসেছে এবং চারটি সিদ্ধান্তই খোলা আছে।",
+    "bn": "বিশ্লেষণ সেবা সাড়া দেয়নি ({{code}})। কেসটি তবু আপনার কাছে এসেছে, এবং চারটি সিদ্ধান্তই এখনও নেওয়া যাবে।",
     "en": "The analysis service did not answer ({{code}}). The case still reached you and all four actions remain open."
   },
   "officer.case.transcriptNotice": {
-    "bn": "প্রতিলিপি কৃষকের নিজের কথায়, হুবহু দেখানো হয়েছে — অনুবাদ করা হয়নি।",
+    "bn": "লিখিত রূপটি কৃষকের নিজের কথা, হুবহু দেখানো হয়েছে — অনুবাদ করা হয়নি।",
     "en": "The transcript is the farmer's own words, shown verbatim and never translated."
   },
   "officer.case.asrConfidence": {
-    "bn": "কণ্ঠ শনাক্তির আত্মবিশ্বাস",
+    "bn": "কণ্ঠ শনাক্তকরণের নিশ্চয়তা",
     "en": "ASR confidence"
   },
   "officer.case.notFound.title": {
@@ -464,7 +468,7 @@
     "en": "Case not found"
   },
   "officer.case.notFound.detail": {
-    "bn": "এই কেসটি আর সারিতে নেই অথবা আপনার জন্য নয়।",
+    "bn": "কেসটি আর সারিতে নেই, অথবা এটি আপনার খোলার জন্য নয়।",
     "en": "This case is no longer in the queue, or is not yours to open."
   },
   "officer.claim.legend": {

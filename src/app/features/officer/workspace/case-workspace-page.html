@@ -1,7 +1,18 @@
-<a class="back" [routerLink]="queuePath">
-  <foshol-icon name="arrow-left" size="sm" />
-  {{ 'officer.case.back' | translate }}
-</a>
+<!-- The back link and the eyebrow are the two smallest things on the screen, and stacking them
+     left a ragged top edge with the eyebrow starting below the link's 44 px target. On one row
+     they share a baseline, and the divider does the separating that a punctuation glyph would
+     otherwise have had to (WEB-UX-013 — no bare literal in a template). -->
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+  <a class="back" [routerLink]="queuePath">
+    <foshol-icon name="arrow-left" size="sm" />
+    {{ 'officer.case.back' | translate }}
+  </a>
+  <span
+    class="border-s border-surface-3 ps-3 text-xs font-bold tracking-wide text-ink-faint uppercase"
+  >
+    {{ 'officer.case.eyebrow' | translate }}
+  </span>
+</div>
 
 @if (facade.caseProblem(); as problem) {
   <foshol-error-panel class="mt-3 block" [problem]="problem" (retry)="refresh()" />
@@ -10,22 +21,44 @@
 @if (store.loading() && caseDetail() === null) {
   <foshol-spinner class="mt-6" [showLabel]="true" labelKey="officer.case.loading" />
 } @else if (caseDetail(); as detail) {
-  <header class="mt-2 flex flex-wrap items-start justify-between gap-3">
+  <!-- Identity first. The farmer is who this case is about, so the name is the page's own
+       heading rather than a line under an eyebrow; the crop and the case id support it.
+       The badges are optically level with the heading's first line (`md:mt-1`) instead of
+       floating on a baseline of their own, and the grid's `auto` second track lets them sit
+       hard right without pushing the name off its own row. -->
+  <header class="mt-3 grid gap-x-6 gap-y-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
     <div class="min-w-0">
-      <p class="text-xs font-bold tracking-wide text-ink-faint uppercase">
-        {{ 'officer.case.eyebrow' | translate }}
-      </p>
-      <h2 class="mt-0.5 text-2xl leading-snug font-bold text-ink [overflow-wrap:anywhere]">
+      <h2 class="text-2xl leading-snug font-bold text-ink [overflow-wrap:anywhere] md:text-3xl">
         @if (facade.farmerName(); as farmer) {
           {{ farmer }}
+        } @else if (facade.farmerDistrictCode(); as district) {
+          <!-- DEVIATIONS.md D-05 — `CaseDetail` carries no farmer identity, so the name can
+               genuinely be absent. Name the case by what we do hold rather than by a generic
+               word that identifies nothing. -->
+          {{
+            'officer.case.farmerUnknownIn'
+              | translate: { caseId: detail.caseId, district: district }
+          }}
         } @else {
-          {{ 'officer.case.farmer' | translate }}
+          {{ 'officer.case.farmerUnknown' | translate: { caseId: detail.caseId } }}
         }
       </h2>
-      <p class="text-ink-muted">{{ detail.cropNameBn }}</p>
+      <p class="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+        <span class="font-semibold text-ink-muted [overflow-wrap:anywhere]">{{
+          detail.cropNameBn
+        }}</span>
+        <!-- Only when the heading is a name: where it is not, the heading already carries the
+             case id and printing it twice in two lines reads as a mistake. -->
+        @if (facade.farmerName()) {
+          <span class="id font-latin border-s border-surface-3 ps-2.5">
+            <span class="sr-only">{{ 'officer.case.caseId' | translate }}</span
+            >{{ detail.caseId }}
+          </span>
+        }
+      </p>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2 md:mt-1 md:justify-end">
       <!-- WEB-FR-215 / WEB-FR-216 — as received, on every case, never computed. -->
       @if (analysis(); as view) {
         <foshol-decision-path-badge [path]="view.decisionPath" />
@@ -40,7 +73,15 @@
     </div>
   </header>
 
-  <dl class="case-meta">
+  <!-- ONE metadata band, not two stacked lists. The two narrow `<dl>`s each filled a fraction
+       of the console's 110rem measure and left the rest dead, and an officer reads the case's
+       state, its clocks and the farmer-reported metrics together anyway. The track floor is
+       what makes it reflow: one column at 360 px, two at 768 px, five at 1280 px, with the
+       last row's tracks collapsing rather than leaving empty cells.
+       `metricsSource` keeps a cell of its own rather than a tint or an icon — a spoken area is
+       a transcription and a typed one is not, and an officer needs to know which before
+       trusting a dose (WEB-UX-042). -->
+  <dl class="case-meta" data-testid="case-metrics">
     <div>
       <dt>{{ 'officer.case.status' | translate }}</dt>
       <dd>{{ 'badge.status.' + detail.status | translate }}</dd>
@@ -58,7 +99,7 @@
       </div>
     }
     <!-- The OFFICER's own clock (REVIEW-FR-090 / REVIEW-FR-091). Absent until the server sends
-         it, in which case there is no row here at all — never a dash and never an empty box. -->
+         it, in which case there is no cell here at all — never a dash and never an empty box. -->
     @if (facade.kpiDueAt(); as kpiDue) {
       <div>
         <dt>{{ 'officer.queue.col.kpi' | translate }}</dt>
@@ -71,16 +112,6 @@
         </dd>
       </div>
     }
-    <div>
-      <dt>{{ 'officer.case.caseId' | translate }}</dt>
-      <dd class="font-latin id">{{ detail.caseId }}</dd>
-    </div>
-  </dl>
-
-  <!-- The farmer-reported metrics the server reckons a dose from. `metricsSource` gets its own
-       row rather than a tint or an icon: a spoken area is a transcription and a typed one is
-       not, and an officer needs to know which before trusting a dose (WEB-UX-042). -->
-  <dl class="case-meta" data-testid="case-metrics">
     <div>
       <dt>{{ 'officer.case.metrics.fieldArea' | translate }}</dt>
       <dd class="tabular" data-testid="metrics-field-area">
@@ -223,7 +254,10 @@
   }
 
   <!-- ── Evidence: image beside candidates at xl (WEB-UX-030) ───────────────────────── -->
-  <div class="mt-5 grid gap-4 xl:grid-cols-2 xl:items-start">
+  <!-- A third column from 2xl. Five panels in two columns left the console's 110rem measure
+       with a column of dead width to the right at 1536 px and above; at three the panels stay
+       wider than the ~28rem an image or a candidate list actually needs. -->
+  <div class="mt-5 grid gap-4 xl:grid-cols-2 xl:items-start 2xl:grid-cols-3">
     <details class="panel" open>
       <summary class="panel-head">{{ 'officer.case.section.images' | translate }}</summary>
       @if (activeImage(); as image) {
@@ -586,7 +620,7 @@
 
     <!-- What each of the four actions means, in one place. The distinction between them is
          the product's argument, so it is written down rather than implied by a button. -->
-    <dl class="mt-3.5 grid gap-x-5 gap-y-2 text-sm sm:grid-cols-2">
+    <dl class="mt-3.5 grid gap-x-5 gap-y-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
       <div>
         <dt class="font-bold text-ink">{{ 'officer.action.approve' | translate }}</dt>
         <dd class="m-0 text-ink-muted">{{ 'officer.action.approveHint' | translate }}</dd>
