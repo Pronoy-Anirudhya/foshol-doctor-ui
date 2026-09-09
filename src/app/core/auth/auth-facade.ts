@@ -5,6 +5,7 @@ import type { AuthResponse } from '../../generated/models/auth-response';
 import type { Principal } from '../../generated/models/principal';
 import { AuthService } from '../../generated/services/auth.service';
 import { APP_CONFIG } from '../config/app-config';
+import { LanguageStore } from '../i18n/language-store';
 import { homePathForRole, loginPathForUrl } from './auth.guard';
 import { SessionStore } from './session-store';
 
@@ -47,6 +48,10 @@ const IDLE: AuthOperationState = { phase: 'idle', problem: null };
 const PENDING: AuthOperationState = { phase: 'pending', problem: null };
 const SUCCEEDED: AuthOperationState = { phase: 'succeeded', problem: null };
 
+/** The surface whose language is fixed rather than merely defaulted — see `applyRoleLanguage`. */
+const FARMER_ROLE = 'FARMER';
+const FARMER_LOCALE = 'bn';
+
 /** The `202` challenge body of `POST /api/v1/auth/otp/request` (handover §5.1). */
 interface OtpChallenge {
   readonly expiresInSeconds: number;
@@ -66,6 +71,7 @@ export class AuthFacade {
   private readonly api = inject(AuthService);
   private readonly session = inject(SessionStore);
   private readonly router = inject(Router);
+  private readonly language = inject(LanguageStore);
   private readonly teardowns = inject(SESSION_TEARDOWN, { optional: true }) ?? [];
 
   private readonly _requestState = signal<AuthOperationState>(IDLE);
@@ -194,15 +200,42 @@ export class AuthFacade {
    * WEB-FR-002 — restore the URL the guard retained, or fall back to the role's home. If the
    * retained URL belongs to a group this role may not enter, `roleGuard` sends it on to
    * `/not-permitted`, which is the honest outcome rather than a silent redirect.
+   *
+   * The one seam both login paths pass through — farmer OTP and officer/admin password alike —
+   * so the language decision below is made once rather than twice.
    */
   private async completeSignIn(auth: AuthResponse): Promise<void> {
     this.session.signIn(auth.token, auth.principal, auth.expiresAt);
+    this.applyRoleLanguage();
     this._expiresInSeconds.set(null);
     this._otpDeliveryMode.set(null);
     this._retryAfterSeconds.set(null);
 
     const intended = this.session.takeIntendedUrl();
     await this.router.navigateByUrl(intended ?? homePathForRole(this.session.role()));
+  }
+
+  /**
+   * WEB-UX-011 / COMMON-NFR-037 — Bangla is the language of record, and on the farmer surface
+   * it is not merely the default: it is the only language most of its users read.
+   *
+   * The preference is persisted (`WEB-DATA-020`) and deliberately survives a sign-out —
+   * `core/stores/store-teardown.ts` leaves `LanguageStore` out of the sweep on purpose. That is
+   * right for a personal device and wrong for the shared handset this product actually meets in
+   * a field office, where whoever used it last leaves English behind for the next farmer, who
+   * then has to find a toggle written in a language they cannot read. Re-asserting Bangla at the
+   * moment the role becomes known costs an officer nothing and unsticks the farmer.
+   *
+   * Only FARMER. An officer or admin works in a console alongside English case data and Latin
+   * identifiers, and their choice is a working preference, not an accessibility floor — so
+   * theirs is left exactly as they set it. And this is a seed, not a lock: `LanguageStore.use`
+   * is the same call the toggle makes, so a farmer who then switches to English stays there for
+   * the rest of the session (`WEB-UX-012`).
+   */
+  private applyRoleLanguage(): void {
+    if (this.session.role() === FARMER_ROLE) {
+      this.language.use(FARMER_LOCALE);
+    }
   }
 }
 
