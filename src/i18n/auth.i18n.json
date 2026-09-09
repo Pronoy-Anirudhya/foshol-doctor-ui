@@ -1,22 +1,22 @@
 {
   "auth.brand.consoleNote": {
-    "bn": "মাঠ কর্মকর্তা কনসোল",
+    "bn": "মাঠ কর্মকর্তার কনসোল",
     "en": "Field officer console"
   },
   "auth.brand.eyebrow": {
-    "bn": "মানুষ-যাচাই করা ফসল পরামর্শ",
-    "en": "Human-verified crop advice"
+    "bn": "কৃষকের আস্থায়, বিশেষজ্ঞের ছোঁয়ায়",
+    "en": "The farmer's trust, the expert's touch"
   },
   "auth.brand.step1": {
     "bn": "ছবি তুলুন, চাইলে বাংলায় বলুন",
     "en": "Take a photo, or just say it in Bangla"
   },
   "auth.brand.step2": {
-    "bn": "এআই কয়েক সেকেন্ডে প্রাথমিক বাছাই করে",
+    "bn": "এআই কয়েক সেকেন্ডেই প্রাথমিক বাছাই করে",
     "en": "AI triages it in seconds"
   },
   "auth.brand.step3": {
-    "bn": "একজন মাঠ কর্মকর্তা প্রতিটি পরামর্শ অনুমোদন করেন",
+    "bn": "প্রতিটি পরামর্শ একজন মাঠ কর্মকর্তা অনুমোদন করেন",
     "en": "A field officer approves every advisory"
   },
   "auth.demo.adminLabel": {
@@ -56,23 +56,23 @@
     "en": "Reference"
   },
   "auth.farmer.changeNumber": {
-    "bn": "অন্য নম্বর ব্যবহার করুন",
+    "bn": "অন্য নম্বর দিন",
     "en": "Use a different number"
   },
   "auth.farmer.codeDigitLabel": {
-    "bn": "{{total}}টির মধ্যে {{index}} নম্বর অঙ্ক",
+    "bn": "{{index}} নম্বর অঙ্ক, মোট {{total}}টি",
     "en": "Digit {{index}} of {{total}}"
   },
   "auth.farmer.codeGroupLabel": {
-    "bn": "একবার ব্যবহারের কোড",
+    "bn": "যাচাইকরণ কোড",
     "en": "One-time code"
   },
   "auth.farmer.codeHint": {
-    "bn": "টাইপ করুন বা পেস্ট করুন — ঘরগুলো নিজেই এগিয়ে যাবে",
+    "bn": "লিখুন বা পেস্ট করুন — ঘর নিজেই এগিয়ে যাবে",
     "en": "Type or paste it — the boxes advance on their own"
   },
   "auth.farmer.codeInvalid": {
-    "bn": "{{length}} অঙ্কের কোড লিখুন",
+    "bn": "{{length}} অঙ্কের কোডটি লিখুন",
     "en": "Enter the {{length}}-digit code"
   },
   "auth.farmer.codeSentAnnounce": {
@@ -80,7 +80,7 @@
     "en": "Code sent"
   },
   "auth.farmer.codeSentTo": {
-    "bn": "{{phone}} নম্বরে {{length}} অঙ্কের একটি কোড পাঠানো হয়েছে",
+    "bn": "{{phone}} নম্বরে {{length}} অঙ্কের কোড পাঠানো হয়েছে",
     "en": "We sent a {{length}}-digit code to {{phone}}"
   },
   "auth.farmer.codeTitle": {
@@ -88,15 +88,15 @@
     "en": "Enter the code"
   },
   "auth.farmer.devFixedNotice": {
-    "bn": "এই সেশনে একটি নির্ধারিত যাচাইকরণ কোড ব্যবহার হচ্ছে",
+    "bn": "এখন একটি নির্ধারিত যাচাইকরণ কোড ব্যবহার হচ্ছে",
     "en": "This session is using a fixed verification code"
   },
   "auth.farmer.expired": {
-    "bn": "কোডের মেয়াদ শেষ। নতুন একটি কোড নিন।",
+    "bn": "কোডের মেয়াদ শেষ হয়ে গেছে। নতুন কোড নিন।",
     "en": "That code has expired. Request a new one."
   },
   "auth.farmer.expiresIn": {
-    "bn": "কোডের মেয়াদ আর {{time}}",
+    "bn": "কোডের মেয়াদ আছে আর {{time}}",
     "en": "Code expires in {{time}}"
   },
   "auth.farmer.officerLink": {
@@ -120,7 +120,7 @@
     "en": "Enter your mobile number"
   },
   "auth.farmer.rateLimited": {
-    "bn": "অনেকবার চেষ্টা হয়েছে। {{time}} পরে আবার চেষ্টা করুন।",
+    "bn": "অনেকবার চেষ্টা করা হয়েছে। {{time}} পরে আবার চেষ্টা করুন।",
     "en": "Too many requests. Try again in {{time}}."
   },
   "auth.farmer.requestOtp": {
@@ -152,7 +152,7 @@
     "en": "Verifying…"
   },
   "auth.notPermitted.body": {
-    "bn": "কোনো ভুল হয়নি। পাতাটি অন্য একটি ভূমিকার জন্য তৈরি, তাই আপনাকে দেখানো হচ্ছে না।",
+    "bn": "কোনো ভুল হয়নি। এই পাতাটি অন্য ধরনের ব্যবহারকারীর জন্য, তাই আপনাকে দেখানো হচ্ছে না।",
     "en": "Nothing has gone wrong. That page belongs to a different role, so it is not shown to you."
   },
   "auth.notPermitted.home": {
@@ -164,11 +164,11 @@
     "en": "Go to sign in"
   },
   "auth.notPermitted.signedInAs": {
-    "bn": "প্রবেশ করেছেন: {{role}}",
+    "bn": "{{role}} হিসেবে প্রবেশ করেছেন",
     "en": "Signed in as {{role}}"
   },
   "auth.notPermitted.title": {
-    "bn": "এই অংশটি আপনার ভূমিকার জন্য নয়",
+    "bn": "এই অংশটি আপনার জন্য নয়",
     "en": "That area is not part of your role"
   },
   "auth.officer.farmerLink": {
