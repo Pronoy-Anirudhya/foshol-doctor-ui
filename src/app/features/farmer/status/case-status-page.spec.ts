@@ -186,7 +186,7 @@ describe('CaseStatusPage (WEB-FR-151…160, AC-21, AC-23)', () => {
     const draft = TestBed.inject(CaseDraftStore);
     expect(draft.parentCaseId()).toBe(REJECTED_ROW.caseId);
     expect(draft.cropId()).toBe(BASE_DETAIL.cropId);
-    expect(navigate).toHaveBeenCalledWith(FARMER_PATHS.capture);
+    expect(navigate).toHaveBeenCalledWith(FARMER_PATHS.newCase);
     http.verify();
   });
 

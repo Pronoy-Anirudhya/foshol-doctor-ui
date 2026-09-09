@@ -27,19 +27,20 @@ import type { Routes } from '@angular/router';
  * The capture surface declares the URLs it navigates to in
  * `capture/farmer-paths.ts` (`FARMER_PATHS`) because it may not edit this file. These paths
  * are the other half of that contract and must keep matching it: `/farmer/new`,
- * `/farmer/new/capture`, `/farmer/cases/{caseId}`.
+ * `/farmer/cases/{caseId}`.
  */
 export const farmerRoutes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'cases' },
   {
+    // A new case IS the stepper, whose first step is the crop. There used to be a standalone
+    // crop-picker page here and the stepper then opened on a crop step with that same choice
+    // already selected — one decision asked for twice. The picker is gone; its grid lives on
+    // as step one.
     path: 'new',
-    pathMatch: 'full',
-    loadComponent: () => import('./crop-picker/crop-picker-page').then((m) => m.CropPickerPage),
-  },
-  {
-    path: 'new/capture',
     loadComponent: () => import('./capture/capture-page').then((m) => m.CapturePage),
   },
+  // Anything still pointing at the old two-screen URL lands on the stepper rather than a 404.
+  { path: 'new/capture', pathMatch: 'full', redirectTo: 'new' },
   {
     path: 'cases',
     loadComponent: () => import('./history/case-history-page').then((m) => m.CaseHistoryPage),

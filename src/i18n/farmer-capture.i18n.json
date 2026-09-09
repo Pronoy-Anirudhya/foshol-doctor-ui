@@ -1,7 +1,7 @@
 {
-  "farmer.capture.backToCrop": {
-    "bn": "ফসল বাছাইয়ে ফিরুন",
-    "en": "Back to crop selection"
+  "farmer.capture.backToCases": {
+    "bn": "কেসের তালিকায় ফিরে যান",
+    "en": "Back to my cases"
   },
   "farmer.capture.camera.cancel": {
     "bn": "বাতিল করুন",

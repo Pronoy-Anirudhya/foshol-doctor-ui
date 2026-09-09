@@ -7,12 +7,10 @@
  * which is a different thing entirely.
  */
 export const FARMER_PATHS = {
-  /** The case list — also where the crop picker's and capture screen's back links return to. */
+  /** The case list — also where the capture screen's back link returns to. */
   casesList: '/farmer/cases',
-  /** The crop picker — the start of a new case. */
+  /** The capture stepper: crop, photographs, field, describe, review (`WEB-FR-100`…`150`). */
   newCase: '/farmer/new',
-  /** The capture screen: crop, photographs, voice, note (`WEB-FR-100`…`150`). */
-  capture: '/farmer/new/capture',
   /** WEB-FR-151 — where a `202` lands. Owned by C-farmer-view. */
   caseStatus: (caseId: string): string => `/farmer/cases/${caseId}`,
 } as const;

@@ -100,6 +100,6 @@ export class RejectionPanel {
     this.draft.chooseCrop(this.cropId());
     // WEB-FR-160 — the resubmission names the case it replaces.
     this.draft.setParentCase(this.caseId());
-    await this.router.navigateByUrl(FARMER_PATHS.capture);
+    await this.router.navigateByUrl(FARMER_PATHS.newCase);
   }
 }
