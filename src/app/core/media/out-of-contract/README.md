@@ -71,9 +71,9 @@ same object. That is the server's business; the client still states which it wan
 
 1. Add the two operations, and a `PresignedUrlView` schema (`{ url, expiresAt }`), to
    `docs/openapi/foshol-api.yaml`. Owner: agent A1 — the file is frozen (`00-common` §12.1).
-2. `npm run api:gen`.
+2. `pnpm run api:gen`.
 3. **Delete this directory** and point `SecureMediaService` at the generated `CasesService`.
 
 Nothing else in the application may add a file here. Every other call goes through
-`src/app/generated/`, which `npm run check:arch` enforces by refusing `HttpClient` injection
+`src/app/generated/`, which `pnpm run check:arch` enforces by refusing `HttpClient` injection
 outside `core/http`, `core/media`, `core/sse` and `core/i18n`.

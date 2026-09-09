@@ -22,7 +22,7 @@ const before = ['bn', 'en'].map((l) => readFileSync(join(OUT, `${l}.json`), 'utf
 execFileSync(process.execPath, [join(root, 'scripts', 'merge-i18n.mjs')], { stdio: 'pipe' });
 const after = ['bn', 'en'].map((l) => readFileSync(join(OUT, `${l}.json`), 'utf8'));
 if (before[0] !== after[0] || before[1] !== after[1]) {
-  errors.push('public/i18n/*.json is stale — run `npm run i18n:build` and commit the result.');
+  errors.push('public/i18n/*.json is stale — run `pnpm run i18n:build` and commit the result.');
 }
 
 const bn = JSON.parse(after[0]);

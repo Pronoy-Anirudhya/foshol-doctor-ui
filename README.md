@@ -23,7 +23,7 @@ proxy, deliberately — a proxy would hide a CORS problem until demo day.
 `./start-ui.sh --skip-install` skips the dependency check on repeat runs. `PORT=4300
 ./start-ui.sh` serves on a different port.
 
-Equivalent by hand: `npm install && npm start`.
+Equivalent by hand: `pnpm install && pnpm start`.
 
 The backend runs separately:
 
@@ -42,8 +42,8 @@ admin `admin` / `password`. The OTP endpoint is genuinely rate-limited to **3 re
 ## Verifying it
 
 ```bash
-npm run verify      # i18n parity · exact pins · architecture lint · WCAG AA contrast · tsc strict + strictTemplates
-npm run verify:all  # the above, plus regenerate-and-diff the API client, a production build, and 491 tests
+pnpm run verify      # i18n parity · exact pins · architecture lint · WCAG AA contrast · tsc strict + strictTemplates
+pnpm run verify:all  # the above, plus regenerate-and-diff the API client, a production build, and 491 tests
 ```
 
 These are not decoration. Requirements that are usually only promised are enforced as build gates,
@@ -80,7 +80,7 @@ src/app/
 - **`core/config/app-config.ts` holds every constant.** No numeric literal belongs in a component
   or service (`WEB-NFR-009`); each mirrored value names the server property it mirrors.
 - **Strings live in `src/i18n/<namespace>.i18n.json` fragments**, each key carrying *both*
-  languages. `npm run i18n:build` merges them into `public/i18n/`. That shape makes an unpaired
+  languages. `pnpm run i18n:build` merges them into `public/i18n/`. That shape makes an unpaired
   key structurally impossible rather than merely tested.
 - **Agronomic content is never authored here.** Disease names, remedy steps, dosages and
   pre-harvest intervals render exactly as the server returns them, and are never translated

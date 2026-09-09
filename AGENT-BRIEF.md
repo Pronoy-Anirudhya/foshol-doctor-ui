@@ -65,12 +65,12 @@ blocker in `DEVIATIONS.md` and implement the nearest specified behaviour.
 ## How to verify your work
 
 ```bash
-cd /Users/a.sarker/Work/Code/foshol-doctor-ui && npm run verify
+cd /Users/a.sarker/Work/Code/foshol-doctor-ui && pnpm run verify
 ```
 
 That runs: i18n parity, exact-pin check, the architecture lint, the WCAG contrast gate, and
 `tsc` under `strict` + `strictTemplates`. **Your work is not done until this passes.** Then run
-your own tests with `npx ng test --no-watch`.
+your own tests with `pnpm exec ng test --no-watch`.
 
 ## Adding strings (this is how many agents share the catalogues)
 
@@ -87,7 +87,7 @@ carries **both** languages:
 ```
 
 The fragment filename determines the required key prefix: `officer-queue.i18n.json` owns
-`officer.queue.*`. `npm run i18n:build` merges all fragments into `public/i18n/{bn,en}.json`.
+`officer.queue.*`. `pnpm run i18n:build` merges all fragments into `public/i18n/{bn,en}.json`.
 Because both languages sit in one entry, `WEB-UX-017` (identical key sets) cannot be violated.
 
 Write real Bangla. If you are unsure of a UI phrase, keep it short and plain — but never invent
@@ -167,7 +167,7 @@ shape difference.
 
 Warm, agricultural, confident. Generous whitespace, large type, rounded corners (`rounded-2xl`
 on cards), soft shadows. Motion **settles, never bounces**. The palette is contrast-gated by
-`npm run check:contrast` — if you need a new colour, it must pass, so add the pair to that
+`pnpm run check:contrast` — if you need a new colour, it must pass, so add the pair to that
 script's list.
 
 This is for a hackathon: aim for genuine visual delight, but never at the cost of a

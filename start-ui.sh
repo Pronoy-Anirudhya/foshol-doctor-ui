@@ -5,8 +5,8 @@
 # http://localhost:8080 — this script never starts, stops or touches it.
 #
 # What it does, in order:
-#   1. Verifies Node/npm are present and match what this project was built against.
-#   2. `npm install` if node_modules is missing or package.json/lock changed since
+#   1. Verifies Node/pnpm are present and match what this project was built against.
+#   2. `pnpm install` if node_modules is missing or package.json/lock changed since
 #      the last install (skip with --skip-install if you know it's current).
 #   3. Regenerates the API client from the frozen OpenAPI contract, ONLY if it is
 #      missing (src/app/generated/ is a committed, hand-verified artefact — see
@@ -20,7 +20,7 @@
 #
 # Usage:
 #   ./start-ui.sh                 # normal start
-#   ./start-ui.sh --skip-install  # skip the npm install check (faster on repeat runs)
+#   ./start-ui.sh --skip-install  # skip the pnpm install check (faster on repeat runs)
 #   PORT=4300 ./start-ui.sh       # serve on a different port
 #
 set -euo pipefail
@@ -48,13 +48,13 @@ echo "Foshol Doctor — frontend startup"
 echo "================================="
 
 # ── 1. Toolchain ─────────────────────────────────────────────────────────────
-step "Checking Node and npm"
+step "Checking Node and pnpm"
 command -v node >/dev/null 2>&1 || fail "node not found on PATH. Install Node (this project was built against v25.9.0) and retry."
-command -v npm  >/dev/null 2>&1 || fail "npm not found on PATH."
+command -v pnpm >/dev/null 2>&1 || fail "pnpm not found on PATH. Install it via 'corepack enable' or 'npm install -g pnpm' and retry."
 
 NODE_VERSION="$(node -v)"
-NPM_VERSION="$(npm -v)"
-ok "node ${NODE_VERSION}, npm ${NPM_VERSION}"
+PNPM_VERSION="$(pnpm -v)"
+ok "node ${NODE_VERSION}, pnpm ${PNPM_VERSION}"
 
 REQUIRED_NODE_MAJOR=20
 NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]')"
@@ -66,12 +66,12 @@ fi
 if [ "$SKIP_INSTALL" -eq 1 ]; then
   warn "Skipping dependency install (--skip-install passed)"
 elif [ ! -d node_modules ]; then
-  step "node_modules missing — running npm install"
-  npm install
+  step "node_modules missing — running pnpm install"
+  pnpm install
   ok "Dependencies installed"
-elif [ package.json -nt node_modules ] || [ package-lock.json -nt node_modules ]; then
-  step "package.json/package-lock.json changed since last install — running npm install"
-  npm install
+elif [ package.json -nt node_modules ] || [ pnpm-lock.yaml -nt node_modules ]; then
+  step "package.json/pnpm-lock.yaml changed since last install — running pnpm install"
+  pnpm install
   ok "Dependencies updated"
 else
   ok "Dependencies already installed and current"
@@ -103,10 +103,10 @@ ok ".postcssrc.json present (Tailwind will actually compile)"
 # src/app/generated/ is committed and hand-verified; this script only generates it
 # when it is entirely absent (a fresh clone missing the directory for some reason).
 # It never regenerates over an existing, possibly hand-adjusted, checked-in client —
-# use `npm run api:gen` yourself if you deliberately want a fresh pull from the spec.
+# use `pnpm run api:gen` yourself if you deliberately want a fresh pull from the spec.
 if [ ! -d src/app/generated ] || [ -z "$(ls -A src/app/generated 2>/dev/null)" ]; then
   step "src/app/generated/ is missing — generating the API client from the frozen contract"
-  npm run api:gen
+  pnpm run api:gen
   ok "API client generated"
 else
   ok "Generated API client present (src/app/generated/)"
@@ -114,7 +114,7 @@ fi
 
 # ── 4. i18n catalogues ────────────────────────────────────────────────────────
 step "Merging i18n fragments into public/i18n/{bn,en}.json"
-npm run i18n:build
+pnpm run i18n:build
 ok "i18n catalogues up to date"
 
 # ── 5. Backend reachability (advisory only — never blocks the UI) ───────────
@@ -138,4 +138,4 @@ ok "Starting the dev server on http://localhost:${PORT}"
 echo "  (Ctrl-C to stop. No dev proxy — the app talks to ${API_ORIGIN} directly.)"
 echo
 
-exec npx ng serve --port "${PORT}"
+exec pnpm exec ng serve --port "${PORT}"

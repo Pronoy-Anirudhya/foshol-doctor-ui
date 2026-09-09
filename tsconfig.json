@@ -1,6 +1,6 @@
 /* Foshol Doctor UI — TypeScript configuration.
  * WEB-NFR-008: zero TypeScript errors under `strict` and zero template errors under
- * `strictTemplates`. Both are asserted by `npm run verify`, not merely hoped for. */
+ * `strictTemplates`. Both are asserted by `pnpm run verify`, not merely hoped for. */
 {
   "compileOnSave": false,
   "compilerOptions": {

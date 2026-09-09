@@ -3,23 +3,23 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "npm run i18n:build && ng serve --port 4200",
-    "build": "npm run i18n:build && ng build",
-    "test": "npm run i18n:build && ng test",
+    "start": "pnpm run i18n:build && ng serve --port 4200",
+    "build": "pnpm run i18n:build && ng build",
+    "test": "pnpm run i18n:build && ng test",
     "api:sync": "node scripts/sync-openapi.mjs",
-    "api:gen": "npm run api:sync && ng-openapi-gen -c ng-openapi-gen.json",
+    "api:gen": "pnpm run api:sync && ng-openapi-gen -c ng-openapi-gen.json",
     "i18n:build": "node scripts/merge-i18n.mjs",
     "i18n:check": "node scripts/check-i18n.mjs",
     "check:pins": "node scripts/check-pins.mjs",
     "check:arch": "node scripts/check-architecture.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "check:generated": "npm run api:gen && git diff --exit-code --stat src/app/generated openapi",
+    "check:generated": "pnpm run api:gen && git diff --exit-code --stat src/app/generated openapi",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
-    "verify": "npm run i18n:check && npm run check:pins && npm run check:arch && npm run check:contrast && npm run typecheck",
-    "verify:all": "npm run verify && npm run check:generated && ng build --configuration production && ng test --no-watch"
+    "verify": "pnpm run i18n:check && pnpm run check:pins && pnpm run check:arch && pnpm run check:contrast && pnpm run typecheck",
+    "verify:all": "pnpm run verify && pnpm run check:generated && ng build --configuration production && ng test --no-watch"
   },
   "private": true,
-  "packageManager": "npm@11.12.1",
+  "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "@angular/common": "22.1.5",
     "@angular/compiler": "22.1.5",
@@ -43,5 +43,16 @@
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vitest": "4.1.11"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "lmdb",
+      "msgpackr-extract"
+    ]
+  },
+  "volta": {
+    "node": "24.15.0"
   }
 }

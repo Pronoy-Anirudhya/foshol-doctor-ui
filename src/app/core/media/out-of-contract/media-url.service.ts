@@ -23,7 +23,7 @@
    breaks the load.
 
    UNBLOCK: add the two operations and a PresignedUrlView schema to docs/openapi/foshol-api.yaml
-   (owner: agent A1 — the file is frozen, 00-common §12.1), run `npm run api:gen`, then DELETE
+   (owner: agent A1 — the file is frozen, 00-common §12.1), run `pnpm run api:gen`, then DELETE
    this directory and point SecureMediaService at the generated CasesService.
    ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
