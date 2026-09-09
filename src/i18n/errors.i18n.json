@@ -12,7 +12,7 @@
     "en": "No internet connection"
   },
   "errors.offline.detail": {
-    "bn": "আপনার ছবি ও লেখা এখানেই রাখা আছে। সংযোগ ফিরে এলে আবার পাঠান।",
+    "bn": "আপনার ছবি ও লেখা এখানেই রাখা আছে। সংযোগ ফিরলে আবার পাঠান।",
     "en": "Your photos and notes are safe here. Send again once you are back online."
   },
   "errors.unauthorised.title": {
@@ -20,15 +20,15 @@
     "en": "Please sign in again"
   },
   "errors.unauthorised.detail": {
-    "bn": "নিরাপত্তার জন্য আপনার সেশনটি শেষ হয়ে গেছে। লগইন করলে যেখানে ছিলেন সেখানেই ফিরে যাবেন।",
+    "bn": "নিরাপত্তার জন্য কিছুক্ষণ পর নিজে থেকেই লগআউট হয়ে যায়। আবার লগইন করলে যেখানে ছিলেন সেখানেই ফিরবেন।",
     "en": "Your session has ended for safety. Sign in and you will come back to where you were."
   },
   "errors.forbidden.title": {
-    "bn": "এই অংশে আপনার প্রবেশাধিকার নেই",
+    "bn": "এই অংশে ঢোকার অনুমতি নেই",
     "en": "You do not have access to this"
   },
   "errors.forbidden.detail": {
-    "bn": "এই পাতাটি অন্য ধরনের ব্যবহারকারীর জন্য। নিজের পাতায় ফিরে যান।",
+    "bn": "এই পাতাটি অন্য ভূমিকার ব্যবহারকারীদের জন্য। নিজের পাতায় ফিরে যান।",
     "en": "This page is for a different kind of user. Please go back to your own pages."
   },
   "errors.notFound.title": {
@@ -36,7 +36,7 @@
     "en": "We could not find this"
   },
   "errors.notFound.detail": {
-    "bn": "জিনিসটি হয়তো সরে গেছে, অথবা এটি আপনার নয়।",
+    "bn": "যেটি খুঁজছেন সেটি হয়তো সরিয়ে ফেলা হয়েছে, অথবা আপনার তালিকায় নেই।",
     "en": "It may have moved, or it may not be yours."
   },
   "errors.conflict.title": {
@@ -44,11 +44,11 @@
     "en": "This has already changed"
   },
   "errors.conflict.detail": {
-    "bn": "অন্য কেউ এর মধ্যে কাজটি করে ফেলেছেন। নতুন করে দেখে নিয়ে আবার চেষ্টা করুন।",
+    "bn": "অন্য কেউ ইতিমধ্যে কাজটি করে ফেলেছেন। নতুন করে দেখে নিয়ে আবার চেষ্টা করুন।",
     "en": "Someone got there first. Refresh to see the latest, then try again."
   },
   "errors.tooLarge.title": {
-    "bn": "ফাইলটি অনেক বড়",
+    "bn": "ফাইলটি আকারে অনেক বড়",
     "en": "That file is too large"
   },
   "errors.tooLarge.detail": {
@@ -64,11 +64,11 @@
     "en": "Please send the photo or recording in another format."
   },
   "errors.badRequest.title": {
-    "bn": "তথ্যে কিছু একটা ঠিক নেই",
+    "bn": "কিছু তথ্য ঠিক করতে হবে",
     "en": "Something needs fixing"
   },
   "errors.badRequest.detail": {
-    "bn": "চিহ্নিত ঘরগুলো একবার দেখে ঠিক করে আবার পাঠান।",
+    "bn": "চিহ্নিত ঘরগুলো দেখে ঠিক করে আবার পাঠান।",
     "en": "Check the highlighted fields, then send again."
   },
   "errors.quality.title": {
@@ -84,7 +84,7 @@
     "en": "Please wait a moment"
   },
   "errors.rateLimited.detail": {
-    "bn": "অল্প সময়ে অনেকবার চেষ্টা হয়েছে। একটু পরে আবার করুন।",
+    "bn": "অল্প সময়ে অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।",
     "en": "That was tried a few too many times. Please try again shortly."
   },
   "errors.unavailable.title": {
@@ -92,7 +92,7 @@
     "en": "Temporarily unavailable"
   },
   "errors.unavailable.detail": {
-    "bn": "সার্ভার এখন ব্যস্ত। একটু পরে আবার চেষ্টা করুন।",
+    "bn": "সেবাটি এখন ব্যস্ত আছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।",
     "en": "The service is busy right now. Please try again in a moment."
   },
   "errors.correlationId.label": {

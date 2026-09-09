@@ -1,16 +1,16 @@
 {
-  "badge.confidence.label": { "bn": "আত্মবিশ্বাস", "en": "Confidence" },
+  "badge.confidence.label": { "bn": "নিশ্চয়তা", "en": "Confidence" },
   "badge.confidence.thresholdLow": { "bn": "নিম্ন সীমা", "en": "Low threshold" },
   "badge.confidence.thresholdHigh": { "bn": "উচ্চ সীমা", "en": "High threshold" },
   "badge.confidence.aria": {
-    "bn": "আত্মবিশ্বাস {{value}}। নিম্ন সীমা {{low}}, উচ্চ সীমা {{high}}।",
+    "bn": "নিশ্চয়তা {{value}}। নিম্ন সীমা {{low}}, উচ্চ সীমা {{high}}।",
     "en": "Confidence {{value}}. Low threshold {{low}}, high threshold {{high}}."
   },
 
   "badge.decisionPath.label": { "bn": "সিদ্ধান্তের পথ", "en": "Decision path" },
-  "badge.decisionPath.PRIMARY": { "bn": "প্রাথমিক", "en": "Primary" },
-  "badge.decisionPath.SECONDARY": { "bn": "দ্বিতীয়", "en": "Secondary" },
-  "badge.decisionPath.UNDETERMINED": { "bn": "অনিশ্চিত", "en": "Undetermined" },
+  "badge.decisionPath.PRIMARY": { "bn": "নিশ্চিত", "en": "Primary" },
+  "badge.decisionPath.SECONDARY": { "bn": "সম্ভাব্য", "en": "Secondary" },
+  "badge.decisionPath.UNDETERMINED": { "bn": "অনির্ধারিত", "en": "Undetermined" },
 
   "badge.analysisMode.label": { "bn": "বিশ্লেষণের ধরন", "en": "Analysis mode" },
   "badge.analysisMode.LIVE": { "bn": "সরাসরি", "en": "Live" },
@@ -23,7 +23,7 @@
   "badge.severity.HIGH": { "bn": "বেশি", "en": "High" },
   "badge.severity.CRITICAL": { "bn": "গুরুতর", "en": "Critical" },
 
-  "badge.matcher.label": { "bn": "যেভাবে মিল পাওয়া গেছে", "en": "Matched by" },
+  "badge.matcher.label": { "bn": "মিলের ধরন", "en": "Matched by" },
   "badge.matcher.score": { "bn": "মিলের মাত্রা", "en": "Match score" },
   "badge.matcher.VECTOR": { "bn": "ভেক্টর মিল", "en": "Vector" },
   "badge.matcher.FUZZY": { "bn": "আংশিক মিল", "en": "Fuzzy" },
@@ -39,10 +39,10 @@
   "badge.status.SUBMITTED": { "bn": "জমা হয়েছে", "en": "Submitted" },
   "badge.status.ANALYSING": { "bn": "বিশ্লেষণ চলছে", "en": "Analysing" },
   "badge.status.ANALYSED": { "bn": "বিশ্লেষণ শেষ", "en": "Analysed" },
-  "badge.status.IN_REVIEW": { "bn": "পর্যালোচনায়", "en": "In review" },
-  "badge.status.ADVISED": { "bn": "পরামর্শ দেওয়া হয়েছে", "en": "Advised" },
-  "badge.status.REJECTED": { "bn": "বাতিল করা হয়েছে", "en": "Rejected" },
-  "badge.status.FAILED": { "bn": "ব্যর্থ হয়েছে", "en": "Failed" },
+  "badge.status.IN_REVIEW": { "bn": "পর্যালোচনা চলছে", "en": "In review" },
+  "badge.status.ADVISED": { "bn": "পরামর্শ পাঠানো হয়েছে", "en": "Advised" },
+  "badge.status.REJECTED": { "bn": "ফেরত পাঠানো হয়েছে", "en": "Rejected" },
+  "badge.status.FAILED": { "bn": "সম্পন্ন করা যায়নি", "en": "Failed" },
   "badge.status.state.done": { "bn": "সম্পন্ন", "en": "Completed" },
   "badge.status.state.current": { "bn": "চলছে", "en": "Current" },
   "badge.status.state.upcoming": { "bn": "বাকি", "en": "Not started" }
