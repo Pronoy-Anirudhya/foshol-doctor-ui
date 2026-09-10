@@ -137,6 +137,7 @@ const STEP_REVIEW = 'review';
           titleKey="farmer.capture.crop.stepTitle"
           guideKey="farmer.capture.crop.help"
           [complete]="draft.cropId() !== null"
+          [required]="true"
         >
           @if (crops.isLoading()) {
             <foshol-skeleton variant="media" [count]="skeletonTiles" />
@@ -158,6 +159,7 @@ const STEP_REVIEW = 'review';
           titleKey="farmer.capture.images.stepTitle"
           guideKey="farmer.capture.images.help"
           [complete]="hasEnoughPhotos()"
+          [required]="true"
         >
           @if (tiles().length > 0) {
             <div class="mb-3">
@@ -228,6 +230,7 @@ const STEP_REVIEW = 'review';
           titleKey="farmer.capture.field.stepTitle"
           guideKey="farmer.capture.field.help"
           [complete]="draft.hasFieldArea()"
+          [required]="true"
         >
           <foshol-land-step
             [fieldArea]="draft.fieldArea()"

@@ -422,6 +422,7 @@
   "farmer.capture.serverReason.UNREADABLE": "Could not be read",
   "farmer.capture.stepper.back": "Previous step",
   "farmer.capture.stepper.done": "Done",
+  "farmer.capture.stepper.incomplete": "Fill in this step before moving on.",
   "farmer.capture.stepper.listen": "Listen",
   "farmer.capture.stepper.mute": "Sound off",
   "farmer.capture.stepper.next": "Next step",
