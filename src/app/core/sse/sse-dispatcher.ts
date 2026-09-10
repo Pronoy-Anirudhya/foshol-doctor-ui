@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import type { CaseStatus } from '../../generated/models/case-status';
 import { SessionStore } from '../auth/session-store';
 import { CaseStatusStore } from '../stores/case-status-store';
 import { LiveAnnouncer } from '../stores/live-announcer';
@@ -6,6 +7,7 @@ import {
   NotificationStore,
   NOTIFY_ADVISORY,
   NOTIFY_KPI_WARNING,
+  NOTIFY_QUEUE_ARRIVAL,
   NOTIFY_REJECTION,
   NOTIFY_REVISION,
   NOTIFY_STATUS,
@@ -14,6 +16,7 @@ import {
 import { QueueStore } from '../stores/queue-store';
 import {
   ToastStore,
+  TOAST_ERROR,
   TOAST_INFO,
   TOAST_SUCCESS,
   TOAST_WARNING,
@@ -45,9 +48,42 @@ const KEY_RESYNCED = 'live.stream.resynced';
  * `live.*` only because `src/i18n/live.i18n.json` is another agent's fragment.
  */
 const KEY_KPI_RESOLUTION_WARN = 'shared.notifications.kpi.resolutionWarning';
+/**
+ * New work on the console's queue. In `shared.notifications.*` for the same reason the KPI
+ * warning is: `live.i18n.json` is another agent's fragment, and the merge gate requires the
+ * kind label (`shared.notifications.kind.QUEUE_ARRIVAL`) to sit under `shared.` regardless — so
+ * both halves of one bell row stay under one owner.
+ */
+const KEY_QUEUE_ANALYSED = 'shared.notifications.queue.analysed';
+const KEY_QUEUE_ANALYSED_BODY = 'shared.notifications.queue.analysedBody';
 
 /** Farmers receive `advisory` / `case-status`; officers receive `queue` / `kpi`. */
 const ROLE_FARMER = 'FARMER';
+const ROLE_OFFICER = 'OFFICER';
+
+/**
+ * The one queue transition worth interrupting an officer for: analysis finished, so a review row
+ * now exists to claim. `SUBMITTED` and `ANALYSING` have no review row yet, `IN_REVIEW` is usually
+ * this officer's own claim coming back to them, and `ADVISED` / `REJECTED` / `FAILED` are work
+ * LEAVING the queue — none of those is news. Those still patch the queue and announce, exactly as
+ * before; they simply raise no toast and record no bell row.
+ */
+const STATUS_ANALYSED: CaseStatus = 'ANALYSED';
+
+/**
+ * Which case transitions are worth a toast on the FARMER's surface, and in what tone.
+ *
+ * A partial map rather than an `if`, so "no toast" is the structural default and every exclusion
+ * is visible in one place. `SUBMITTED` is the farmer's own button coming back to them. `ADVISED`
+ * and `REJECTED` are excluded because `#onAdvisory` ALREADY toasts both beats — the server sends
+ * an `advisory` frame and a `case-status` frame for each, so toasting here too would put two
+ * toasts on screen for one event.
+ */
+const CASE_STATUS_TOAST: Readonly<Partial<Record<CaseStatus, ToastKind>>> = {
+  ANALYSED: TOAST_INFO,
+  IN_REVIEW: TOAST_INFO,
+  FAILED: TOAST_ERROR,
+};
 /**
  * A status notification's detail line is the status label the badges already use, looked up by
  * the value the server sent. Reusing that catalogue rather than authoring a second set of status
@@ -130,13 +166,28 @@ export class SseDispatcher {
     if (event === null) return;
     // WEB-FR-353 — the whole update, with no request behind it.
     this.caseStatus.applyServerStatus(event.caseId, event.toStatus, event.fromStatus ?? null);
+    const bodyKey = `${KEY_STATUS_LABEL_PREFIX}${event.toStatus}`;
     this.notifications.record({
       kind: NOTIFY_STATUS,
       titleKey: KEY_STATUS_CHANGED,
-      bodyKey: `${KEY_STATUS_LABEL_PREFIX}${event.toStatus}`,
+      bodyKey,
       caseId: event.caseId,
       notificationId: event.notificationId,
     });
+    // The bell records every transition; only the ones a farmer would want interrupting for get
+    // a toast. Role-gated belt-and-braces: `case-status` is farmer-addressed, but a console that
+    // ever received one must not start toasting case chatter over a review.
+    const toastKind = CASE_STATUS_TOAST[event.toStatus];
+    if (toastKind !== undefined && this.session.role() === ROLE_FARMER) {
+      this.toasts.show({
+        kind: toastKind,
+        titleKey: KEY_STATUS_CHANGED,
+        // The same status label the badges and the bell row use — one catalogue, so the toast
+        // and the stepper can never disagree about what `IN_REVIEW` is called.
+        bodyKey,
+        caseId: event.caseId,
+      });
+    }
     this.announcer.announce(KEY_STATUS_CHANGED);
   }
 
@@ -202,6 +253,32 @@ export class SseDispatcher {
     const patched = this.queue.patchRow(event.caseId, event.toStatus);
     if (!patched) this.queue.markNeedsReload();
     this.announcer.announce(KEY_QUEUE_UPDATED);
+
+    // Everything above is the queue's business and runs for whoever is signed in. Everything
+    // below is notification CHROME, and only an officer is its audience: an admin has no bell,
+    // and a farmer has no queue.
+    if (this.session.role() !== ROLE_OFFICER || event.toStatus !== STATUS_ANALYSED) return;
+
+    // Recorded FIRST, and the toast gated on the result. `record` returns `null` for a replay,
+    // `ToastStore` has no dedupe of its own, and a `resync` replays frames — so ordering it the
+    // other way round would show one bell row and N toasts for the same arrival.
+    const recorded = this.notifications.record({
+      kind: NOTIFY_QUEUE_ARRIVAL,
+      titleKey: KEY_QUEUE_ANALYSED,
+      bodyKey: KEY_QUEUE_ANALYSED_BODY,
+      caseId: event.caseId,
+    });
+    if (recorded === null) return;
+
+    this.toasts.show({
+      kind: TOAST_INFO,
+      titleKey: KEY_QUEUE_ANALYSED,
+      bodyKey: KEY_QUEUE_ANALYSED_BODY,
+      caseId: event.caseId,
+    });
+    // WEB-UX-046 — the application's one live region, through the announcer the queue patch
+    // above already used. The more specific message replaces the generic one for this frame.
+    this.announcer.announce(KEY_QUEUE_ANALYSED);
   }
 }
 

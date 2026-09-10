@@ -943,3 +943,33 @@ because the browser now sends it on every POST; safe only because the JWT is a h
 fetch uses `credentials: 'omit'`, so nothing ambient rides on it. `/api/v1/stream` gets its own
 location with `proxy_buffering off` — `sse.timeoutMs` is 30 minutes with a 50 s stale watchdog, and
 a buffering proxy turns a healthy stream into a silent reconnect loop.
+
+---
+
+## D-36 · Admins are shown no notification bell
+
+**What.** `app-header.ts` gates `<foshol-notification-bell>` on the role — `FARMER` and `OFFICER`
+only. An `ADMIN` session sees the SSE indicator, the language toggle and the account menu, and no
+notification control, on `/admin/**` and on `/officer/**` alike.
+
+**Why there is an entry.** `docs/frontend-demo-api.md` §10 addresses the `queue` event to
+"Officer / admin", so a reader of the handover would expect an admin to have somewhere for those
+frames to land. They no longer do. This is a product decision about the AUDIENCE, not a claim that
+the event is misaddressed: the bell's rows speak about a farmer's cases and an officer's queue,
+and an admin acts on neither. A control that sits permanently empty is worse than no control,
+because an empty bell reads as "the stream is down".
+
+**Decided by role, never by URL.** An admin is allowed onto `/officer/**` (`WEB-FR-001`), so a
+path check would put the bell back the moment they opened the console. `app-header.spec.ts` pins
+all four cases, including that one.
+
+**What was deliberately NOT changed.** `#onKpi` still records for any non-farmer, and
+`kpi-warning-seeder.ts` still seeds for `OFFICER` and `ADMIN`. So an admin's `NotificationStore`
+still accumulates KPI rows behind a header that no longer renders them. That is accepted rather
+than overlooked: the store is session-scoped and `clearSession` empties it at sign-out
+(`WEB-SEC-004`), nothing reads it, and narrowing the two role lists as well would have put a
+second, unrelated behaviour change into a UI-chrome commit. The bell is the surface; the surface
+is what this entry removes.
+
+**Requirement.** `WEB-FR-001` (chrome follows the JWT role) is preserved; `WEB-FR-354` /
+`WEB-FR-357` are unaffected for the two roles they address.

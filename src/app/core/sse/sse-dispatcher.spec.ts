@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import type { OfficerQueueRow } from '../../generated/models/officer-queue-row';
 import type { PageOfOfficerQueueRow } from '../../generated/models/page-of-officer-queue-row';
+import type { Role } from '../auth/jwt';
 import { SessionStore } from '../auth/session-store';
 import { CaseStatusStore } from '../stores/case-status-store';
 import { LiveAnnouncer } from '../stores/live-announcer';
@@ -25,6 +26,22 @@ const page = (rows: readonly OfficerQueueRow[]): PageOfOfficerQueueRow => ({
   totalPages: 1,
   content: [...rows],
 });
+
+/**
+ * `SessionStore` re-derives the role from the token, so a test that needs a role must hand it a
+ * payload carrying that claim — the principal alone is not enough. Signing in here is inert:
+ * neither `SseClient` nor `KpiWarningSeeder` is injected in this spec, and nothing ticks.
+ */
+const signInAs = (role: Role): void => {
+  const payload = btoa(JSON.stringify({ sub: 'u', role, exp: 9_999_999_999 }));
+  TestBed.inject(SessionStore).signIn(
+    `h.${payload}.s`,
+    { id: 'u-1', name: 'Demo', role },
+    new Date(),
+  );
+};
+
+const ANALYSED_FRAME = '{"caseId":"c-7","toStatus":"ANALYSED","correlationId":"q-1"}';
 
 describe('SseDispatcher', () => {
   let dispatcher: SseDispatcher;
@@ -238,6 +255,136 @@ describe('SseDispatcher', () => {
     );
 
     expect(notifications.items()).toHaveLength(2);
+  });
+
+  // ── The officer's queue arrival: the same chrome a farmer gets for an advisory ──────────────
+
+  it('toasts and records new review work for an officer, and still asks for the refetch', () => {
+    signInAs('OFFICER');
+    queue.applyPage(page([row('c-1')]));
+
+    dispatcher.dispatch('queue', ANALYSED_FRAME);
+
+    const toast = toasts.toasts()[0];
+    expect(toasts.toasts()).toHaveLength(1);
+    expect(toast.kind).toBe('INFO');
+    expect(toast.titleKey).toBe('shared.notifications.queue.analysed');
+    expect(toast.bodyKey).toBe('shared.notifications.queue.analysedBody');
+    expect(toast.caseId).toBe('c-7');
+
+    const entry = notifications.items()[0];
+    expect(notifications.items()).toHaveLength(1);
+    expect(entry.kind).toBe('QUEUE_ARRIVAL');
+    expect(entry.titleKey).toBe('shared.notifications.queue.analysed');
+    expect(entry.caseId).toBe('c-7');
+    expect(notifications.unreadCount()).toBe(1);
+
+    // The queue's own behaviour is untouched: a case not on this page still asks for the page.
+    expect(queue.needsReload()).toBe(true);
+    expect(queue.rows().map((r) => r.caseId)).toEqual(['c-1']);
+    expect(announcer.message()?.key).toBe('shared.notifications.queue.analysed');
+  });
+
+  it('stays quiet for an officer on ANALYSING — there is no review row to claim yet', () => {
+    signInAs('OFFICER');
+
+    dispatcher.dispatch('queue', '{"caseId":"c-7","toStatus":"ANALYSING"}');
+
+    expect(toasts.toasts()).toHaveLength(0);
+    expect(notifications.items()).toHaveLength(0);
+    expect(announcer.message()?.key).toBe('live.queue.updated');
+  });
+
+  it('stays quiet for an officer on work LEAVING the queue, but still stales the page', () => {
+    signInAs('OFFICER');
+    queue.applyPage(page([row('c-7')]));
+
+    dispatcher.dispatch('queue', '{"caseId":"c-7","toStatus":"ADVISED"}');
+
+    expect(toasts.toasts()).toHaveLength(0);
+    expect(notifications.items()).toHaveLength(0);
+    expect(queue.needsReload()).toBe(true);
+  });
+
+  // WEB-FR-358 — a resync replays frames. `ToastStore` has no dedupe of its own, so the toast
+  // count is the assertion that matters here: the bell alone would pass with the bug present.
+  it('does not double a replayed queue arrival, in the bell OR on screen', () => {
+    signInAs('OFFICER');
+
+    dispatcher.dispatch('queue', ANALYSED_FRAME);
+    dispatcher.dispatch('queue', ANALYSED_FRAME);
+
+    expect(notifications.items()).toHaveLength(1);
+    expect(toasts.toasts()).toHaveLength(1);
+  });
+
+  it('raises no notification chrome on a queue frame for a farmer', () => {
+    signInAs('FARMER');
+
+    dispatcher.dispatch('queue', ANALYSED_FRAME);
+
+    expect(toasts.toasts()).toHaveLength(0);
+    expect(notifications.items()).toHaveLength(0);
+  });
+
+  it('raises no notification chrome on a queue frame for an admin — admins have no bell', () => {
+    signInAs('ADMIN');
+
+    dispatcher.dispatch('queue', ANALYSED_FRAME);
+
+    expect(toasts.toasts()).toHaveLength(0);
+    expect(notifications.items()).toHaveLength(0);
+  });
+
+  // ── The farmer's case transitions ───────────────────────────────────────────────────────────
+
+  it('toasts a farmer on the transitions worth interrupting for', () => {
+    signInAs('FARMER');
+
+    dispatcher.dispatch('case-status', '{"caseId":"c-1","toStatus":"ANALYSED"}');
+    dispatcher.dispatch('case-status', '{"caseId":"c-2","toStatus":"IN_REVIEW"}');
+    dispatcher.dispatch('case-status', '{"caseId":"c-3","toStatus":"FAILED"}');
+
+    expect(toasts.toasts().map((t) => t.kind)).toEqual(['INFO', 'INFO', 'ERROR']);
+    expect(toasts.toasts()[0].titleKey).toBe('live.case.statusChanged');
+    expect(toasts.toasts()[0].bodyKey).toBe('badge.status.ANALYSED');
+    expect(toasts.toasts()[2].bodyKey).toBe('badge.status.FAILED');
+  });
+
+  it('keeps a farmer status change in the bell without a toast where a toast would be noise', () => {
+    signInAs('FARMER');
+
+    // Their own button coming back at them.
+    dispatcher.dispatch('case-status', '{"caseId":"c-1","toStatus":"SUBMITTED"}');
+    // Both of these already toast from the `advisory` channel — see #onAdvisory.
+    dispatcher.dispatch('case-status', '{"caseId":"c-2","toStatus":"ADVISED"}');
+    dispatcher.dispatch('case-status', '{"caseId":"c-3","toStatus":"REJECTED"}');
+
+    expect(toasts.toasts()).toHaveLength(0);
+    expect(notifications.items()).toHaveLength(3);
+  });
+
+  it('shows exactly one toast when a rejection arrives on both channels', () => {
+    signInAs('FARMER');
+
+    dispatcher.dispatch('advisory', '{"caseId":"c-9","type":"CASE_REJECTED"}');
+    dispatcher.dispatch('case-status', '{"caseId":"c-9","toStatus":"REJECTED"}');
+
+    expect(toasts.toasts()).toHaveLength(1);
+    expect(toasts.toasts()[0].kind).toBe('WARNING');
+  });
+
+  /**
+   * The regression lock for the dedupe identity. A farmer's status chain arrives as several
+   * entries for ONE case, and the server may omit `notificationId` — so any identity that folded
+   * `caseId` in generally would collapse the whole chain into one bell row.
+   */
+  it('keeps every step of a status chain that carries no server id', () => {
+    dispatcher.dispatch('case-status', '{"caseId":"c-1","toStatus":"ANALYSING"}');
+    dispatcher.dispatch('case-status', '{"caseId":"c-1","toStatus":"ANALYSED"}');
+    dispatcher.dispatch('case-status', '{"caseId":"c-1","toStatus":"IN_REVIEW"}');
+
+    expect(notifications.items()).toHaveLength(3);
   });
 
   it('counts an unknown event and leaves everything else alone (WEB-FR-352)', () => {

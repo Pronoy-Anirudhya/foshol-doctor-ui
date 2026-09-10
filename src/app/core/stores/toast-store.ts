@@ -25,6 +25,8 @@ export interface Toast {
   readonly titleKey?: string;
   /** A string the server supplied; rendered verbatim and never translated. */
   readonly title?: string;
+  /** The body's chrome half, mirroring `titleKey`. Mutually exclusive with `body` in practice. */
+  readonly bodyKey?: string;
   readonly body?: string;
   /** WEB-FR-354 — lets the toast offer "open the case" without the view guessing. */
   readonly caseId?: string;

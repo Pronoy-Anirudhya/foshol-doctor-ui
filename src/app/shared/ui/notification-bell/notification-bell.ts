@@ -6,9 +6,11 @@ import { APP_CONFIG } from '../../../core/config/app-config';
 import { LiveAnnouncer } from '../../../core/stores/live-announcer';
 import {
   NotificationStore,
+  NOTIFY_QUEUE_ARRIVAL,
   type AppNotification,
   type NotificationKind,
 } from '../../../core/stores/notification-store';
+import { QueueStore } from '../../../core/stores/queue-store';
 import { formatDhakaTime } from '../../../core/time/dhaka-time';
 import { Icon, type IconName } from '../icon/icon';
 
@@ -34,6 +36,13 @@ const ARIA_KEY_UNREAD = 'shared.notifications.aria.unread';
 const KIND_KEY_PREFIX = 'shared.notifications.kind.';
 const KEY_ANNOUNCE_OPENED = 'shared.notifications.announce.opened';
 const KEY_ANNOUNCE_ALL_READ = 'shared.notifications.announce.allRead';
+/**
+ * The empty state's second line follows the audience. The farmer copy talks about case updates
+ * and advisories, which is the wrong sentence on a console where the only two kinds that can
+ * ever arrive are new review work and a deadline warning.
+ */
+const KEY_EMPTY_HINT = 'shared.notifications.emptyHint';
+const KEY_EMPTY_HINT_OFFICER = 'shared.notifications.emptyHintOfficer';
 
 /** `aria-controls` needs a stable id, and the application renders exactly one header bell. */
 const PANEL_ID = 'foshol-notification-panel';
@@ -46,6 +55,9 @@ const GLYPHS: Readonly<Record<NotificationKind, IconName>> = {
   // No clock glyph exists and `icon.ts` is another agent's file; the hourglass is the closer
   // reading anyway — a KPI warning is time running out, not an error.
   KPI_WARNING: 'hourglass',
+  // Work arriving in a tray. The same glyph the empty state uses, which is the point: this is
+  // the thing the empty state was waiting for.
+  QUEUE_ARRIVAL: 'inbox',
 };
 
 /** Icon colour only; every row states its kind in words beside the glyph (WEB-UX-044). */
@@ -55,6 +67,9 @@ const GLYPH_TONES: Readonly<Record<NotificationKind, string>> = {
   REVISION: 'text-accent',
   REJECTION: 'text-danger',
   KPI_WARNING: 'text-dawn-700',
+  // teal-700 rather than the `accent` alias: accent is 4.34:1 on surface-2, which fails the
+  // moment an unread row's tint sits under it. teal-700 is gated at 4.5 on all three surfaces.
+  QUEUE_ARRIVAL: 'text-teal-700',
 };
 
 /**
@@ -62,16 +77,21 @@ const GLYPH_TONES: Readonly<Record<NotificationKind, string>> = {
  *
  * The farmer surface is addressed by case id (`/farmer/cases/:caseId`); the console's workspace
  * is addressed by REVIEW TASK id, as a child of the queue (`/officer/queue/tasks/:taskId`), and
- * a KPI warning is the one entry that carries one. Both are re-declared here rather than
+ * a KPI warning is the one entry that carries one outright. A queue arrival carries only a case,
+ * so it resolves its task id from `QueueStore` and falls back to the queue itself. All three are
+ * re-declared here rather than
  * imported: `shared/` may not import from `features/`, so `features/officer/officer-paths.ts`
  * is out of reach and this constant must be kept in step with it by hand. Route paths are not
  * user-visible strings, so WEB-UX-013 does not apply to them (see `auth.guard.ts`).
  */
 const FARMER_CASE_PATH: readonly string[] = ['/farmer', 'cases'];
 const OFFICER_TASK_PATH: readonly string[] = ['/officer', 'queue', 'tasks'];
+const OFFICER_QUEUE_PATH: readonly string[] = ['/officer', 'queue'];
 const ROLE_FARMER = 'FARMER';
+const ROLE_OFFICER = 'OFFICER';
 const KEY_OPEN_CASE = 'shared.notifications.openCase';
 const KEY_OPEN_TASK = 'shared.notifications.openTask';
+const KEY_OPEN_QUEUE = 'shared.notifications.openQueue';
 
 @Component({
   selector: 'foshol-notification-bell',
@@ -91,6 +111,14 @@ const KEY_OPEN_TASK = 'shared.notifications.openTask';
 export class NotificationBell {
   private readonly store = inject(NotificationStore);
   private readonly session = inject(SessionStore);
+  /**
+   * Read to turn a queue arrival's `caseId` into the review task id the console routes by. Read
+   * LAZILY, at render time rather than when the frame arrived: a case reaching `ANALYSED` is a
+   * NEW queue row, so it is by construction absent from the loaded page at that instant (which
+   * is exactly why `patchRow` returned `false` and asked for a refetch). By the time the officer
+   * opens this panel the queue has usually reloaded and the deep link resolves.
+   */
+  private readonly queue = inject(QueueStore);
   private readonly announcer = inject(LiveAnnouncer);
   private readonly host = inject(ElementRef<HTMLElement>);
 
@@ -113,6 +141,10 @@ export class NotificationBell {
   /** The fuller sentence for the accessible name; the badge digit alone is not a label. */
   protected readonly ariaKey = computed(() => (this.hasUnread() ? ARIA_KEY_UNREAD : ARIA_KEY_NONE));
   protected readonly ariaParams = computed(() => ({ count: this.unreadCount() }));
+
+  protected readonly emptyHintKey = computed(() =>
+    this.session.role() === ROLE_OFFICER ? KEY_EMPTY_HINT_OFFICER : KEY_EMPTY_HINT,
+  );
 
   protected readonly buttonClass = computed(() =>
     this.tone() === 'dark'
@@ -193,6 +225,11 @@ export class NotificationBell {
    */
   protected linkPath(item: AppNotification): string[] | null {
     const role = this.session.role();
+    if (item.kind === NOTIFY_QUEUE_ARRIVAL) {
+      if (role !== ROLE_OFFICER) return null;
+      const taskId = this.#taskIdFor(item);
+      return taskId === undefined ? [...OFFICER_QUEUE_PATH] : [...OFFICER_TASK_PATH, taskId];
+    }
     if (item.reviewTaskId !== undefined) {
       return role === null || role === ROLE_FARMER ? null : [...OFFICER_TASK_PATH, item.reviewTaskId];
     }
@@ -200,9 +237,29 @@ export class NotificationBell {
     return [...FARMER_CASE_PATH, item.caseId];
   }
 
-  /** The link's own wording follows its target: a case opens, a review task opens. */
+  /**
+   * The link's own wording follows its target: a case opens, a review task opens, a queue opens.
+   *
+   * This branches on the SAME resolution `linkPath` does, deliberately — keying it off
+   * `reviewTaskId` alone would put "Open the case" over a link that goes to `/officer/queue`.
+   */
   protected linkKey(item: AppNotification): string {
+    if (item.kind === NOTIFY_QUEUE_ARRIVAL) {
+      return this.#taskIdFor(item) === undefined ? KEY_OPEN_QUEUE : KEY_OPEN_TASK;
+    }
     return item.reviewTaskId === undefined ? KEY_OPEN_CASE : KEY_OPEN_TASK;
+  }
+
+  /**
+   * The review task for a queue arrival's case, if it is on the queue page currently loaded.
+   *
+   * `undefined` is the ordinary answer, not an error: before the queue reloads, and again if the
+   * officer pages the row off screen, the link is the queue rather than the task. A link that
+   * DOWNGRADES is the right failure — the alternative is a task route built from a stale id.
+   */
+  #taskIdFor(item: AppNotification): string | undefined {
+    if (item.caseId === undefined) return undefined;
+    return this.queue.rows().find((row) => row.caseId === item.caseId)?.reviewTaskId;
   }
 
   /**

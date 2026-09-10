@@ -15,8 +15,8 @@ import { ToastStore, type Toast, type ToastKind } from '../../../core/stores/toa
  * same breath (`SseDispatcher` already does). Two live regions racing is how a screen reader
  * ends up reading neither.
  *
- * WEB-UX-013 / COMMON-CON-003 — `titleKey` is chrome and is translated; `title` and `body`
- * came from the server and are rendered verbatim as text (WEB-SEC-005, WEB-UX-016).
+ * WEB-UX-013 / COMMON-CON-003 — `titleKey` and `bodyKey` are chrome and are translated; `title`
+ * and `body` came from the server and are rendered verbatim as text (WEB-SEC-005, WEB-UX-016).
  *
  * WEB-UX-044 — kind is carried by a glyph and by the text, never by the hue alone.
  */
@@ -120,7 +120,9 @@ const TONES: Record<ToastKind, string> = {
                   {{ toast.title }}
                 }
               </p>
-              @if (toast.body) {
+              @if (toast.bodyKey) {
+                <p class="mt-0.5 text-sm break-words opacity-90">{{ toast.bodyKey | translate }}</p>
+              } @else if (toast.body) {
                 <p class="mt-0.5 text-sm break-words opacity-90">{{ toast.body }}</p>
               }
             </div>

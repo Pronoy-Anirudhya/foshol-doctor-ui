@@ -67,9 +67,12 @@
     </a>
 
     <div class="ms-auto flex items-center gap-2 md:gap-3">
+      <!-- The stream's state, then what the stream delivered. The indicator is for every signed-in
+           role; the bell is only for the roles that are notified — see BELL_ROLES. -->
       @if (authenticated()) {
         <foshol-sse-indicator [tone]="tone()" />
-        <!-- The stream's state, then what the stream delivered. -->
+      }
+      @if (showBell()) {
         <foshol-notification-bell [tone]="tone()" />
       }
 

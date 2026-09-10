@@ -4,6 +4,7 @@ import {
   NotificationStore,
   NOTIFY_ADVISORY,
   NOTIFY_KPI_WARNING,
+  NOTIFY_QUEUE_ARRIVAL,
   NOTIFY_REJECTION,
   NOTIFY_STATUS,
 } from './notification-store';
@@ -25,6 +26,53 @@ describe('NotificationStore (WEB-FR-354)', () => {
       'live.advisory.published',
       'live.case.statusChanged',
     ]);
+  });
+
+  /**
+   * A `queue` frame carries neither a server id nor a task, so the case IS the identity — which
+   * is what stops a resync replay from stacking the same arrival. The three tests after this one
+   * pin the edges of that fallback: it is scoped to this kind, and to this kind only.
+   */
+  it('identifies a queue arrival by its case, so a replayed frame is not a second row', () => {
+    const notifications = store();
+    const first = notifications.record({ kind: NOTIFY_QUEUE_ARRIVAL, caseId: 'c-1' });
+    const phase = notifications.arrivalPhase();
+    const replay = notifications.record({ kind: NOTIFY_QUEUE_ARRIVAL, caseId: 'c-1' });
+
+    expect(first).not.toBeNull();
+    expect(replay).toBeNull();
+    expect(notifications.items()).toHaveLength(1);
+    // A swallowed replay must not re-arm the arrival animation either.
+    expect(notifications.arrivalPhase()).toBe(phase);
+  });
+
+  it('records a queue arrival per case — two cases are two pieces of work', () => {
+    const notifications = store();
+    notifications.record({ kind: NOTIFY_QUEUE_ARRIVAL, caseId: 'c-1' });
+    notifications.record({ kind: NOTIFY_QUEUE_ARRIVAL, caseId: 'c-2' });
+
+    expect(notifications.items()).toHaveLength(2);
+  });
+
+  it('does not let a queue arrival swallow another kind about the same case', () => {
+    const notifications = store();
+    notifications.record({ kind: NOTIFY_QUEUE_ARRIVAL, caseId: 'c-1' });
+    notifications.record({ kind: NOTIFY_STATUS, bodyKey: 'badge.status.ANALYSED', caseId: 'c-1' });
+
+    expect(notifications.items()).toHaveLength(2);
+  });
+
+  /**
+   * The regression lock. A farmer's status chain is several entries about ONE case, and the
+   * server may omit `notificationId` — so the case fallback must never widen past its own kind.
+   */
+  it('keeps every id-less status change about the same case', () => {
+    const notifications = store();
+    notifications.record({ kind: NOTIFY_STATUS, bodyKey: 'badge.status.ANALYSED', caseId: 'c-1' });
+    notifications.record({ kind: NOTIFY_STATUS, bodyKey: 'badge.status.IN_REVIEW', caseId: 'c-1' });
+    notifications.record({ kind: NOTIFY_STATUS, bodyKey: 'badge.status.IN_REVIEW', caseId: 'c-1' });
+
+    expect(notifications.items()).toHaveLength(3);
   });
 
   it('caps the list at notifications.maxItems and drops the oldest', () => {
