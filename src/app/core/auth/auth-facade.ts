@@ -99,9 +99,19 @@ export class AuthFacade {
   readonly rateLimited = computed(() => this._retryAfterSeconds() !== null);
 
   /**
-   * WEB-FR-010 step one. A `202` is returned whether or not the phone is known, so a failure
-   * here never says whether the number exists (handover §5.1) — the UI simply shows the
-   * problem document the server chose to send.
+   * WEB-FR-010 step one.
+   *
+   * A `202` now means the phone IS a registered farmer and a challenge was created; a `404`
+   * `ERR_FARMER_NOT_FOUND` means it is not, and the caller must stay on the phone step rather
+   * than opening the code step (`IDENTITY-FR-001`).
+   *
+   * That reverses the earlier contract, under which a `202` came back whether or not the number
+   * was known so that a caller could not tell the two apart. The identity module withdrew that
+   * property deliberately — see `DEVIATIONS.md` D-31 — accepting that seeded farmer numbers
+   * become enumerable in exchange for an unregistered number never reaching the OTP screen.
+   *
+   * Either way this method reports only success or failure; deciding what a failure MEANS is the
+   * caller's, from `problem.code`.
    */
   async requestOtp(phone: string): Promise<boolean> {
     this._requestState.set(PENDING);

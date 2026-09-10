@@ -680,3 +680,33 @@ rendered. `capture-page`'s back link returned to the picker and now returns to t
 Safe because nothing required a crop to be chosen before the stepper opened: there was no guard,
 no redirect and no effect on `new/capture`, and the stepper always opened on the crop step
 regardless.
+
+---
+
+## D-31 · The OTP request no longer hides whether a number is a farmer
+
+**What.** `POST /api/v1/auth/otp/request` used to answer `202` for every well-formed phone,
+registered or not. It now answers `404` `ERR_FARMER_NOT_FOUND` when the number is not a registered
+farmer, and the farmer login stays on the phone step rather than opening the OTP screen.
+
+**Why this is recorded here even though the client now matches the contract.** The old behaviour
+was not an accident, and this client was built to rely on it — `auth-facade.ts` carried a comment
+stating that a failure "never says whether the number exists". Anyone reading that history needs to
+know the property was withdrawn on purpose rather than lost.
+
+`IDENTITY-FR-001` was rewritten to mandate the `404` and states the trade-off in its own words:
+*"A distinguishable unknown-phone response lets callers enumerate seeded farmer numbers; that cost
+is accepted so an unregistered number never reaches OTP."*
+
+**What that costs, stated plainly.** The login is now an enumeration oracle: anyone may probe
+numbers and learn which belong to registered farmers, rate-limited to 3 per 10 minutes per number
+but not per caller. That sits oddly beside the lengths the farmer directory goes to — `FarmerRecord`
+carries no phone field at all, and D-29 records a `WEB-SEC-002` conflict over a phone in a query
+string. It is the identity module's call and it has been made; this entry exists so the two
+decisions are visible together.
+
+**Client-side consequence.** `WEB-FR-013` is untouched: `problem.interceptor` acts on `401` only,
+and both OTP paths are in `PUBLIC_AUTH_PATHS`, so this `404` clears no session and triggers no
+redirect. The 404 is displayed with the catalogue's Bangla copy rather than the server's `detail`,
+because the identity module hardcodes that detail in English and negotiates no language — see
+`features/auth/shared/auth-error-keys.ts`.

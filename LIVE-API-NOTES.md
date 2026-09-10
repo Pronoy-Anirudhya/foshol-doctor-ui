@@ -115,7 +115,8 @@ server reports (`WEB-NFR-001`).
 ## Farmer path — verified end to end
 
 ```
-POST /auth/otp/request  → 202 {"expiresInSeconds":300,"otpDeliveryMode":"DEV_FIXED"}
+POST /auth/otp/request  → 202 {"expiresInSeconds":300,"otpDeliveryMode":"DEV_FIXED"}  (registered farmer)
+POST /auth/otp/request  → 404 ERR_FARMER_NOT_FOUND                                    (not a farmer)
 POST /auth/otp/verify   → 200 AuthResponse (principal.preferredLanguage = "bn")
 POST /cases             → 202 {caseId,status:"SUBMITTED",submittedAt}
                           + `Location: /api/v1/cases/{caseId}`

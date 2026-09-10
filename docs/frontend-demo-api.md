@@ -133,13 +133,17 @@ Content-Type: application/json
 {"phone":"+8801711111111"}
 ```
 
-**202** (challenge created if the phone is known; do not leak whether the number exists):
+**202** (the phone IS a registered farmer; a challenge was created):
 
 ```json
 { "expiresInSeconds": 300, "otpDeliveryMode": "DEV_FIXED" }
 ```
 
-(`otpDeliveryMode` is a live extra vs a minimal OpenAPI description of 202.) **400**, **429**.
+(`otpDeliveryMode` is a live extra vs a minimal OpenAPI description of 202.) **400**, **404**, **429**.
+
+**404** `ERR_FARMER_NOT_FOUND` — the number is not a registered farmer. The frontend stays on the
+phone step and never opens the OTP screen (`IDENTITY-FR-001`). This replaced an earlier contract
+that answered `202` either way so the two could not be told apart.
 
 ### 5.2 Farmer — verify OTP
 
