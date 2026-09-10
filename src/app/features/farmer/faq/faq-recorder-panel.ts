@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import type { DraftAudio } from '../../../core/stores/case-draft-store';
-import { PointerHoldDirective } from '../../../shared/directives/pointer-hold.directive';
+import { HoldToTalk } from '../../../shared/ui/hold-to-talk/hold-to-talk';
 import { VoiceRecorder } from '../capture/voice-recorder';
 import { WaveformCanvas } from '../capture/waveform-canvas';
 
@@ -34,35 +34,21 @@ const PERCENT = 100;
 @Component({
   selector: 'foshol-faq-recorder-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PointerHoldDirective, TranslatePipe, WaveformCanvas],
+  imports: [HoldToTalk, TranslatePipe, WaveformCanvas],
   host: { class: 'block' },
   template: `
     @if (recorder.available()) {
       <div class="faq-rec" data-testid="faq-recorder" [attr.data-recording]="recording() || null">
         <div class="flex items-center gap-4">
-          <button
-            type="button"
-            class="faq-rec-button touch-target-lg"
-            data-testid="faq-record-button"
-            fosholPointerHold
-            [fosholPointerHoldDisabled]="holdDisabled()"
-            [attr.data-recording]="recording() ? true : null"
-            [attr.aria-pressed]="recording()"
-            [attr.aria-busy]="busy() || recorder.preparing() ? true : null"
-            [attr.aria-label]="'farmer.faq.mic.holdLabel' | translate"
+          <foshol-hold-to-talk
+            testId="faq-record-button"
+            labelKey="farmer.faq.mic.holdLabel"
+            [active]="recording()"
+            [busy]="busy() || recorder.preparing()"
+            [holdDisabled]="holdDisabled()"
             (holdStart)="recorder.press()"
             (holdEnd)="recorder.release()"
-          >
-            <svg viewBox="0 0 24 24" class="faq-rec-glyph" aria-hidden="true" fill="none">
-              <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
-              <path
-                d="M6 11.5a6 6 0 0012 0M12 17.5V21M9 21h6"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
-          </button>
+          />
 
           <div class="min-w-0 flex-1">
             <p class="faq-rec-state" data-testid="faq-recorder-state">
@@ -135,59 +121,6 @@ const PERCENT = 100;
       border-radius: var(--radius-panel);
       background: var(--color-surface-0);
       box-shadow: var(--shadow-card);
-    }
-
-    .faq-rec-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: none;
-      border-radius: var(--radius-pill);
-      background: var(--color-paddy-600);
-      color: var(--color-ink-invert);
-      box-shadow: var(--shadow-card);
-      transition:
-        transform var(--duration-2) var(--ease-settle),
-        background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
-    }
-
-    .faq-rec-button[aria-disabled='true'] {
-      background: var(--color-surface-3);
-      color: var(--color-ink-faint);
-      box-shadow: none;
-    }
-
-    /* State B. The ring is decorative; the label, the counter, the waveform and aria-pressed
-       all carry "recording" without it (WEB-UX-044). The global prefers-reduced-motion rule in
-       styles.css stops the animation, and the static clay fill still reads as held. */
-    .faq-rec-button[data-recording] {
-      background: var(--color-clay-600);
-      transform: scale(1.06);
-      animation: faq-pulse 1.6s var(--ease-settle) infinite;
-    }
-
-    @keyframes faq-pulse {
-      0% {
-        box-shadow:
-          0 0 0 0 var(--color-clay-300),
-          var(--shadow-lift);
-      }
-      70% {
-        box-shadow:
-          0 0 0 14px rgb(231 155 147 / 0),
-          var(--shadow-lift);
-      }
-      100% {
-        box-shadow:
-          0 0 0 0 rgb(231 155 147 / 0),
-          var(--shadow-lift);
-      }
-    }
-
-    .faq-rec-glyph {
-      inline-size: 2rem;
-      block-size: 2rem;
     }
 
     .faq-rec-state {
