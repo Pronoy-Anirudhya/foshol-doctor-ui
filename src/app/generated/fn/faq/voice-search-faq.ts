@@ -10,6 +10,10 @@ import { RequestBuilder } from '../../request-builder';
 import { VoiceSearchResult } from '../../models/voice-search-result';
 
 export interface VoiceSearchFaq$Params {
+
+/**
+ * ASR language hint only. Catalogue payloads always return both Bangla and English fields; this query does not select a single locale.
+ */
   preferred_language?: 'bn' | 'en';
       body: {
 'cropId': string;

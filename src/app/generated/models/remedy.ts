@@ -11,6 +11,12 @@ export interface Remedy {
   costTier?: 'LOW' | 'MEDIUM' | 'HIGH';
   diseaseId: string;
   dosageBn?: string | null;
+  dosageEn?: string | null;
+
+  /**
+   * True when dosageEn fell back to Bangla (COMMON-NFR-038)
+   */
+  dosageEnFallback?: boolean;
   efficacy?: 'LOW' | 'MEDIUM' | 'HIGH';
   id: string;
 
@@ -25,9 +31,27 @@ export interface Remedy {
   rateAmount?: number | null;
   rateBasis?: ('PER_DECIMAL' | 'PER_SQ_M' | 'PER_HECTARE' | 'PER_ACRE' | 'PER_SQ_FT' | 'FIXED') | null;
   rateNotesBn?: string | null;
+  rateNotesEn?: string | null;
+
+  /**
+   * True when rateNotesEn fell back to Bangla (COMMON-NFR-038)
+   */
+  rateNotesEnFallback?: boolean;
   rateUnit?: ('ML' | 'G' | 'KG' | 'L') | null;
   sourceRef: string;
   stepsBn: Array<string>;
+  stepsEn?: Array<string> | null;
+
+  /**
+   * True when stepsEn fell back to Bangla (COMMON-NFR-038)
+   */
+  stepsEnFallback?: boolean;
   titleBn: string;
+  titleEn?: string | null;
+
+  /**
+   * True when titleEn fell back to Bangla (COMMON-NFR-038)
+   */
+  titleEnFallback?: boolean;
   type: 'CULTURAL' | 'ORGANIC' | 'BIOLOGICAL' | 'CHEMICAL';
 }
