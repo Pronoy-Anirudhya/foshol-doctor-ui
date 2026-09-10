@@ -859,3 +859,87 @@ one would otherwise be owned by nobody.
 **Cost, stated plainly.** The describe and land mics gain the FAQ recorder's pulsing held ring in
 place of a static one — a deliberate visual change, disarmed by the global `prefers-reduced-motion`
 rule, leaving the clay fill which still reads.
+
+---
+
+## D-34 · Catalogue content follows the language toggle
+
+**What.** The knowledge catalogue now returns both locales in one payload — `Crop`, `Disease`,
+`Remedy`, `SymptomRef` and `VoiceSearchCandidate` each carry `*Bn`, `*En` and a `*EnFallback`
+flag. The client was regenerated and every catalogue binding now resolves through one helper,
+`shared/pipes/content-locale.ts`, instead of reading `*Bn` directly.
+
+**Why it is not a deviation so much as a debt being paid.** The toggle already switched all UI
+chrome; it could not switch catalogue text because the wire had only Bangla. Disease names, crop
+names and remedy titles stayed Bangla in English mode, which read as a half-finished feature
+rather than as a deliberate content rule.
+
+**The rule, in one place.** `pickContent` / `pickContentList` / `pickRemedyContent` decide:
+Bangla renders the `*Bn` field unmarked, because Bangla is the language of record
+(`COMMON-NFR-037`); English renders `*En`, and marks it `(bn)` when the server set the fallback
+flag — `COMMON-NFR-038` says that value **is** the Bangla copied across, and `WEB-UX-015` says the
+farmer must be told. A missing English side falls back to marked Bangla rather than a blank,
+because inventing English is `WEB-UX-016`. Nothing is translated, concatenated, reformatted, or
+digit-localised in the client.
+
+**Two rendering forms, one core.** `<foshol-bn-value [bn] [en] [fallback]>` where a marker element
+can exist — it also carries the accessible description — and the `contentText` pipe where one
+cannot, which today is the admin crop filter's `<option>`. Both are driven by the locale as a
+signal or a pure-pipe argument, so a toggle is a re-read: **no refetch**, and an in-flight FAQ
+selection, candidate list and remedy list all survive it (`WEB-UX-012`). Verified in the browser
+by counting requests across a toggle on three surfaces — the count did not move.
+
+**Deliberately left Bangla-only**, because the contract has no English sibling for them:
+`ExtractedSymptom.nameBn` and `Candidate.diseaseNameBn` on the analysis/review payloads,
+`Advisory.diseaseNameBn` and `Advisory.officerNoteBn`, and the SSE notification `titleBn`. The
+remedies **inside** an advisory do switch — `Advisory.remedies` is `{$ref: Remedy}`, which gained
+the pairs — so the advisory card is bilingual in its catalogue rows and Bangla in its own prose.
+That split is intentional and is the one judgement call in this change.
+
+**A bug fixed on the way.** `POST /faq/voice-search`'s `preferred_language` was being bound to the
+UI toggle. It is an **ASR hint** — the language the farmer is speaking — and a farmer reading the
+interface in English still speaks Bangla into the microphone, so the toggle was able to hand
+Whisper the wrong language and wreck a transcription. It is now the default locale, and a test
+asserts it does not follow the toggle. The response carries both locales regardless of what is
+sent, so nothing was gained by the coupling in the first place.
+
+**Fields with no binding yet.** `Disease.descriptionBn/En`, `Remedy.rateNotesBn/En` and the whole
+of `SymptomRef` are rendered nowhere in the app today. The helper serves them; no screen needed
+changing.
+
+---
+
+## D-35 · The API origin is a deployment fact, not a compile-time one
+
+**What.** `src/app/core/config/runtime-config.ts` resolves where the API lives, reading a global
+that `/env.js` sets and falling back to `APP_CONFIG.api.origin` when the deployment has said
+nothing. Five call sites moved onto it. The frontend now ships as a container whose nginx serves
+the SPA and reverse-proxies `/api` to `BACKEND_API_BASE_URL` from an `.env` file.
+
+**Why there is an entry.** Two files outside a feature glob changed. `app.config.ts` is frozen and
+its `ApiConfiguration` provider now reads the accessor; `index.html` (A-kit) gains one classic
+`<script src="env.js">`. `app-config.ts` itself is **untouched** — deliberately, because it is
+`as const` and widening `api.origin` from a literal type to `string` would cascade `tsc` errors
+through 25 spec files for no gain. A separate accessor chooses between the frozen value and a
+deployment value, which is a different kind of fact from a constant.
+
+**The bug this closes on the way.** `auth.interceptor.ts` captured the origin in a module-scope
+`const`, evaluated at import. Had the real origin ever diverged from it, `isApiOriginUrl` would
+return false for every API call and the four decorating interceptors would **silently stop
+sending the bearer, `Accept-Language` and the correlation id** — no error, no log, just 401s.
+Only `gradcam.service.ts` failed loudly. It is now resolved per call.
+
+**Why a reverse proxy rather than an absolute cross-origin URL.** The backend's CORS allow-list is
+`http://localhost:4200` and that repo is not ours to edit, so a cross-origin frontend could not
+ship without someone else moving first. Same-origin also removes the preflight that every request
+would otherwise pay (all of them carry `Authorization` + `X-Correlation-Id` + `Accept-Language`,
+so none is a simple request), removes the mixed-content constraint, and removes the one failure a
+container restart cannot fix: a browser-cached config file pinning the old backend.
+
+**What the deployment must still get right**, all guarded at container start: `BACKEND_API_BASE_URL`
+must be `scheme://host[:port]` with no path — a trailing slash makes nginx rewrite `/api/v1/cases`
+to `/v1/cases` and every call 404s while the SPA loads perfectly. `Origin` is stripped upstream
+because the browser now sends it on every POST; safe only because the JWT is a header and every
+fetch uses `credentials: 'omit'`, so nothing ambient rides on it. `/api/v1/stream` gets its own
+location with `proxy_buffering off` — `sse.timeoutMs` is 30 minutes with a 50 s stale watchdog, and
+a buffering proxy turns a healthy stream into a silent reconnect loop.

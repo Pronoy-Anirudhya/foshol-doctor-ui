@@ -50,11 +50,15 @@ blocker in `DEVIATIONS.md` and implement the nearest specified behaviour.
    `<foshol-hold-to-talk>` and nothing else — never a tap-to-toggle, never a bare `(click)` that
    starts listening. The component brings the gesture, the 64 px target (`WEB-UX-021`), the held
    state and a **required** `labelKey`, so a microphone with no accessible name will not compile.
-9. **Never re-implement a backend rule** (`WEB-NFR-001`). Decision path, severity, queue order,
+9. **Never bind a catalogue `*Bn` field directly** (`DEVIATIONS.md` D-34). Crop, disease,
+   remedy, symptom and voice-candidate text goes through `<foshol-bn-value [bn] [en] [fallback]>`
+   or the `contentText` pipe, which pick the locale and add the `(bn)` marker in one place. Reading
+   `*Bn` in a template leaves that surface stuck in Bangla when the toggle says English.
+10. **Never re-implement a backend rule** (`WEB-NFR-001`). Decision path, severity, queue order,
    claim state and confidence thresholds are rendered as received, never recomputed.
-10. **Only touch files inside your assigned globs.** If you need a change elsewhere, STOP and
+11. **Only touch files inside your assigned globs.** If you need a change elsewhere, STOP and
    report it as an amendment request in your final message. Do not edit it yourself.
-11. **No barrel files.** No `index.ts` anywhere. Deep imports only.
+12. **No barrel files.** No `index.ts` anywhere. Deep imports only.
 
 ## Environment
 
