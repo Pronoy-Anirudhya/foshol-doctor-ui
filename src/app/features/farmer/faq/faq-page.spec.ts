@@ -140,7 +140,7 @@ describe('FaqPage', () => {
   it('offers a way forward when nothing matched, and asks for no remedies', async () => {
     const cropId = await chooseFirstCrop();
 
-    const pending = store().search(cropId, clip(), 'bn');
+    const pending = store().search(cropId, clip());
     backend
       .expectOne((candidate) => candidate.url === SEARCH_URL)
       .flush({
@@ -162,7 +162,7 @@ describe('FaqPage', () => {
   it('shows what it heard before it shows what it matched', async () => {
     const cropId = await chooseFirstCrop();
 
-    const pending = store().search(cropId, clip(), 'bn');
+    const pending = store().search(cropId, clip());
     backend
       .expectOne((candidate) => candidate.url === SEARCH_URL)
       .flush({

@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { toProblemView, type ProblemView } from '../../../core/errors/problem';
-import { LanguageStore } from '../../../core/i18n/language-store';
 import type { DraftAudio } from '../../../core/stores/case-draft-store';
 import type { Crop } from '../../../generated/models/crop';
 import type { Disease } from '../../../generated/models/disease';
@@ -12,6 +11,7 @@ import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Percent1Pipe } from '../../../shared/pipes/percent1.pipe';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 import { CropGrid } from '../crop-picker/crop-grid';
 import { VoiceRecorder } from '../capture/voice-recorder';
 import { FaqCandidateList } from './faq-candidate-list';
@@ -61,6 +61,7 @@ const NONE = 0;
     FaqCandidateList,
     FaqRemedyList,
     FaqDiseaseSearch,
+    BnValue,
   ],
   // VoiceRecorder is page-scoped so leaving the screen gives the microphone back, and FaqStore
   // with it so the transcript and the remedies do not outlive the question that produced them.
@@ -71,7 +72,6 @@ const NONE = 0;
 })
 export class FaqPage {
   private readonly knowledge = inject(KnowledgeService);
-  private readonly language = inject(LanguageStore);
   protected readonly store = inject(FaqStore);
   protected readonly recorder = inject(VoiceRecorder);
 
@@ -142,14 +142,14 @@ export class FaqPage {
     if (cropId === null) return;
     this.lastClip.set(clip);
     this.browseRequested.set(false);
-    await this.store.search(cropId, clip, this.language.current());
+    await this.store.search(cropId, clip);
   }
 
   protected async onRetry(): Promise<void> {
     const cropId = this.selectedCropId();
     const clip = this.lastClip();
     if (cropId === null || clip === null) return;
-    await this.store.search(cropId, clip, this.language.current());
+    await this.store.search(cropId, clip);
   }
 
   protected async onConfirmed(selection: FaqSelection): Promise<void> {
