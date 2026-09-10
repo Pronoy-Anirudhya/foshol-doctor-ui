@@ -33,6 +33,9 @@ interface NavItem {
 const FARMER_ITEMS: readonly NavItem[] = [
   { key: 'cases', path: '/farmer/cases', icon: 'list' },
   { key: 'newCase', path: '/farmer/new', icon: 'camera' },
+  // A first-class destination, listed beside capture rather than buried inside it: asking the
+  // catalogue a question is its own errand, not a detour on the way to submitting a case.
+  { key: 'faq', path: '/farmer/faq', icon: 'view' },
 ];
 
 const OFFICER_ITEMS: readonly NavItem[] = [

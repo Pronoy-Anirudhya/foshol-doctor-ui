@@ -42,6 +42,14 @@ export const farmerRoutes: Routes = [
   // Anything still pointing at the old two-screen URL lands on the stepper rather than a 404.
   { path: 'new/capture', pathMatch: 'full', redirectTo: 'new' },
   {
+    // প্রশ্নোত্তর — a catalogue voice lookup, and a sibling of `new` rather than a step inside
+    // it, because it is a different path through the product: no photographs, no case, no
+    // officer. ADR-0003 is preserved precisely BY the separation — a farmer who wants their own
+    // field diagnosed still goes to `new`, and this page says so on screen.
+    path: 'faq',
+    loadComponent: () => import('./faq/faq-page').then((m) => m.FaqPage),
+  },
+  {
     path: 'cases',
     loadComponent: () => import('./history/case-history-page').then((m) => m.CaseHistoryPage),
     children: [

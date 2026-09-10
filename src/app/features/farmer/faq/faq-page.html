@@ -1,0 +1,215 @@
+<header class="max-w-3xl">
+  <p class="text-xs font-bold tracking-wide text-paddy-700 uppercase">
+    {{ 'farmer.faq.eyebrow' | translate }}
+  </p>
+  <h1 class="mt-1.5 text-2xl font-extrabold text-ink md:text-3xl">
+    {{ 'farmer.faq.title' | translate }}
+  </h1>
+  <p class="mt-2 text-base text-ink-muted md:text-lg">{{ 'farmer.faq.subtitle' | translate }}</p>
+</header>
+
+<!--
+  ADR-0003. Persistent, not dismissible, and above the answer rather than under it: the one
+  thing a farmer must carry away from this screen is that it did not look at their field.
+-->
+<aside class="faq-disclaimer mt-5 max-w-3xl" data-testid="faq-disclaimer">
+  <svg viewBox="0 0 24 24" class="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" fill="none">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+    <path d="M12 11v5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="12" cy="7.6" r="1.05" fill="currentColor" />
+  </svg>
+  <p class="m-0">
+    {{ 'farmer.faq.disclaimer' | translate }}
+    <a class="faq-disclaimer-link" [routerLink]="paths.newCase">
+      {{ 'farmer.faq.disclaimerCta' | translate }}
+    </a>
+  </p>
+</aside>
+
+<!-- ── Step 1 · the crop ────────────────────────────────────────────────────────────────── -->
+<section class="mt-8" aria-labelledby="faq-crop-heading">
+  <h2 id="faq-crop-heading" class="text-lg font-bold text-ink">
+    {{ 'farmer.faq.crop.title' | translate }}
+  </h2>
+  <p class="mt-1 text-sm text-ink-muted">{{ 'farmer.faq.crop.hint' | translate }}</p>
+
+  <div class="mt-4">
+    @if (crops.isLoading()) {
+      <foshol-skeleton variant="block" [count]="skeletonRows" />
+    } @else if (cropProblem(); as problem) {
+      <foshol-error-panel [problem]="problem" (retry)="crops.reload()" />
+    } @else {
+      <foshol-crop-grid
+        [crops]="availableCrops()"
+        [selectedId]="selectedCropId()"
+        (cropChosen)="onCropChosen($event)"
+      />
+    }
+  </div>
+</section>
+
+<!-- ── Step 2 · the question ────────────────────────────────────────────────────────────── -->
+<section class="mt-8 max-w-3xl" aria-labelledby="faq-ask-heading">
+  <h2 id="faq-ask-heading" class="text-lg font-bold text-ink">
+    {{ 'farmer.faq.ask.title' | translate }}
+  </h2>
+  <p class="mt-1 text-sm text-ink-muted">{{ 'farmer.faq.ask.hint' | translate }}</p>
+
+  <div class="mt-4">
+    <foshol-faq-recorder-panel
+      [disabled]="!cropChosen()"
+      [busy]="store.searching()"
+      (ask)="onAsk($event)"
+    />
+  </div>
+
+  @if (cropChosen() && !showBrowse()) {
+    <button
+      type="button"
+      class="faq-link-button touch-target mt-3"
+      data-testid="faq-open-browse"
+      (click)="openBrowse()"
+    >
+      {{ 'farmer.faq.browse.open' | translate }}
+    </button>
+  }
+</section>
+
+<!-- ── The answer ───────────────────────────────────────────────────────────────────────── -->
+<section class="mt-8 max-w-3xl" aria-labelledby="faq-answer-heading">
+  <h2 id="faq-answer-heading" class="sr-only">{{ 'farmer.faq.answer.heading' | translate }}</h2>
+
+  @if (store.searching()) {
+    <div class="faq-panel" data-testid="faq-searching">
+      <p class="faq-panel-title">{{ 'farmer.faq.processing.title' | translate }}</p>
+      <p class="mt-1 text-sm text-ink-muted">{{ 'farmer.faq.processing.hint' | translate }}</p>
+      <div class="mt-4"><foshol-skeleton variant="block" [count]="skeletonRows" /></div>
+    </div>
+  } @else if (store.problem(); as problem) {
+    <foshol-error-panel
+      [problem]="problem"
+      [retryable]="canRetry()"
+      (retry)="onRetry()"
+      data-testid="faq-error"
+    />
+  } @else if (store.result() !== null) {
+    <div class="faq-panel" data-testid="faq-answer">
+      <!-- "What we heard", before anything is claimed about what it means. Verbatim, and
+           clearly the transcript rather than a finding. -->
+      <p class="faq-heard-label">{{ 'farmer.faq.answer.heardLabel' | translate }}</p>
+      <p class="faq-heard" data-testid="faq-transcription">
+        @if (transcription()) {
+          {{ transcription() }}
+        } @else {
+          <span class="text-ink-faint">{{ 'farmer.faq.answer.heardNothing' | translate }}</span>
+        }
+      </p>
+      <p class="faq-heard-meta" data-testid="faq-asr-confidence">
+        {{
+          'farmer.faq.answer.asrConfidence' | translate: { score: asrConfidence() | percent1 }
+        }}
+      </p>
+
+      @if (store.inconclusive()) {
+        <div class="mt-4">
+          <foshol-empty-state
+            titleKey="farmer.faq.noMatch.title"
+            detailKey="farmer.faq.noMatch.detail"
+            data-testid="faq-no-match"
+          >
+            <div class="flex flex-wrap justify-center gap-2">
+              <button type="button" class="faq-cta touch-target" (click)="askAgain()">
+                {{ 'farmer.faq.noMatch.askAgain' | translate }}
+              </button>
+              <a class="faq-cta faq-cta-quiet touch-target" [routerLink]="paths.newCase">
+                {{ 'farmer.faq.noMatch.startCase' | translate }}
+              </a>
+            </div>
+          </foshol-empty-state>
+        </div>
+      } @else {
+        <div class="mt-5">
+          <h3 class="faq-section-title">{{ 'farmer.faq.answer.candidatesTitle' | translate }}</h3>
+          <!-- The gate. Nothing below this list is fetched until one of them is tapped. -->
+          <p class="mt-1 mb-3 text-sm text-ink-muted">
+            {{ 'farmer.faq.answer.confirmHint' | translate }}
+          </p>
+          <foshol-faq-candidate-list
+            [candidates]="store.candidates()"
+            [selectedId]="store.selection()?.diseaseId ?? null"
+            [disabled]="store.remedyPhase() === 'loading'"
+            (confirmed)="onConfirmed($event)"
+          />
+        </div>
+      }
+    </div>
+  }
+</section>
+
+<!-- ── The confirmed catalogue entry ────────────────────────────────────────────────────── -->
+@if (store.selection(); as selection) {
+  <section class="mt-8 max-w-3xl" aria-labelledby="faq-remedies-heading" data-testid="faq-remedies">
+    <div class="faq-panel">
+      <p class="text-xs font-bold tracking-wide text-paddy-700 uppercase">
+        {{ 'farmer.faq.remedy.eyebrow' | translate }}
+      </p>
+      <h2 id="faq-remedies-heading" class="mt-1 text-xl font-extrabold text-ink md:text-2xl">
+        {{ selection.nameBn }}
+      </h2>
+      <p class="mt-1 text-sm text-ink-muted">
+        <span class="font-latin">{{ selection.code }}</span>
+        <span aria-hidden="true">&nbsp;·&nbsp;</span>
+        <span>{{ 'farmer.faq.remedy.sourceNote' | translate }}</span>
+      </p>
+
+      <div class="mt-5">
+        @if (store.remedyPhase() === 'loading') {
+          <foshol-skeleton variant="block" [count]="skeletonRows" />
+        } @else if (store.remedyProblem(); as problem) {
+          <foshol-error-panel [problem]="problem" (retry)="onRetryRemedies()" />
+        } @else if ((store.remedies() ?? []).length === NONE) {
+          <foshol-empty-state
+            titleKey="farmer.faq.remedy.noneTitle"
+            detailKey="farmer.faq.remedy.noneDetail"
+            data-testid="faq-remedies-empty"
+          />
+        } @else {
+          <foshol-faq-remedy-list [remedies]="store.remedies() ?? []" />
+        }
+      </div>
+
+      <p class="faq-footnote">{{ 'farmer.faq.remedy.footnote' | translate }}</p>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="faq-cta touch-target"
+          data-testid="faq-ask-again"
+          (click)="askAgain()"
+        >
+          {{ 'farmer.faq.remedy.askAnother' | translate }}
+        </button>
+        <a class="faq-cta faq-cta-quiet touch-target" [routerLink]="paths.newCase">
+          {{ 'farmer.faq.remedy.startCase' | translate }}
+        </a>
+      </div>
+    </div>
+  </section>
+}
+
+<!-- ── The typed catalogue: the always-available path ───────────────────────────────────── -->
+@if (showBrowse()) {
+  <section class="mt-8 max-w-3xl" aria-labelledby="faq-browse-heading" data-testid="faq-browse">
+    <h2 id="faq-browse-heading" class="text-lg font-bold text-ink">
+      {{ 'farmer.faq.browse.title' | translate }}
+    </h2>
+    <p class="mt-1 mb-4 text-sm text-ink-muted">{{ 'farmer.faq.browse.hint' | translate }}</p>
+    <foshol-faq-disease-search
+      [diseases]="diseases.value() ?? []"
+      [loading]="diseases.isLoading()"
+      [disabled]="store.remedyPhase() === 'loading'"
+      [selectedId]="store.selection()?.diseaseId ?? null"
+      (confirmed)="onConfirmed($event)"
+    />
+  </section>
+}
