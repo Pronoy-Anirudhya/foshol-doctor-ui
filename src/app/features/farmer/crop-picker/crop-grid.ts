@@ -133,17 +133,27 @@ const ROVING_SKIPPED = -1;
       background: var(--color-paddy-100);
     }
 
-    .crop-figure :is(svg) {
+    /*
+     * The pictogram sizes itself through foshol-crop-icon's own size input. This rule must
+     * exclude the tick explicitly: the tick's svg is the only one in THIS component's template,
+     * and emulated encapsulation rewrites the selector to .crop-figure[_ngcontent] :is(svg[_ngcontent]),
+     * so the tick was the only element it could ever reach — which sized the tick at 58% of the
+     * tile and buried the crop picture underneath it.
+     */
+    .crop-figure :is(svg):not(.crop-tick) {
       inline-size: 58%;
       block-size: auto;
     }
 
+    /* Centred on the pictogram, so the chosen tile reads the same at arm's length in a field as
+       it does close up. Translated rather than offset so it stays centred at every tile size. */
     .crop-tick {
       position: absolute;
-      inset-block-start: 0.35rem;
-      inset-inline-end: 0.35rem;
-      inline-size: 1.6rem;
-      block-size: 1.6rem;
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      transform: translate(-50%, -50%);
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
       color: var(--color-paddy-600);
     }
 
