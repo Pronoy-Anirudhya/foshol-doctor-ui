@@ -422,6 +422,7 @@
   "farmer.capture.serverReason.UNREADABLE": "পড়া যায়নি",
   "farmer.capture.stepper.back": "আগের ধাপ",
   "farmer.capture.stepper.done": "সম্পন্ন",
+  "farmer.capture.stepper.incomplete": "পরের ধাপে যেতে এই ধাপের তথ্যগুলো আগে দিন।",
   "farmer.capture.stepper.listen": "শুনুন",
   "farmer.capture.stepper.mute": "শব্দ বন্ধ",
   "farmer.capture.stepper.next": "পরের ধাপ",

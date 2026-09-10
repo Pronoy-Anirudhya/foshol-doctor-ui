@@ -173,6 +173,116 @@ describe('CapturePage — local quality gate (WEB-TEST-002, WEB-FR-120…125)', 
     expect(requestsSincePick()).toEqual([]);
   });
 
+  /**
+   * Next refuses to move on while the step in front of the farmer is missing something the
+   * submission actually needs — crop, photographs, field area. Those three are exactly what
+   * `CaseDraftStore.canSubmit` demands; "describe it" is not among them.
+   */
+  describe('required-step gating', () => {
+    function nextButton(): HTMLButtonElement {
+      return el().querySelector<HTMLButtonElement>('[data-testid="step-next"]')!;
+    }
+
+    function blockedHint(): HTMLElement | null {
+      return el().querySelector<HTMLElement>('[data-testid="step-blocked"]');
+    }
+
+    it('refuses Next on the crop step until a crop is chosen, and says why', async () => {
+      await setUp([passingImage()]);
+
+      expect(activeStep(fixture)).toBe('crop');
+      expect(nextButton().disabled).toBe(true);
+      expect(blockedHint()).not.toBeNull();
+      expect(blockedHint()!.textContent?.trim()).toBe(
+        BN_CATALOGUE['farmer.capture.stepper.incomplete'],
+      );
+      // The reason is programmatically tied to the control, not merely printed near it.
+      expect(nextButton().getAttribute('aria-describedby')).toBe('step-blocked');
+
+      draft.chooseCrop(crops[0]!.id);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(nextButton().disabled).toBe(false);
+      expect(blockedHint()).toBeNull();
+      expect(nextButton().getAttribute('aria-describedby')).toBeNull();
+    });
+
+    it('refuses Next on the photographs step until an image is accepted', async () => {
+      const image = passingImage();
+      await setUp([image]);
+      draft.chooseCrop(crops[0]!.id);
+      await showStep(fixture, 'photos');
+
+      expect(nextButton().disabled).toBe(true);
+
+      await choose(image);
+
+      expect(activeStep(fixture)).toBe('photos');
+      expect(nextButton().disabled).toBe(false);
+    });
+
+    it('refuses Next on the field step until an area is given', async () => {
+      const image = passingImage();
+      await setUp([image]);
+      draft.chooseCrop(crops[0]!.id);
+      await choose(image);
+      await showStep(fixture, 'land');
+
+      expect(nextButton().disabled).toBe(true);
+
+      draft.setFieldArea(FIELD_AREA);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(nextButton().disabled).toBe(false);
+    });
+
+    /**
+     * The description is optional on the wire, so gating it would put a wall in front of the one
+     * box `WEB-FR-140`/`141` require to stay reachable.
+     */
+    it('never blocks on the describe step, which is optional', async () => {
+      const image = passingImage();
+      await setUp([image]);
+      draft.chooseCrop(crops[0]!.id);
+      await choose(image);
+      draft.setFieldArea(FIELD_AREA);
+      await showStep(fixture, 'describe');
+
+      expect(draft.noteBn()).toBe('');
+      expect(draft.audio()).toBeNull();
+      expect(nextButton().disabled).toBe(false);
+      expect(blockedHint()).toBeNull();
+    });
+
+    /**
+     * The gate is on Next alone. The rail stays free, because a farmer who cannot yet complete
+     * the crop step must still be able to reach the description box (`WEB-FR-140`/`141`) — that
+     * is the property the test above this block asserts, and gating the rail would break it.
+     */
+    it('leaves the rail free while Next is blocked', async () => {
+      await setUp([passingImage()]);
+
+      expect(nextButton().disabled).toBe(true);
+      await showStep(fixture, 'describe');
+      expect(activeStep(fixture)).toBe('describe');
+    });
+
+    it('disables Next on the last step, as it always did', async () => {
+      const image = passingImage();
+      await setUp([image]);
+      draft.chooseCrop(crops[0]!.id);
+      await choose(image);
+      draft.setFieldArea(FIELD_AREA);
+      await showStep(fixture, 'review');
+
+      expect(nextButton().disabled).toBe(true);
+      // Disabled because there is nowhere to go, not because anything is missing.
+      expect(blockedHint()).toBeNull();
+    });
+  });
+
   /** Only the card in front takes tab stops; the deck behind it must be unreachable. */
   it('marks every card but the active one inert', async () => {
     await setUp([passingImage()]);

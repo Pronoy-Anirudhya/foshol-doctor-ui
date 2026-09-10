@@ -399,6 +399,10 @@
     "bn": "পরের ধাপ",
     "en": "Next step"
   },
+  "farmer.capture.stepper.incomplete": {
+    "bn": "পরের ধাপে যেতে এই ধাপের তথ্যগুলো আগে দিন।",
+    "en": "Fill in this step before moving on."
+  },
   "farmer.capture.stepper.progress": {
     "bn": "ধাপ {{position}} / {{total}}",
     "en": "Step {{position}} of {{total}}"

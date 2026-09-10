@@ -38,6 +38,17 @@ export class CaptureStep {
   readonly guideKey = input.required<string>();
   /** Drives the rail's tick. Text carries it too — `WEB-UX-044` forbids colour-only meaning. */
   readonly complete = input(false);
+
+  /**
+   * Whether `complete` is a PRECONDITION for moving on, rather than just a tick.
+   *
+   * Two different questions, deliberately two inputs. "Describe it" ticks when the farmer has
+   * spoken or typed something, but a description is optional on the wire and `WEB-FR-140`/`141`
+   * require the box to stay reachable — so that step ticks without ever blocking. Crop,
+   * photographs and field area are what `CaseDraftStore.canSubmit` actually demands, and those
+   * are the ones that gate.
+   */
+  readonly required = input(false);
 }
 
 const ANNOUNCE_KEY = 'farmer.capture.stepper.progress';
@@ -213,17 +224,35 @@ const STEP_NUMERALS: readonly string[] = ['১', '২', '৩', '৪', '৫'];
         type="button"
         class="nav-btn nav-next touch-target"
         data-testid="step-next"
-        [disabled]="isLast()"
+        [disabled]="!canAdvance()"
+        [attr.aria-describedby]="blocked() ? 'step-blocked' : null"
         (click)="next()"
       >
         {{ 'farmer.capture.stepper.next' | translate }}
         <foshol-icon name="arrow-right" size="sm" />
       </button>
     </div>
+
+    <!-- A disabled control with no stated reason is a dead end. The live region announces this
+         line when it appears, and the button points at it via aria-describedby so the reason is
+         programmatically associated rather than merely sitting nearby (WEB-UX-046). -->
+    @if (blocked()) {
+      <p id="step-blocked" class="blocked" role="status" data-testid="step-blocked">
+        {{ 'farmer.capture.stepper.incomplete' | translate }}
+      </p>
+    }
   `,
   styles: `
     :host {
       display: block;
+    }
+
+    .blocked {
+      margin-block-start: 0.6rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-clay-700);
+      text-align: center;
     }
 
     .head {
@@ -500,6 +529,20 @@ export class CaptureStepper {
   protected readonly position = computed(() => this.activeIndex() + ONE_BASED);
   protected readonly isFirst = computed(() => this.activeIndex() === FIRST);
   protected readonly isLast = computed(() => this.activeIndex() >= this.total() - ONE_STEP);
+
+  private readonly activeStep = computed(() => this.steps()[this.activeIndex()] ?? null);
+
+  /**
+   * The active step demands something it has not been given, so Next is refused.
+   *
+   * Only ever true for a step marked `required`; an optional step is never a wall.
+   */
+  protected readonly blocked = computed(() => {
+    const step = this.activeStep();
+    return step !== null && step.required() && !step.complete();
+  });
+
+  protected readonly canAdvance = computed(() => !this.isLast() && !this.blocked());
 
   /**
    * Browsers refuse speech synthesis before a user gesture, and an autoplay attempt that fails
