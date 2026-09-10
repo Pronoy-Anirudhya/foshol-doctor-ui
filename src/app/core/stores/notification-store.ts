@@ -25,7 +25,13 @@ import { newUuid } from '../util/uuid';
  * transition has no server prose at all — its detail line is the status label from our own
  * catalogue.
  */
-export type NotificationKind = 'STATUS' | 'ADVISORY' | 'REVISION' | 'REJECTION' | 'KPI_WARNING';
+export type NotificationKind =
+  | 'STATUS'
+  | 'ADVISORY'
+  | 'REVISION'
+  | 'REJECTION'
+  | 'KPI_WARNING'
+  | 'QUEUE_ARRIVAL';
 
 export const NOTIFY_STATUS: NotificationKind = 'STATUS';
 export const NOTIFY_ADVISORY: NotificationKind = 'ADVISORY';
@@ -36,6 +42,12 @@ export const NOTIFY_REJECTION: NotificationKind = 'REJECTION';
  * by `caseId`, because the console's workspace route is addressed by task.
  */
 export const NOTIFY_KPI_WARNING: NotificationKind = 'KPI_WARNING';
+/**
+ * New work landed on the officer's review queue. Addressed by `caseId`, because that is all a
+ * `queue` frame carries — the review task the console routes by does not exist on this client
+ * until the queue page is read again. The bell resolves the task id at render time when it can.
+ */
+export const NOTIFY_QUEUE_ARRIVAL: NotificationKind = 'QUEUE_ARRIVAL';
 
 /** Which half of the arrival animation is armed. See `arrivalPhase` below. */
 export type ArrivalPhase = 'a' | 'b';
@@ -116,13 +128,15 @@ export class NotificationStore {
   }
 
   /**
-   * Two identities, because the two families of entry have two different ones.
+   * Three identities, because the three families of entry have three different ones.
    *
    * A farmer-addressed frame carries the server's `notificationId`, which is authoritative. A
    * KPI warning has no such id at all — officer events are not persisted server-side — so it is
    * identified by WHAT it warns about: this task, due at this instant. That is what stops the
    * seeding fetch after a resync from doubling every warning already delivered live, and it
-   * still lets a re-warning at a NEW due instant through as the new thing it is.
+   * still lets a re-warning at a NEW due instant through as the new thing it is. A queue
+   * arrival is the third: `queue` frames carry neither an id nor a task, so it is identified by
+   * its case alone — see `identityOf` for why that fallback is scoped to that one kind.
    */
   #isReplay(input: NotificationInput): boolean {
     const serverId = input.notificationId;
@@ -150,9 +164,27 @@ export class NotificationStore {
   }
 }
 
-/** `null` for any entry that is not identified by task + due instant. */
-function identityOf(input: Pick<AppNotification, 'reviewTaskId' | 'dueAt'>): string | null {
-  const { reviewTaskId, dueAt } = input;
-  if (reviewTaskId === undefined || dueAt === undefined) return null;
-  return `${reviewTaskId} ${dueAt}`;
+/**
+ * `null` for any entry this application cannot identify by its content — which is most of them,
+ * and deliberately so.
+ *
+ * The case fallback is scoped to `QUEUE_ARRIVAL` alone, and both branches are namespaced so they
+ * can never collide. A GENERAL `kind + caseId` identity would be wrong twice over: a farmer's
+ * `case-status` chain (`SUBMITTED → ANALYSING → ANALYSED → IN_REVIEW`) arrives as several `STATUS`
+ * entries for one case and would collapse into one row whenever the server omits `notificationId`,
+ * and folding `toStatus` in does not rescue it either, because `IN_REVIEW → ADVISED → revised →
+ * IN_REVIEW` is a real loop — which is the whole reason `REVISION` exists as its own kind.
+ *
+ * `QUEUE_ARRIVAL` has no second dimension the way a KPI warning has `dueAt`, so a case driven to
+ * `ANALYSED` a second time is swallowed while the first row is still held. That is the accepted
+ * cost of not doubling on every `resync` replay: the row ages out past `maxItems`, and `dismiss`
+ * clears it, after which a later arrival records as new.
+ */
+function identityOf(
+  input: Pick<AppNotification, 'kind' | 'caseId' | 'reviewTaskId' | 'dueAt'>,
+): string | null {
+  const { kind, caseId, reviewTaskId, dueAt } = input;
+  if (reviewTaskId !== undefined && dueAt !== undefined) return `task ${reviewTaskId} ${dueAt}`;
+  if (kind === NOTIFY_QUEUE_ARRIVAL && caseId !== undefined) return `${kind} ${caseId}`;
+  return null;
 }

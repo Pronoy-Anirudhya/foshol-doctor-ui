@@ -13,11 +13,15 @@ import {
   NotificationStore,
   NOTIFY_ADVISORY,
   NOTIFY_KPI_WARNING,
+  NOTIFY_QUEUE_ARRIVAL,
   NOTIFY_STATUS,
 } from '../../../core/stores/notification-store';
 import { LiveAnnouncer } from '../../../core/stores/live-announcer';
+import { QueueStore } from '../../../core/stores/queue-store';
+import type { OfficerQueueRow } from '../../../generated/models/officer-queue-row';
+import type { PageOfOfficerQueueRow } from '../../../generated/models/page-of-officer-queue-row';
 import type { Principal } from '../../../generated/models/principal';
-import { taskPath } from '../../../features/officer/officer-paths';
+import { OFFICER_PATHS, taskPath } from '../../../features/officer/officer-paths';
 import { NotificationBell } from './notification-bell';
 
 /**
@@ -38,7 +42,26 @@ const CATALOGUE: Readonly<Record<string, string>> = {
   'shared.notifications.openTask': 'কাজটি খুলুন',
   'shared.notifications.dueBy': 'নিষ্পত্তির সময়সীমা {{time}}',
   'shared.notifications.kpi.resolutionWarning': 'এই কেসটি নিষ্পত্তির সময়সীমার কাছাকাছি চলে এসেছে',
+  'shared.notifications.kind.QUEUE_ARRIVAL': 'নতুন কাজ',
+  'shared.notifications.queue.analysed': 'পর্যালোচনার জন্য নতুন কেস এসেছে',
+  'shared.notifications.openQueue': 'সারিটি খুলুন',
 };
+
+const queuePage = (rows: readonly OfficerQueueRow[]): PageOfOfficerQueueRow => ({
+  page: 0,
+  size: 20,
+  totalElements: rows.length,
+  totalPages: 1,
+  content: [...rows],
+});
+
+const queueRow = (caseId: string): OfficerQueueRow => ({
+  caseId,
+  reviewTaskId: `task-${caseId}`,
+  state: 'PENDING',
+  submittedAt: '2026-09-07T16:19:26.677409Z',
+  slaDueAt: '2026-09-07T20:19:26.677409Z',
+});
 
 class LocalCatalogueLoader extends TranslateLoader {
   override getTranslation(): Observable<TranslationObject> {
@@ -77,6 +100,7 @@ describe('NotificationBell (WEB-FR-354, WEB-UX-044, WEB-UX-046)', () => {
       store: TestBed.inject(NotificationStore),
       announcer: TestBed.inject(LiveAnnouncer),
       session: TestBed.inject(SessionStore),
+      queue: TestBed.inject(QueueStore),
     };
   }
 
@@ -249,6 +273,62 @@ describe('NotificationBell (WEB-FR-354, WEB-UX-044, WEB-UX-046)', () => {
       caseId: 'c-1',
       reviewTaskId: 't-9',
       dueAt: '2026-09-08T11:30:00Z',
+    });
+    button(host).click();
+    await fixture.whenStable();
+
+    expect(host.querySelector('li a')).toBeNull();
+  });
+
+  it('deep-links a queue arrival to the task once that row is on the loaded page', async () => {
+    const { fixture, host, store, session, queue } = await render();
+    session.signIn(tokenFor('OFFICER'), { id: 'u-2', name: 'Officer', role: 'OFFICER' }, new Date());
+    queue.applyPage(queuePage([queueRow('c-1')]));
+    store.record({
+      kind: NOTIFY_QUEUE_ARRIVAL,
+      titleKey: 'shared.notifications.queue.analysed',
+      caseId: 'c-1',
+    });
+    button(host).click();
+    await fixture.whenStable();
+
+    const link = host.querySelector('li a') as HTMLAnchorElement | null;
+    // Pinned against the console's own builder for the reason spelled out on the KPI test above.
+    expect(link?.getAttribute('href')).toBe(taskPath('task-c-1'));
+    expect(link?.textContent).toContain(CATALOGUE['shared.notifications.openTask']);
+    // WEB-UX-044 — the kind is stated in words beside the glyph.
+    expect(host.textContent).toContain(CATALOGUE['shared.notifications.kind.QUEUE_ARRIVAL']);
+  });
+
+  /**
+   * The ordinary case at the moment the frame lands: a case reaching `ANALYSED` is a NEW queue
+   * row, so it cannot already be on the loaded page. The link must still go somewhere the
+   * officer's guard allows — never a farmer case URL, never a route that 403s.
+   */
+  it('falls back to the queue when the arrival is not on the loaded page yet', async () => {
+    const { fixture, host, store, session } = await render();
+    session.signIn(tokenFor('OFFICER'), { id: 'u-2', name: 'Officer', role: 'OFFICER' }, new Date());
+    store.record({
+      kind: NOTIFY_QUEUE_ARRIVAL,
+      titleKey: 'shared.notifications.queue.analysed',
+      caseId: 'c-7',
+    });
+    button(host).click();
+    await fixture.whenStable();
+
+    const link = host.querySelector('li a') as HTMLAnchorElement | null;
+    expect(link?.getAttribute('href')).toBe(OFFICER_PATHS.queue);
+    // The wording follows the target: this one opens the queue, not a task.
+    expect(link?.textContent).toContain(CATALOGUE['shared.notifications.openQueue']);
+  });
+
+  it('never offers a farmer a queue link, even if an arrival somehow reached the store', async () => {
+    const { fixture, host, store, session } = await render();
+    session.signIn(tokenFor('FARMER'), { id: 'u-1', name: 'Demo', role: 'FARMER' }, new Date());
+    store.record({
+      kind: NOTIFY_QUEUE_ARRIVAL,
+      titleKey: 'shared.notifications.queue.analysed',
+      caseId: 'c-7',
     });
     button(host).click();
     await fixture.whenStable();
