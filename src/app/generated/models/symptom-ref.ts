@@ -6,5 +6,10 @@ export interface SymptomRef {
   id: string;
   nameBn: string;
   nameEn?: string | null;
+
+  /**
+   * True when nameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  nameEnFallback?: boolean;
   organ: 'LEAF' | 'STEM' | 'ROOT' | 'PANICLE' | 'FRUIT' | 'TUBER' | 'WHOLE';
 }

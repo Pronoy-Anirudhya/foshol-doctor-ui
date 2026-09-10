@@ -9,7 +9,8 @@
 
 # Node modules and dependency files
 /node_modules/
-/package-lock.json
+# package-lock.json is COMMITTED: the Docker build runs `npm ci`, which needs it, and a
+# reproducible image is worth more than a quiet diff. (was ignored before containerisation)
 /yarn.lock
 
 # Environment files

@@ -6,5 +6,11 @@ export interface VoiceSearchCandidate {
   diseaseId: string;
   matcher: 'NAME' | 'VECTOR' | 'FUZZY';
   nameBn: string;
+  nameEn?: string | null;
+
+  /**
+   * True when nameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  nameEnFallback?: boolean;
   score: number;
 }

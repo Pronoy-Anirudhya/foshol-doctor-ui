@@ -1,0 +1,25 @@
+# Rendered by docker/nginx/entrypoint.d/15-foshol-config.envsh into /tmp/nginx/.
+#
+# nginx's add_header does NOT inherit into a location that declares an add_header of its own.
+# Every location below that sets Cache-Control therefore re-includes this file. Forgetting one is
+# the commonest way a "hardened" config ends up with headers on some URLs and not others.
+
+add_header X-Content-Type-Options     "nosniff"     always;
+add_header X-Frame-Options            "DENY"        always;
+add_header Referrer-Policy            "no-referrer" always;
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+
+# camera= and microphone= are REQUIRED, not hygiene: the capture viewfinder (getUserMedia) and the
+# hold-to-talk recorder both fail silently without them, and the farmer sees a dead button.
+add_header Permissions-Policy "camera=(self), microphone=(self), geolocation=(), payment=(), usb=()" always;
+
+#  script-src 'self'          — /env.js is same-origin; AOT output needs no eval.
+#  style-src  'unsafe-inline' — Angular injects component styles as <style> elements.
+#  connect-src                — the Grad-CAM fetch 302s into the object store, and CSP applies to
+#                               the REDIRECT TARGET, so that origin belongs here even though the
+#                               app never types it.
+#  img-src / media-src        — presigned object-store URLs bind straight to <img [src]> and
+#                               <audio [src]>; blob: is the Grad-CAM overlay and the recorded clip.
+# Cross-Origin-Embedder-Policy is deliberately ABSENT: require-corp would block every presigned
+# image, which is the officer queue's entire content.
+add_header ${CSP_HEADER_NAME} "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ${CSP_MEDIA_SRC}; media-src 'self' blob: ${CSP_MEDIA_SRC}; font-src 'self'; connect-src 'self' ${CSP_CONNECT_SRC}; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;

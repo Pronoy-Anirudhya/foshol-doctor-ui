@@ -1,0 +1,64 @@
+# shellcheck shell=sh
+#
+# Sourced by the stock nginx entrypoint BEFORE 20-envsubst-on-templates.sh.
+#
+# It is a `.envsh` and not a `.sh` on purpose: the entrypoint SOURCES `.envsh` files and EXECUTES
+# `.sh` files, and an `export` only reaches the later envsubst pass if this runs in the same
+# shell. Two jobs here — validate the one variable that matters, and give every optional variable
+# a default, because envsubst turns an unset name into an empty string and `client_max_body_size ;`
+# is a config-parse failure at 2am rather than a warning.
+
+set -eu
+
+# ── The one that matters ────────────────────────────────────────────────────────────────────
+if [ -z "${BACKEND_API_BASE_URL:-}" ]; then
+  echo "FATAL: BACKEND_API_BASE_URL is unset. Set it in .env next to docker-compose.yml." >&2
+  exit 1
+fi
+
+# `proxy_pass http://host:8080;` forwards the request URI unchanged.
+# `proxy_pass http://host:8080/;` REPLACES the matched location prefix — /api/v1/cases becomes
+# /v1/cases and every call 404s while the SPA still loads perfectly, which reads as a backend
+# outage. One trailing slash is the difference, so strip it and reject anything with a path.
+BACKEND_API_BASE_URL="${BACKEND_API_BASE_URL%"${BACKEND_API_BASE_URL##*[!/]}"}"
+
+case "$BACKEND_API_BASE_URL" in
+  http://* | https://*) ;;
+  *)
+    echo "FATAL: BACKEND_API_BASE_URL must start with http:// or https:// (got '$BACKEND_API_BASE_URL')." >&2
+    exit 1
+    ;;
+esac
+
+case "${BACKEND_API_BASE_URL#*://}" in
+  */*)
+    echo "FATAL: BACKEND_API_BASE_URL must be scheme://host[:port] with no path (got '$BACKEND_API_BASE_URL')." >&2
+    exit 1
+    ;;
+esac
+
+export BACKEND_API_BASE_URL
+
+# ── Defaults for everything else in NGINX_ENVSUBST_FILTER ───────────────────────────────────
+# 3 x intake.maxImageBytes (8 MiB) + intake.maxAudioBytes (4 MiB) + multipart overhead. nginx's
+# own default is 1m, which 413s every real case submission while a one-image test passes.
+export NGINX_CLIENT_MAX_BODY_SIZE="${NGINX_CLIENT_MAX_BODY_SIZE:-32m}"
+# >= faq.requestTimeoutMs (45s): Whisper genuinely takes that long.
+export API_PROXY_READ_TIMEOUT="${API_PROXY_READ_TIMEOUT:-90s}"
+# >= sse.timeoutMs (1_800_000ms = 30min), with margin.
+export SSE_PROXY_READ_TIMEOUT="${SSE_PROXY_READ_TIMEOUT:-1830s}"
+export CSP_HEADER_NAME="${CSP_HEADER_NAME:-Content-Security-Policy-Report-Only}"
+export CSP_CONNECT_SRC="${CSP_CONNECT_SRC:-}"
+export CSP_MEDIA_SRC="${CSP_MEDIA_SRC:-}"
+
+# ── Render the shared snippet ───────────────────────────────────────────────────────────────
+# The stock entrypoint only envsubsts /etc/nginx/templates into /etc/nginx/conf.d. A snippet
+# cannot live there — conf.d/*.conf is included at http level and these directives are
+# server/location level — so it is rendered here, into the tmpfs, and included by absolute path.
+mkdir -p /tmp/nginx
+envsubst '${CSP_HEADER_NAME} ${CSP_CONNECT_SRC} ${CSP_MEDIA_SRC}' \
+  < /etc/nginx/snippets/security-headers.conf.template \
+  > /tmp/nginx/security-headers.conf
+
+echo "foshol: proxying /api -> ${BACKEND_API_BASE_URL}"
+echo "foshol: ${CSP_HEADER_NAME} active"

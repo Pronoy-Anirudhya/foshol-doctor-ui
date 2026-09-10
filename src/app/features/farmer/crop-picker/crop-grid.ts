@@ -27,8 +27,8 @@ import { CropIcon } from '../../../shared/ui/pictogram/crop-icon';
  * the arrow keys move between crops, which is what a screen-reader user expects of a radio
  * group and what a keyboard-only judge will try first.
  *
- * WEB-UX-016 / WEB-UX-015 — `nameBn` and `nameEn` render exactly as the server returned them,
- * through `<foshol-bn-value>` so `nameEnFallback` carries its `(bn)` marker.
+ * WEB-UX-016 / WEB-UX-015 — the crop name renders exactly as the server returned it, in the
+ * active locale, through `<foshol-bn-value>` so `nameEnFallback` carries its `(bn)` marker.
  */
 const NEXT_KEYS: readonly string[] = ['ArrowRight', 'ArrowDown'];
 const PREVIOUS_KEYS: readonly string[] = ['ArrowLeft', 'ArrowUp'];
@@ -80,7 +80,11 @@ const ROVING_SKIPPED = -1;
             }
           </span>
           <span class="crop-name">
-            <foshol-bn-value [value]="crop.nameBn" />
+            <foshol-bn-value
+              [bn]="crop.nameBn"
+              [en]="crop.nameEn"
+              [fallback]="crop.nameEnFallback"
+            />
           </span>
         </button>
       }

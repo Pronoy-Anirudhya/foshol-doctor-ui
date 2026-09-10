@@ -1,0 +1,25 @@
+# Everything the image build does not read.
+# package-lock.json is deliberately NOT listed: `npm ci` needs it.
+.git
+.github
+node_modules
+dist
+.angular
+coverage
+out-tsc
+.env
+.env.*
+!.env.template
+docker-compose*.yml
+Dockerfile
+.dockerignore
+*.md
+docs
+# Only api:gen / check:generated read these, and neither runs in the image.
+openapi
+ng-openapi-gen.json
+start-ui.sh
+.claude
+.DS_Store
+**/*.tsbuildinfo
+npm-debug.log*

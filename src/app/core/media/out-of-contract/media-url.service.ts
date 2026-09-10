@@ -30,7 +30,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { APP_CONFIG } from '../../config/app-config';
+import { apiOrigin } from '../../config/runtime-config';
 
 /**
  * The record the server returns, verified field-for-field against the running backend and
@@ -116,6 +116,6 @@ export class MediaUrlService {
    * bearer is added downstream by `authInterceptor`, which applies the same origin test.
    */
   private absolute(path: string): string {
-    return new URL(path, APP_CONFIG.api.origin).toString();
+    return new URL(path, apiOrigin()).toString();
   }
 }

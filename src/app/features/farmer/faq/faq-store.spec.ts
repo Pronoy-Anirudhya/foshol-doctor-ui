@@ -68,7 +68,7 @@ describe('FaqStore — the confirmation gate', () => {
   afterEach(() => backend.verify());
 
   it('sends the clip as multipart with the language hint, and asks for nothing else', async () => {
-    const pending = store.search(CROP_ID, clip(), 'bn');
+    const pending = store.search(CROP_ID, clip());
 
     const request = backend.expectOne((candidate) => candidate.url === SEARCH_URL);
     expect(request.request.method).toBe('POST');
@@ -87,20 +87,31 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('carries a correlation id of its own and a finite timeout', async () => {
-    const pending = store.search(CROP_ID, clip(), 'en');
+    const pending = store.search(CROP_ID, clip());
     const request = backend.expectOne((candidate) => candidate.url === SEARCH_URL);
 
     // WEB-FR-005 — the id printed on a failure panel must belong to THIS attempt.
     expect(request.request.headers.get(CORRELATION_ID_HEADER)).toMatch(/^[0-9a-f-]{36}$/);
     expect(request.request.timeout).toBe(APP_CONFIG.faq.requestTimeoutMs);
-    expect(request.request.params.get('preferred_language')).toBe('en');
+
+    request.flush(ANSWERED);
+    await pending;
+  });
+
+  it('sends the SPOKEN language as the ASR hint, never the UI toggle', async () => {
+    const pending = store.search(CROP_ID, clip());
+    const request = backend.expectOne((candidate) => candidate.url === SEARCH_URL);
+
+    // A farmer reading the interface in English still speaks Bangla into the microphone, and
+    // the response carries both locales regardless — so the toggle has no say here.
+    expect(request.request.params.get('preferred_language')).toBe(APP_CONFIG.i18n.defaultLocale);
 
     request.flush(ANSWERED);
     await pending;
   });
 
   it('fetches remedies only once a candidate is confirmed', async () => {
-    const search = store.search(CROP_ID, clip(), 'bn');
+    const search = store.search(CROP_ID, clip());
     backend.expectOne((candidate) => candidate.url === SEARCH_URL).flush(ANSWERED);
     await search;
 
@@ -118,7 +129,7 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('retracts a confirmation when a new question is asked, remedies and all', async () => {
-    const search = store.search(CROP_ID, clip(), 'bn');
+    const search = store.search(CROP_ID, clip());
     backend.expectOne((candidate) => candidate.url === SEARCH_URL).flush(ANSWERED);
     await search;
 
@@ -127,7 +138,7 @@ describe('FaqStore — the confirmation gate', () => {
     await confirm;
     expect(store.remedies()).not.toBeNull();
 
-    const second = store.search(CROP_ID, clip(), 'bn');
+    const second = store.search(CROP_ID, clip());
     // The previous answer must not still be on screen describing a question nobody asked.
     expect(store.selection()).toBeNull();
     expect(store.remedies()).toBeNull();
@@ -136,7 +147,7 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('treats an inconclusive answer as a state, never as an error', async () => {
-    const pending = store.search(CROP_ID, clip(), 'bn');
+    const pending = store.search(CROP_ID, clip());
     backend
       .expectOne((candidate) => candidate.url === SEARCH_URL)
       .flush({ ...ANSWERED, inconclusive: true, candidates: [] });
@@ -148,7 +159,7 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('counts an empty candidate list as inconclusive even when the flag says otherwise', async () => {
-    const pending = store.search(CROP_ID, clip(), 'bn');
+    const pending = store.search(CROP_ID, clip());
     backend
       .expectOne((candidate) => candidate.url === SEARCH_URL)
       .flush({ ...ANSWERED, inconclusive: false, candidates: [] });
@@ -158,7 +169,7 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('flags a 503 so the page can fall back to the typed catalogue rather than die', async () => {
-    const pending = store.search(CROP_ID, clip(), 'bn');
+    const pending = store.search(CROP_ID, clip());
     backend
       .expectOne((candidate) => candidate.url === SEARCH_URL)
       .flush(
@@ -172,7 +183,7 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('reports a 401 rather than showing remedies (the interceptor owns the sign-out)', async () => {
-    const pending = store.search(CROP_ID, clip(), 'bn');
+    const pending = store.search(CROP_ID, clip());
     backend
       .expectOne((candidate) => candidate.url === SEARCH_URL)
       .flush({}, { status: 401, statusText: 'Unauthorized' });
@@ -184,10 +195,10 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('drops a slow first answer when a second question has already been asked', async () => {
-    const first = store.search(CROP_ID, clip(), 'bn');
+    const first = store.search(CROP_ID, clip());
     const firstRequest = backend.expectOne((candidate) => candidate.url === SEARCH_URL);
 
-    const second = store.search(CROP_ID, clip(), 'bn');
+    const second = store.search(CROP_ID, clip());
     const secondRequest = backend.expectOne((candidate) => candidate.url === SEARCH_URL);
 
     secondRequest.flush({ ...ANSWERED, transcription: '[second]' });
@@ -199,7 +210,7 @@ describe('FaqStore — the confirmation gate', () => {
   });
 
   it('never submits a case from this flow (ADR-0003)', async () => {
-    const search = store.search(CROP_ID, clip(), 'bn');
+    const search = store.search(CROP_ID, clip());
     backend.expectOne((candidate) => candidate.url === SEARCH_URL).flush(ANSWERED);
     await search;
 

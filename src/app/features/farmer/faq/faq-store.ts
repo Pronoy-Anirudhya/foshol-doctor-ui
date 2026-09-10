@@ -1,6 +1,6 @@
 import { HttpContext } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { APP_CONFIG, type Locale } from '../../../core/config/app-config';
+import { APP_CONFIG } from '../../../core/config/app-config';
 import { toProblemView, type ProblemView, HTTP_STATUS } from '../../../core/errors/problem';
 import {
   ATTEMPT_CORRELATION_ID,
@@ -41,7 +41,10 @@ export type RemedyPhase = 'idle' | 'loading' | 'loaded' | 'failed';
 export interface FaqSelection {
   readonly diseaseId: string;
   readonly code: string;
+  /** Both locales travel together so the toggle re-reads them without a refetch (WEB-UX-012). */
   readonly nameBn: string;
+  readonly nameEn?: string | null;
+  readonly nameEnFallback?: boolean;
 }
 
 const NONE = 0;
@@ -95,7 +98,7 @@ export class FaqStore {
   #searchSeq = NONE;
   #remedySeq = NONE;
 
-  async search(cropId: string, clip: DraftAudio, preferredLanguage: Locale): Promise<void> {
+  async search(cropId: string, clip: DraftAudio): Promise<void> {
     const seq = ++this.#searchSeq;
 
     this._phase.set('searching');
@@ -114,9 +117,14 @@ export class FaqStore {
     try {
       const result = await this.faq.voiceSearchFaq(
         {
-          // An ASR hint only. The catalogue's Bangla is returned as written either way — nothing
-          // in this application machine-translates agronomic content (COMMON-CON-003).
-          preferred_language: preferredLanguage,
+          /*
+           * An ASR hint — the language the farmer is SPEAKING — and deliberately not the UI
+           * toggle. A farmer reading the interface in English still speaks Bangla into the
+           * microphone, and binding this to the toggle would hand Whisper the wrong language and
+           * wreck the transcription. The response carries both locales regardless of what is
+           * sent here, so the toggle needs no say in it.
+           */
+          preferred_language: APP_CONFIG.i18n.defaultLocale,
           body: { cropId, audio: clip.blob },
         },
         context,

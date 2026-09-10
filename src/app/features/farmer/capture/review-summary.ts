@@ -29,7 +29,11 @@ const QUANTITY_UNIT_PREFIX = 'shared.unit.quantity.';
         <dt>{{ 'farmer.capture.review.crop' | translate }}</dt>
         <dd>
           @if (crop(); as chosen) {
-            <foshol-bn-value [value]="chosen.nameBn" />
+            <foshol-bn-value
+              [bn]="chosen.nameBn"
+              [en]="chosen.nameEn"
+              [fallback]="chosen.nameEnFallback"
+            />
           } @else {
             <span class="missing">
               <foshol-icon name="warning" size="sm" />

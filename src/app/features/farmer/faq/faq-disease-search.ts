@@ -67,15 +67,13 @@ const EMPTY = 0;
                 [disabled]="disabled()"
                 (click)="choose(disease)"
               >
-                <span class="faq-ds-name">{{ disease.nameBn }}</span>
-                @if (disease.nameEn) {
-                  <span class="faq-ds-en">
-                    <foshol-bn-value
-                      [value]="disease.nameEn"
-                      [fallback]="disease.nameEnFallback ?? false"
-                    />
-                  </span>
-                }
+                <span class="faq-ds-name">
+                  <foshol-bn-value
+                    [bn]="disease.nameBn"
+                    [en]="disease.nameEn"
+                    [fallback]="disease.nameEnFallback"
+                  />
+                </span>
                 <span class="faq-ds-code font-latin" aria-hidden="true">{{ disease.code }}</span>
               </button>
             </li>
@@ -204,6 +202,8 @@ export class FaqDiseaseSearch {
       diseaseId: disease.id,
       code: disease.code,
       nameBn: disease.nameBn,
+      nameEn: disease.nameEn,
+      nameEnFallback: disease.nameEnFallback,
     });
   }
 }

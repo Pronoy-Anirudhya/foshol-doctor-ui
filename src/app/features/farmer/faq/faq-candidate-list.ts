@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { TranslatePipe } from '@ngx-translate/core';
 import type { VoiceSearchCandidate } from '../../../generated/models/voice-search-candidate';
 import { Percent1Pipe } from '../../../shared/pipes/percent1.pipe';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 import type { FaqSelection } from './faq-store';
 
 /**
@@ -13,7 +14,7 @@ import type { FaqSelection } from './faq-store';
  * No remedy text, no dosage, no chemical name is fetched from this component — `FaqStore.confirm`
  * is the only door to that, and only a tap opens it.
  *
- * `WEB-UX-016` — `nameBn` is the catalogue's own Bangla and renders verbatim in both locales;
+ * `WEB-UX-016` — the name renders verbatim in whichever locale the catalogue supplied;
  * the `code` is the catalogue's Latin identifier and gets `font-latin` tracking rather than
  * being translated or hidden. The `matcher` enum is NOT shown raw: `NAME` / `VECTOR` / `FUZZY`
  * mean nothing to a farmer, so each maps to one plain-language line.
@@ -23,7 +24,7 @@ import type { FaqSelection } from './faq-store';
 @Component({
   selector: 'foshol-faq-candidate-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, Percent1Pipe],
+  imports: [TranslatePipe, Percent1Pipe, BnValue],
   host: { class: 'block' },
   template: `
     <ul class="grid list-none gap-3 p-0" data-testid="faq-candidates">
@@ -40,7 +41,13 @@ import type { FaqSelection } from './faq-store';
             (click)="choose(candidate)"
           >
             <span class="faq-cand-main">
-              <span class="faq-cand-name">{{ candidate.nameBn }}</span>
+              <span class="faq-cand-name">
+                <foshol-bn-value
+                  [bn]="candidate.nameBn"
+                  [en]="candidate.nameEn"
+                  [fallback]="candidate.nameEnFallback"
+                />
+              </span>
               <span class="faq-cand-meta">
                 <span class="font-latin">{{ candidate.code }}</span>
                 <span aria-hidden="true">&nbsp;·&nbsp;</span>
@@ -155,6 +162,8 @@ export class FaqCandidateList {
       diseaseId: candidate.diseaseId,
       code: candidate.code,
       nameBn: candidate.nameBn,
+      nameEn: candidate.nameEn,
+      nameEnFallback: candidate.nameEnFallback,
     });
   }
 }

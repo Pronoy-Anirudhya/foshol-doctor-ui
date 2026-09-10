@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageStore } from '../../../core/i18n/language-store';
 import type { Remedy } from '../../../generated/models/remedy';
+import { pickRemedyContent, type RemedyContentView } from '../../../shared/pipes/content-locale';
+import { BnMarker } from '../../../shared/ui/bn-value/bn-marker';
 import { RemedyTypeIcon } from '../../../shared/ui/pictogram/remedy-type-icon';
 
 /**
@@ -20,17 +23,22 @@ import { RemedyTypeIcon } from '../../../shared/ui/pictogram/remedy-type-icon';
  */
 const NONE = 0;
 
+interface RemedyRow {
+  readonly remedy: Remedy;
+  readonly content: RemedyContentView;
+}
+
 interface RemedyGroup {
   readonly key: string;
   readonly titleKey: string;
   readonly chemical: boolean;
-  readonly items: readonly Remedy[];
+  readonly items: readonly RemedyRow[];
 }
 
 @Component({
   selector: 'foshol-faq-remedy-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, RemedyTypeIcon],
+  imports: [TranslatePipe, RemedyTypeIcon, BnMarker],
   host: { class: 'block' },
   template: `
     @for (group of groups(); track group.key) {
@@ -53,41 +61,58 @@ interface RemedyGroup {
           }
 
           <ul class="grid list-none gap-4 p-0">
-            @for (remedy of group.items; track remedy.id) {
+            @for (row of group.items; track row.remedy.id) {
               <li
                 class="faq-rem-card"
                 data-testid="faq-remedy"
                 [attr.data-chemical]="group.chemical ? true : null"
               >
                 <div class="flex items-center gap-3">
-                  <foshol-remedy-type-icon [type]="remedy.type" size="md" />
+                  <foshol-remedy-type-icon [type]="row.remedy.type" size="md" />
                   <div class="min-w-0">
-                    <h4 class="faq-rem-title">{{ remedy.titleBn }}</h4>
+                    <h4 class="faq-rem-title">
+                      {{ row.content.title.text }}
+                      @if (row.content.title.marked) {
+                        <foshol-bn-marker />
+                      }
+                    </h4>
                     <p class="faq-rem-type">
-                      {{ 'farmer.faq.remedy.type.' + remedy.type | translate }}
+                      {{ 'farmer.faq.remedy.type.' + row.remedy.type | translate }}
                     </p>
                   </div>
                 </div>
 
                 <div class="mt-3.5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_17rem] xl:gap-7">
                   <ol class="faq-rem-steps" data-testid="faq-remedy-steps">
-                    @for (step of remedy.stepsBn; track $index) {
-                      <li class="faq-rem-step text-base md:text-lg">{{ step }}</li>
+                    @for (step of row.content.steps.items; track $index) {
+                      <li class="faq-rem-step text-base md:text-lg">
+                        {{ step }}
+                        <!-- One flag covers the whole array, so it is marked once, on the last
+                             line, rather than on every step. -->
+                        @if (row.content.steps.marked && $last) {
+                          <foshol-bn-marker />
+                        }
+                      </li>
                     }
                   </ol>
 
                   <dl class="m-0 grid content-start gap-2.5">
-                    @if (remedy.dosageBn) {
+                    @if (row.content.dosage; as dosage) {
                       <div class="faq-rem-meta" data-testid="faq-remedy-dosage">
                         <dt class="faq-rem-meta-label">
                           {{ 'farmer.faq.remedy.dosage' | translate }}
                         </dt>
                         <!-- The units are the catalogue's. Never recalculated, never converted. -->
-                        <dd class="faq-rem-meta-value">{{ remedy.dosageBn }}</dd>
+                        <dd class="faq-rem-meta-value">
+                          {{ dosage.text }}
+                          @if (dosage.marked) {
+                            <foshol-bn-marker />
+                          }
+                        </dd>
                       </div>
                     }
 
-                    @if (remedy.phiDays !== null && remedy.phiDays !== undefined) {
+                    @if (row.remedy.phiDays !== null && row.remedy.phiDays !== undefined) {
                       <div
                         class="faq-rem-meta faq-rem-meta-phi"
                         data-testid="faq-remedy-phi"
@@ -96,18 +121,20 @@ interface RemedyGroup {
                           {{ 'farmer.faq.remedy.phiLabel' | translate }}
                         </dt>
                         <dd class="faq-rem-meta-value">
-                          {{ 'farmer.faq.remedy.phiValue' | translate: { days: remedy.phiDays } }}
+                          {{
+                            'farmer.faq.remedy.phiValue' | translate: { days: row.remedy.phiDays }
+                          }}
                         </dd>
                       </div>
                     }
 
-                    @if (remedy.sourceRef) {
+                    @if (row.remedy.sourceRef) {
                       <div class="faq-rem-meta" data-testid="faq-remedy-source">
                         <dt class="faq-rem-meta-label">
                           {{ 'farmer.faq.remedy.source' | translate }}
                         </dt>
                         <dd class="faq-rem-meta-value faq-rem-meta-source">
-                          {{ remedy.sourceRef }}
+                          {{ row.remedy.sourceRef }}
                         </dd>
                       </div>
                     }
@@ -238,9 +265,17 @@ interface RemedyGroup {
   `,
 })
 export class FaqRemedyList {
+  private readonly language = inject(LanguageStore);
+
   readonly remedies = input<readonly Remedy[]>([]);
 
   protected readonly NONE = NONE;
+
+  /** Both locales are already on each remedy, so the toggle re-reads this — no refetch. */
+  private readonly rows = computed<readonly RemedyRow[]>(() => {
+    const locale = this.language.current();
+    return this.remedies().map((remedy) => ({ remedy, content: pickRemedyContent(remedy, locale) }));
+  });
 
   /**
    * Non-chemical first. Not a ranking of efficacy — the catalogue's own order is preserved
@@ -248,19 +283,19 @@ export class FaqRemedyList {
    * carries a pre-harvest interval arriving under its own heading rather than in a mixed list.
    */
   protected readonly groups = computed<readonly RemedyGroup[]>(() => {
-    const all = this.remedies();
+    const all = this.rows();
     return [
       {
         key: 'nonchemical',
         titleKey: 'farmer.faq.remedy.nonChemicalTitle',
         chemical: false,
-        items: all.filter((remedy) => remedy.type !== 'CHEMICAL'),
+        items: all.filter((row) => row.remedy.type !== 'CHEMICAL'),
       },
       {
         key: 'chemical',
         titleKey: 'farmer.faq.remedy.chemicalTitle',
         chemical: true,
-        items: all.filter((remedy) => remedy.type === 'CHEMICAL'),
+        items: all.filter((row) => row.remedy.type === 'CHEMICAL'),
       },
     ];
   });

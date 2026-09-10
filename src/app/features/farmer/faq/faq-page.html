@@ -154,7 +154,11 @@
         {{ 'farmer.faq.remedy.eyebrow' | translate }}
       </p>
       <h2 id="faq-remedies-heading" class="mt-1 text-xl font-extrabold text-ink md:text-2xl">
-        {{ selection.nameBn }}
+        <foshol-bn-value
+          [bn]="selection.nameBn"
+          [en]="selection.nameEn"
+          [fallback]="selection.nameEnFallback"
+        />
       </h2>
       <p class="mt-1 text-sm text-ink-muted">
         <span class="font-latin">{{ selection.code }}</span>

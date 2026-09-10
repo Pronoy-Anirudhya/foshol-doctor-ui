@@ -5,10 +5,20 @@ export interface Disease {
   code: string;
   cropId: string;
   descriptionBn?: string | null;
+  descriptionEn?: string | null;
+
+  /**
+   * True when descriptionEn fell back to Bangla (COMMON-NFR-038)
+   */
+  descriptionEnFallback?: boolean;
   healthy: boolean;
   id: string;
   nameBn: string;
   nameEn?: string | null;
+
+  /**
+   * True when nameEn fell back to Bangla (COMMON-NFR-038)
+   */
   nameEnFallback?: boolean;
   severity: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL' | 'NONE';
 }

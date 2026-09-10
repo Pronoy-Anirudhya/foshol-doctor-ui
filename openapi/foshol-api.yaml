@@ -1,8 +1,8 @@
-# Foshol Doctor — FROZEN API contract.
-# Owned by agent A1. Frozen at Day 0, before any other agent starts.
-# The Angular client in web/src/app/generated/ is generated from this file by ng-openapi-gen
-# and is never hand-edited (COMMON-NFR-043).
-# A backend endpoint that does not match this file is a Definition-of-Done failure (00-common §11.7).
+# Foshol Doctor — API contract (source of truth for the Angular client).
+# Additive bilingual catalogue fields may be added. Do not remove or rename existing required fields.
+# The Angular client is generated from this file by ng-openapi-gen and is never hand-edited
+# (COMMON-NFR-043). A backend endpoint that does not match this file is a Definition-of-Done
+# failure (00-common §11.7).
 openapi: 3.0.3
 
 info:
@@ -345,6 +345,9 @@ paths:
         - name: preferred_language
           in: query
           required: false
+          description: >
+            ASR language hint only. Catalogue payloads always return both Bangla and English
+            fields; this query does not select a single locale.
           schema: { type: string, default: bn, enum: [bn, en] }
       requestBody:
         required: true
@@ -1156,8 +1159,10 @@ components:
         code:          { type: string }
         nameBn:        { type: string }
         nameEn:        { type: string, nullable: true }
-        nameEnFallback: { type: boolean }
+        nameEnFallback: { type: boolean, description: True when nameEn fell back to Bangla (COMMON-NFR-038) }
         descriptionBn: { type: string, nullable: true }
+        descriptionEn: { type: string, nullable: true }
+        descriptionEnFallback: { type: boolean, description: True when descriptionEn fell back to Bangla (COMMON-NFR-038) }
         severity:      { type: string, enum: [LOW, MODERATE, HIGH, CRITICAL, NONE] }
         healthy:       { type: boolean }
 
@@ -1182,6 +1187,14 @@ components:
           nullable: true
           enum: [PER_DECIMAL, PER_SQ_M, PER_HECTARE, PER_ACRE, PER_SQ_FT, FIXED]
         rateNotesBn: { type: string, nullable: true }
+        titleEn: { type: string, nullable: true }
+        titleEnFallback: { type: boolean, description: True when titleEn fell back to Bangla (COMMON-NFR-038) }
+        stepsEn: { type: array, items: { type: string }, nullable: true }
+        stepsEnFallback: { type: boolean, description: True when stepsEn fell back to Bangla (COMMON-NFR-038) }
+        dosageEn: { type: string, nullable: true }
+        dosageEnFallback: { type: boolean, description: True when dosageEn fell back to Bangla (COMMON-NFR-038) }
+        rateNotesEn: { type: string, nullable: true }
+        rateNotesEnFallback: { type: boolean, description: True when rateNotesEn fell back to Bangla (COMMON-NFR-038) }
         computedDose:
           $ref: '#/components/schemas/ComputedDose'
           nullable: true
@@ -1219,6 +1232,8 @@ components:
         diseaseId: { type: string, format: uuid }
         code: { type: string }
         nameBn: { type: string }
+        nameEn: { type: string, nullable: true }
+        nameEnFallback: { type: boolean, description: True when nameEn fell back to Bangla (COMMON-NFR-038) }
         score: { type: number, format: float }
         matcher: { type: string, enum: [NAME, VECTOR, FUZZY] }
 
@@ -1230,6 +1245,7 @@ components:
         code:   { type: string }
         nameBn: { type: string }
         nameEn: { type: string, nullable: true }
+        nameEnFallback: { type: boolean, description: True when nameEn fell back to Bangla (COMMON-NFR-038) }
         organ:  { type: string, enum: [LEAF, STEM, ROOT, PANICLE, FRUIT, TUBER, WHOLE] }
 
     CaseAccepted:

@@ -1,7 +1,7 @@
 import type { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { SessionStore } from '../auth/session-store';
-import { APP_CONFIG } from '../config/app-config';
+import { apiOrigin } from '../config/runtime-config';
 
 /**
  * WEB-SEC-002 — the JWT is attached as an `Authorization: Bearer` header by an interceptor and
@@ -12,8 +12,6 @@ import { APP_CONFIG } from '../config/app-config';
  * object-store URL carries its own authorisation (COMMON-SEC-016); forwarding our bearer to
  * MinIO would hand a third-party host a credential it has no business seeing.
  */
-
-const API_ORIGIN = new URL(APP_CONFIG.api.origin).origin;
 
 /**
  * The three endpoints that exist precisely to obtain a token, so sending one is meaningless
@@ -35,7 +33,11 @@ export const PUBLIC_AUTH_PATHS: readonly string[] = [
  */
 export function isApiOriginUrl(url: string): boolean {
   try {
-    return new URL(url, API_ORIGIN).origin === API_ORIGIN;
+    // Resolved per call, never cached: a module-scope constant would freeze whatever the origin
+    // was at import time, and a disagreement between the two silently strips the bearer from
+    // every request rather than failing anywhere visible.
+    const origin = apiOrigin();
+    return new URL(url, origin).origin === origin;
   } catch {
     return false;
   }
@@ -43,7 +45,7 @@ export function isApiOriginUrl(url: string): boolean {
 
 export function isPublicAuthUrl(url: string): boolean {
   try {
-    return PUBLIC_AUTH_PATHS.includes(new URL(url, API_ORIGIN).pathname);
+    return PUBLIC_AUTH_PATHS.includes(new URL(url, apiOrigin()).pathname);
   } catch {
     return false;
   }
