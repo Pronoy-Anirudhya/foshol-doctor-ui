@@ -12,6 +12,7 @@ import { acceptLanguageInterceptor } from './core/http/accept-language.intercept
 import { authInterceptor } from './core/http/auth.interceptor';
 import { correlationIdInterceptor } from './core/http/correlation-id.interceptor';
 import { problemInterceptor } from './core/http/problem.interceptor';
+import { requestAttemptInterceptor } from './core/http/request-attempt.interceptor';
 import { provideI18n } from './core/i18n/i18n.providers';
 import { provideSse } from './core/sse/sse.providers';
 import { SESSION_TEARDOWN } from './core/auth/auth-facade';
@@ -28,11 +29,14 @@ export const appConfig: ApplicationConfig = {
     // last place a component would otherwise need an RxJS subscription (WEB-NFR-003).
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
 
-    // Interceptor order matters: correlation id and language decorate the request, auth adds
-    // the bearer for the API origin only, and problem sits outermost to see every response.
+    // Interceptor order matters: the per-attempt decorations go on first (a caller-minted
+    // correlation id must already be on the request when correlationIdInterceptor decides
+    // whether to quote the remembered one back), then language, then auth adds the bearer for
+    // the API origin only, and problem sits outermost to see every response.
     provideHttpClient(
       withFetch(),
       withInterceptors([
+        requestAttemptInterceptor,
         correlationIdInterceptor,
         acceptLanguageInterceptor,
         authInterceptor,
