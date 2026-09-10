@@ -10,6 +10,16 @@ import { NotificationBell } from '../notification-bell/notification-bell';
 import { SseIndicator } from '../sse-indicator/sse-indicator';
 
 /**
+ * Who sees the notification bell. Decided by the JWT role and never by the URL (WEB-FR-001) —
+ * an ADMIN session standing on `/officer/**`, which the guard allows, still gets no bell.
+ *
+ * Admins are not a notification audience in this product: the console's bell speaks about a
+ * farmer's cases and an officer's queue, and neither is an admin's work. They keep the SSE
+ * indicator beside it, because connection health IS everyone's business.
+ */
+const BELL_ROLES: readonly string[] = ['FARMER', 'OFFICER'];
+
+/**
  * The application's one header: a mobile nav toggle, product mark, language toggle,
  * live-connection state, and the account menu (identity, location, sign-out — all in one place).
  *
@@ -56,6 +66,11 @@ export class AppHeader {
 
   protected readonly authenticated = this.session.isAuthenticated;
   protected readonly role = this.session.role;
+
+  protected readonly showBell = computed(() => {
+    const role = this.role();
+    return this.authenticated() && role !== null && BELL_ROLES.includes(role);
+  });
 
   /** Item 3 — the brand mark is a link home, home being whichever surface this role owns. */
   protected readonly homePath = computed(() => homePathForRole(this.role()));
