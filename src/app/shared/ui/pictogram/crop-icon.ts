@@ -19,11 +19,15 @@ import { TranslatePipe } from '@ngx-translate/core';
 const RICE = 'crop-rice';
 const TOMATO = 'crop-tomato';
 const POTATO = 'crop-potato';
+const CORN = 'crop-corn';
+const WHEAT = 'crop-wheat';
 
 const ALT_KEYS = new Map<string, string>([
   [RICE, 'shared.pictogram.crop.crop-rice'],
   [TOMATO, 'shared.pictogram.crop.crop-tomato'],
   [POTATO, 'shared.pictogram.crop.crop-potato'],
+  [CORN, 'shared.pictogram.crop.crop-corn'],
+  [WHEAT, 'shared.pictogram.crop.crop-wheat'],
 ]);
 const GENERIC_ALT_KEY = 'shared.pictogram.crop.generic';
 
@@ -124,6 +128,66 @@ type IconSize = keyof typeof SIZES;
             <ellipse cx="21.8" cy="30.8" rx="2.1" ry="1.4" transform="rotate(8 21.8 30.8)" />
           </g>
         }
+        @case ('crop-corn') {
+          <!-- A cob in its husk: kernels banded across it, two husk leaves swept back. -->
+          <path
+            d="M24 6.5C29.6 6.5 33.2 13.2 33.2 22.5C33.2 31.8 29.6 40.5 24 40.5C18.4 40.5 14.8 31.8 14.8 22.5C14.8 13.2 18.4 6.5 24 6.5Z"
+            fill="currentColor"
+            fill-opacity="0.28"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linejoin="round"
+          />
+          <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-opacity="0.75">
+            <path d="M24 9V38" />
+            <path d="M18.4 15.5H29.6" />
+            <path d="M17.2 22H30.8" />
+            <path d="M17.4 28.5H30.6" />
+            <path d="M19.2 34.5H28.8" />
+          </g>
+          <path
+            d="M14.9 21.5C10.2 24.2 7.8 30.6 9.4 37.4C15.1 35.4 17.6 29.1 14.9 21.5Z"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M33.1 21.5C37.8 24.2 40.2 30.6 38.6 37.4C32.9 35.4 30.4 29.1 33.1 21.5Z"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+        }
+        @case ('crop-wheat') {
+          <!-- An upright ear: paired grains climbing a straight culm, awns at the tip.
+               Deliberately symmetric and vertical, so it never reads as the rice panicle,
+               which arches and droops. -->
+          <path d="M24 44V16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+          <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M24 10.5V4.5" />
+            <path d="M20.6 11.5L17.6 6.6" />
+            <path d="M27.4 11.5L30.4 6.6" />
+          </g>
+          <g fill="currentColor">
+            <ellipse cx="24" cy="14.6" rx="2" ry="3.4" />
+            <ellipse cx="19.9" cy="18.4" rx="2.1" ry="3.6" transform="rotate(-34 19.9 18.4)" />
+            <ellipse cx="28.1" cy="18.4" rx="2.1" ry="3.6" transform="rotate(34 28.1 18.4)" />
+            <ellipse cx="19.5" cy="25.2" rx="2.1" ry="3.6" transform="rotate(-34 19.5 25.2)" />
+            <ellipse cx="28.5" cy="25.2" rx="2.1" ry="3.6" transform="rotate(34 28.5 25.2)" />
+            <ellipse cx="19.5" cy="32" rx="2.1" ry="3.6" transform="rotate(-34 19.5 32)" />
+            <ellipse cx="28.5" cy="32" rx="2.1" ry="3.6" transform="rotate(34 28.5 32)" />
+          </g>
+          <path
+            d="M24 36.8C21.2 34.4 17.4 34.4 14.4 36.8C17.2 39.8 21.2 40.1 24 36.8Z"
+            fill="currentColor"
+            fill-opacity="0.28"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+        }
         @default {
           <!-- Generic foliage, for a crop this build has never seen. -->
           <path
@@ -166,6 +230,10 @@ export class CropIcon {
       case TOMATO:
         return 'text-clay-600';
       case POTATO:
+        return 'text-dawn-700';
+      case CORN:
+        return 'text-dawn-600';
+      case WHEAT:
         return 'text-dawn-700';
       default:
         return 'text-paddy-600';
