@@ -801,3 +801,61 @@ origin, a refused permission, no device, no supported container — or when the 
 
 **Unblock.** Nothing is outstanding: the operation is in the frozen contract and the generated
 client, so no hand-written URL exists anywhere in this feature.
+
+---
+
+## D-33 · Press-and-hold is the only way this application opens a microphone
+
+**What.** The land step's dictation mic changed from tap-to-toggle to press-and-hold, so all three
+voice controls now share one gesture. `SpeechRecognition.continuous` is `true` while held.
+`APP_CONFIG.speech.listenTimeoutMs` is raised 12 s → 30 s. The button itself is extracted into
+`shared/ui/hold-to-talk/`, which every voice surface now renders through.
+
+**Why there is an entry at all.** No requirement governs this. `WEB-FR-130` mandates hold-only for
+the **audio recorder**, and the describe and FAQ recorders already obeyed it. The land dictation is
+Web Speech, which `WEB-FR-913` marks `[DEFERRED]` and out of scope, so its interaction was
+specified nowhere and arrived with D-23 as an unspecified aid. Making it hold is a product decision
+recorded here per "no requirement, no code". Nothing on the wire changes: the dictated audio still
+never leaves the browser, the server still receives only the typed values and still decides
+`CaseDetail.metricsSource` on its own (`WEB-NFR-001`).
+
+**Why the copy did not need rewriting, only the control.** The Bangla already read
+"মাইক চেপে বলুন" — *press and hold the mic*. The gesture had drifted from the words rather than the
+other way round. The English said "Press the microphone", which described the tap, and is corrected
+to "Hold" in `farmer.capture.land.speak` and `farmer.capture.field.help`.
+
+**Why `continuous = true` does not contradict D-23.** D-23 set it `false` because "a continuous
+recogniser on a phone in a field is an open microphone the farmer has no reason to expect". Under a
+hold the microphone is open exactly while a finger is on the button, and closes on every one of
+`PointerHoldDirective`'s six release paths plus a hidden page and `DestroyRef`. That is a *physical*
+bound, and a stricter one than the model it replaces — the old toggle could hold the microphone for
+a further 12 s after the farmer's last word. D-23 is amended, not overturned. The change is also
+forced by the gesture: with `continuous = false` the engine ends at the first pause, so a farmer
+who drew breath mid-sentence lost the rest while still visibly holding the button.
+
+**Why the timeout survives, at 30 s.** It is no longer what normally stops a listen — the release
+is — so it is demoted to a leak guard for an engine that never reports its own end. 30 s is
+`intake.maxAudioSeconds`, so one hold means the same maximum everywhere in the application.
+Expressing it as `maxAudioSeconds * msPerSecond` and deleting `listenTimeoutMs` was considered and
+rejected: a value change is a smaller edit to a frozen file than a removal, and the spec asserts the
+two are equal so they cannot drift apart silently.
+
+**The release-before-start race, which the gesture introduced.** A quick press can call `stop()`
+before the engine has acknowledged `start()`; stopping an engine that has not started either throws
+or lets it start afterwards and stay open — an open microphone with no control on screen. `stop()`
+now records the request and returns, and `onstart` applies it the moment there is an engine to
+stop. A minimum-hold timer was rejected as a guess about engine latency on an unknown device. A
+too-short press therefore yields an empty transcript, which the existing guard already discards, so
+the farmer sees nothing happen rather than an error they cannot act on.
+
+**Why a shared component rather than a written rule.** The three call sites duplicated the same
+button shell, the same 24×24 glyph and about twenty lines of CSS each, and the drifted one was the
+only mic in the app with **no accessible name at all** — its single child was `aria-hidden`. The
+extracted `<foshol-hold-to-talk>` makes `labelKey` a required input, so that particular defect can
+no longer be written; and there is no way to render a microphone through it without the gesture.
+`OWNERS.md` is amended because the A-kit glob enumerates `shared/ui` directories by name, so a new
+one would otherwise be owned by nobody.
+
+**Cost, stated plainly.** The describe and land mics gain the FAQ recorder's pulsing held ring in
+place of a static one — a deliberate visual change, disarmed by the global `prefers-reduced-motion`
+rule, leaving the clay fill which still reads.
