@@ -46,7 +46,9 @@
       <select class="ac-select" data-testid="cases-filter-crop" [value]="filters().cropCode ?? ''" (change)="onCrop($event)">
         <option value="">{{ 'admin.cases.filters.crop.any' | translate }}</option>
         @for (crop of crops(); track crop.code) {
-          <option [value]="crop.code">{{ crop.nameBn }}</option>
+          <option [value]="crop.code">
+            {{ crop.nameBn | contentText: crop.nameEn : crop.nameEnFallback : locale() }}
+          </option>
         }
       </select>
     </label>

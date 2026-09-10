@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import type { ComputedDose } from '../../../generated/models/computed-dose';
 import type { Remedy } from '../../../generated/models/remedy';
 import { RemedyTypeIcon } from '../../../shared/ui/pictogram/remedy-type-icon';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { remedyId } from '../review-task.adapter';
+import { LanguageStore } from '../../../core/i18n/language-store';
+import { pickRemedyContent, type RemedyContentView } from '../../../shared/pipes/content-locale';
+import { BnMarker } from '../../../shared/ui/bn-value/bn-marker';
 
 /**
  * `WEB-FR-231` — the remedy editor, pre-filled with the active remedies of the selected
@@ -34,13 +37,26 @@ const EMPTY_DOSES: ReadonlyMap<string, ComputedDose> = new Map();
 @Component({
   selector: 'foshol-remedy-editor',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RemedyTypeIcon, Skeleton, TranslatePipe],
+  imports: [RemedyTypeIcon, Skeleton, TranslatePipe, BnMarker],
   templateUrl: './remedy-editor.html',
   styleUrl: './remedy-editor.css',
   host: { class: 'block' },
 })
 export class RemedyEditor {
+  private readonly language = inject(LanguageStore);
+
   readonly remedies = input.required<readonly Remedy[]>();
+
+  /** Both locales ride on each remedy, so the toggle re-reads this without a refetch. */
+  protected readonly rows = computed<readonly { remedy: Remedy; content: RemedyContentView }[]>(
+    () => {
+      const locale = this.language.current();
+      return this.remedies().map((remedy) => ({
+        remedy,
+        content: pickRemedyContent(remedy, locale),
+      }));
+    },
+  );
   readonly selectedIds = input.required<readonly string[]>();
   readonly note = input('');
   /** True while the claim is not live: the text stays, the controls stop. */

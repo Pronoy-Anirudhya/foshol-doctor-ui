@@ -27,41 +27,56 @@
   <p class="empty">{{ 'officer.remedy.none' | translate }}</p>
 } @else {
   <ul class="remedies">
-    @for (remedy of remedies(); track identity(remedy)) {
+    @for (row of rows(); track identity(row.remedy)) {
       <li
         class="remedy"
-        [attr.data-selected]="isSelected(remedy)"
-        [attr.data-remedy-id]="identity(remedy)"
+        [attr.data-selected]="isSelected(row.remedy)"
+        [attr.data-remedy-id]="identity(row.remedy)"
       >
         <label class="remedy-pick touch-target">
           <input
             type="checkbox"
             class="tick"
             data-testid="remedy-tick"
-            [checked]="isSelected(remedy)"
+            [checked]="isSelected(row.remedy)"
             [disabled]="disabled()"
-            (change)="onToggle(remedy)"
+            (change)="onToggle(row.remedy)"
           />
           <span class="sr-only">{{ 'officer.remedy.include' | translate }}</span>
-          <foshol-remedy-type-icon [type]="remedy.type" size="sm" />
-          <span class="remedy-title">{{ remedy.titleBn }}</span>
+          <foshol-remedy-type-icon [type]="row.remedy.type" size="sm" />
+          <span class="remedy-title">
+            {{ row.content.title.text }}
+            @if (row.content.title.marked) {
+              <foshol-bn-marker />
+            }
+          </span>
         </label>
 
         <p class="steps-label">{{ 'officer.remedy.steps' | translate }}</p>
         <ol class="steps">
-          @for (step of remedy.stepsBn; track $index) {
-            <li>{{ step }}</li>
+          @for (step of row.content.steps.items; track $index) {
+            <li>
+              {{ step }}
+              @if (row.content.steps.marked && $last) {
+                <foshol-bn-marker />
+              }
+            </li>
           }
         </ol>
 
         <dl class="remedy-meta">
-          @if (remedy.dosageBn) {
+          @if (row.content.dosage; as dosage) {
             <div>
               <dt>{{ 'officer.remedy.dosage' | translate }}</dt>
-              <dd>{{ remedy.dosageBn }}</dd>
+              <dd>
+                {{ dosage.text }}
+                @if (dosage.marked) {
+                  <foshol-bn-marker />
+                }
+              </dd>
             </div>
           }
-          @if (doseFor(remedy); as dose) {
+          @if (doseFor(row.remedy); as dose) {
             <!-- WEB-NFR-001 — the server's own sum, rendered as received. Nothing here
                  multiplies an area by a rate; an invented dosage is harm, not a bug. -->
             <div class="dose" data-testid="computed-dose">
@@ -82,17 +97,17 @@
               </dd>
             </div>
           }
-          @if (remedy.phiDays !== null && remedy.phiDays !== undefined) {
+          @if (row.remedy.phiDays !== null && row.remedy.phiDays !== undefined) {
             <div>
               <dt>{{ 'officer.remedy.phi' | translate }}</dt>
               <dd class="tabular">
-                {{ 'officer.remedy.phiValue' | translate: { days: remedy.phiDays } }}
+                {{ 'officer.remedy.phiValue' | translate: { days: row.remedy.phiDays } }}
               </dd>
             </div>
           }
           <div>
             <dt>{{ 'officer.remedy.source' | translate }}</dt>
-            <dd class="source font-latin">{{ remedy.sourceRef }}</dd>
+            <dd class="source font-latin">{{ row.remedy.sourceRef }}</dd>
           </div>
         </dl>
       </li>

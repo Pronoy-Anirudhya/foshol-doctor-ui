@@ -20,6 +20,8 @@ import { Paginator } from '../../../shared/ui/paginator/paginator';
 import { taskPath } from '../../officer/officer-paths';
 import type { RejectionReason } from '../../officer/officer-facade';
 import { QueueRejectFields, rejectReady } from '../../officer/queue/queue-reject-fields';
+import { LanguageStore } from '../../../core/i18n/language-store';
+import { ContentTextPipe } from '../../../shared/pipes/content-locale.pipe';
 import {
   AdminCasesStore,
   type AdminCasesDecisionPath,
@@ -51,6 +53,7 @@ const NONE = 0;
   imports: [
     RouterLink,
     TranslatePipe,
+    ContentTextPipe,
     DhakaDateTimePipe,
     Percent1Pipe,
     DecisionPathBadge,
@@ -65,6 +68,7 @@ const NONE = 0;
   host: { class: 'block' },
 })
 export class AdminCasesSection {
+  private readonly language = inject(LanguageStore);
   private readonly admin = inject(AdminService);
   private readonly review = inject(ReviewService);
   private readonly knowledge = inject(KnowledgeService);
@@ -72,6 +76,9 @@ export class AdminCasesSection {
 
   /** Fired after a bulk reject completes (even partially) — the dashboard also refreshes stats. */
   readonly rejected = output<void>();
+
+  /** Passed to the pure content pipe so the toggle re-evaluates it (WEB-UX-012). */
+  protected readonly locale = this.language.current;
 
   protected readonly NONE = NONE;
   protected readonly maxSize = APP_CONFIG.review.bulkMaxSize;

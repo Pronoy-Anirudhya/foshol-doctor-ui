@@ -46,6 +46,9 @@ import { CandidateList } from './candidate-list';
 import { ClaimTimerRing } from './claim-timer-ring';
 import { RemedyEditor } from './remedy-editor';
 import { TransferPanel } from './transfer-panel';
+import { LanguageStore } from '../../../core/i18n/language-store';
+import { pickContent } from '../../../shared/pipes/content-locale';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 
 /**
  * The case workspace — where the human approval gate actually happens.
@@ -88,6 +91,7 @@ const BUTTON_BASE =
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AnalysisModeBadge,
+    BnValue,
     AudioPlayer,
     CandidateList,
     ClaimTimerRing,
@@ -115,6 +119,7 @@ export class CaseWorkspacePage {
   /** Bound from the `:taskId` route parameter by `withComponentInputBinding()`. */
   readonly taskId = input.required<string>();
 
+  private readonly language = inject(LanguageStore);
   protected readonly facade = inject(OfficerFacade);
   protected readonly store = inject(CaseReviewStore);
   private readonly sse = inject(SseStore);
@@ -183,7 +188,16 @@ export class CaseWorkspacePage {
     const diseaseId = this.draft().diseaseId;
     if (diseaseId === null) return '';
     const disease = this.facade.diseases().find((entry) => entry.id === diseaseId);
-    if (disease !== undefined) return disease.nameBn;
+    if (disease !== undefined) {
+      // `Disease` carries both locales, so this follows the toggle without a refetch.
+      return pickContent(
+        disease.nameBn,
+        disease.nameEn,
+        disease.nameEnFallback,
+        this.language.current(),
+      ).text;
+    }
+    // `Candidate.diseaseNameBn` has no English sibling in the contract — Bangla, unmarked.
     const candidate = this.store.candidates().find((entry) => entry.diseaseId === diseaseId);
     return candidate?.diseaseNameBn ?? '';
   });

@@ -85,56 +85,67 @@
 
     <ul class="grid list-none gap-4 p-0">
       <!-- Order received is order rendered; nothing here sorts (WEB-FR-156, WEB-NFR-001). -->
-      @for (remedy of advisory().remedies; track remedyKey(remedy, $index)) {
+      @for (row of remedyRows(); track remedyKey(row.remedy, $index)) {
         <li
           class="rounded-2xl border border-surface-3 bg-surface-0 p-4"
           data-testid="advisory-remedy"
         >
           <div class="flex items-center gap-3">
-            <foshol-remedy-type-icon [type]="remedy.type" size="md" />
-            <h5 class="m-0 text-lg font-bold">{{ remedy.titleBn }}</h5>
+            <foshol-remedy-type-icon [type]="row.remedy.type" size="md" />
+            <h5 class="m-0 text-lg font-bold">
+              {{ row.content.title.text }}
+              @if (row.content.title.marked) {
+                <foshol-bn-marker />
+              }
+            </h5>
           </div>
 
           <!-- WEB-UX-032 — steps beside the remedy's meta once there is room for both. -->
           <div class="mt-3.5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_17rem] xl:gap-7">
             <ol class="ad-steps m-0 grid list-none gap-2.5 p-0" data-testid="advisory-steps">
-              @for (step of remedy.stepsBn; track $index) {
+              @for (step of row.content.steps.items; track $index) {
                 <li class="ad-step relative min-h-8 ps-10 text-base leading-relaxed md:text-lg">
                   {{ step }}
+                  @if (row.content.steps.marked && $last) {
+                    <foshol-bn-marker />
+                  }
                 </li>
               }
             </ol>
 
             <dl class="m-0 grid content-start gap-2.5">
-              @if (remedy.dosageBn) {
+              @if (row.content.dosage; as dosage) {
                 <div class="rounded-xl bg-surface-1 px-3 py-2.5">
                   <dt class="text-xs font-bold text-ink-muted">
                     {{ 'farmer.advisory.dosage' | translate }}
                   </dt>
                   <!-- Never reformatted. The units are the server's (COMMON-CON-003). -->
                   <dd class="mt-1 mb-0 ms-0 text-base font-semibold text-ink">
-                    {{ remedy.dosageBn }}
+                    {{ dosage.text }}
+                    @if (dosage.marked) {
+                      <foshol-bn-marker />
+                    }
                   </dd>
                 </div>
               }
 
-              @if (remedy.phiDays !== null && remedy.phiDays !== undefined) {
+              @if (row.remedy.phiDays !== null && row.remedy.phiDays !== undefined) {
                 <!-- WEB-FR-157 — a labelled field, with the value exactly as supplied. -->
                 <div class="ad-meta-phi rounded-xl px-3 py-2.5" data-testid="advisory-phi">
                   <dt class="text-xs font-bold">{{ 'farmer.advisory.phiLabel' | translate }}</dt>
                   <dd class="mt-1 mb-0 ms-0 text-base font-semibold">
-                    {{ 'farmer.advisory.phiValue' | translate: { days: remedy.phiDays } }}
+                    {{ 'farmer.advisory.phiValue' | translate: { days: row.remedy.phiDays } }}
                   </dd>
                 </div>
               }
 
-              @if (remedy.sourceRef) {
+              @if (row.remedy.sourceRef) {
                 <div class="rounded-xl bg-surface-1 px-3 py-2.5">
                   <dt class="text-xs font-bold text-ink-muted">
                     {{ 'farmer.advisory.source' | translate }}
                   </dt>
                   <dd class="mt-1 mb-0 ms-0 text-sm break-words text-ink-muted">
-                    {{ remedy.sourceRef }}
+                    {{ row.remedy.sourceRef }}
                   </dd>
                 </div>
               }
@@ -198,11 +209,20 @@
                   <p class="mt-2 mb-0 font-bold">{{ prior.diseaseNameBn }}</p>
                 }
                 @for (remedy of prior.remedies; track remedyKey(remedy, $index)) {
-                  <p class="mt-3 mb-1.5 font-semibold">{{ remedy.titleBn }}</p>
+                  @let priorView = priorContent(remedy);
+                  <p class="mt-3 mb-1.5 font-semibold">
+                    {{ priorView.title.text }}
+                    @if (priorView.title.marked) {
+                      <foshol-bn-marker />
+                    }
+                  </p>
                   <ol class="ad-steps m-0 grid list-none gap-2 p-0">
-                    @for (step of remedy.stepsBn; track $index) {
+                    @for (step of priorView.steps.items; track $index) {
                       <li class="ad-step relative min-h-8 ps-10 text-sm leading-relaxed">
                         {{ step }}
+                        @if (priorView.steps.marked && $last) {
+                          <foshol-bn-marker />
+                        }
                       </li>
                     }
                   </ol>

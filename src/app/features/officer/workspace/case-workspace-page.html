@@ -473,7 +473,13 @@
                     [disabled]="!canAct()"
                     (change)="chooseDisease(disease.id)"
                   />
-                  <span class="disease-name">{{ disease.nameBn }}</span>
+                  <span class="disease-name">
+                    <foshol-bn-value
+                      [bn]="disease.nameBn"
+                      [en]="disease.nameEn"
+                      [fallback]="disease.nameEnFallback"
+                    />
+                  </span>
                   @if (disease.id === draft().diseaseId) {
                     <span class="current">{{ 'officer.replace.current' | translate }}</span>
                   }

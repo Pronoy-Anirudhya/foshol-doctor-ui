@@ -16,6 +16,9 @@ import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
 import { RemedyTypeIcon } from '../../../shared/ui/pictogram/remedy-type-icon';
 import { SeverityBadge } from '../../../shared/ui/severity-badge/severity-badge';
 import { VerifiedStamp } from './verified-stamp';
+import { LanguageStore } from '../../../core/i18n/language-store';
+import { pickRemedyContent, type RemedyContentView } from '../../../shared/pipes/content-locale';
+import { BnMarker } from '../../../shared/ui/bn-value/bn-marker';
 
 /**
  * Demo beat 5, and the screen the whole system exists to produce.
@@ -49,12 +52,20 @@ const FIRST_VERSION = 1;
 @Component({
   selector: 'foshol-advisory-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, DhakaDateTimePipe, RemedyTypeIcon, SeverityBadge, VerifiedStamp],
+  imports: [
+    TranslatePipe,
+    DhakaDateTimePipe,
+    RemedyTypeIcon,
+    SeverityBadge,
+    VerifiedStamp,
+    BnMarker,
+  ],
   host: { class: 'block' },
   templateUrl: './advisory-card.html',
   styleUrl: './advisory-card.css',
 })
 export class AdvisoryCard {
+  private readonly language = inject(LanguageStore);
   private readonly knowledge = inject(KnowledgeService);
   private readonly review = inject(ReviewService);
 
@@ -65,6 +76,23 @@ export class AdvisoryCard {
   protected readonly historyOpen = this._historyOpen.asReadonly();
 
   protected readonly isRevised = computed(() => this.advisory().version > FIRST_VERSION);
+
+  /**
+   * `Advisory.remedies` is the generated `Remedy`, which carries both locales, so the toggle
+   * re-reads these. The advisory's OWN prose — `diseaseNameBn`, `officerNoteBn` — has no English
+   * sibling in the contract and stays Bangla (`WEB-UX-016`: never invent English).
+   */
+  protected readonly remedyRows = computed(() => {
+    const locale = this.language.current();
+    return this.advisory().remedies.map((remedy) => ({
+      remedy,
+      content: pickRemedyContent(remedy, locale),
+    }));
+  });
+
+  protected priorContent(remedy: Parameters<typeof pickRemedyContent>[0]): RemedyContentView {
+    return pickRemedyContent(remedy, this.language.current());
+  }
 
   /**
    * The severity of the disease the officer settled on. `diseaseId` is nullable in the
