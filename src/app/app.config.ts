@@ -7,7 +7,7 @@ import {
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { ApiConfiguration } from './generated/api-configuration';
-import { APP_CONFIG } from './core/config/app-config';
+import { apiBaseUrl } from './core/config/runtime-config';
 import { acceptLanguageInterceptor } from './core/http/accept-language.interceptor';
 import { authInterceptor } from './core/http/auth.interceptor';
 import { correlationIdInterceptor } from './core/http/correlation-id.interceptor';
@@ -64,6 +64,9 @@ export const appConfig: ApplicationConfig = {
     },
 
     // The generated client's single base URL. Paths already carry /api/v1, so this must NOT.
-    { provide: ApiConfiguration, useValue: { rootUrl: APP_CONFIG.api.origin } satisfies ApiConfiguration },
+    // Read at module scope, which is safe: /env.js is a classic script and has already run.
+    // An empty string here is deliberate and means "same origin" — `RequestBuilder` builds
+    // `this.rootUrl + path`, so '' yields '/api/v1/…' and the reverse proxy decides the host.
+    { provide: ApiConfiguration, useValue: { rootUrl: apiBaseUrl() } satisfies ApiConfiguration },
   ],
 };

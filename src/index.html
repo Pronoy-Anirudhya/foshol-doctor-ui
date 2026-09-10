@@ -20,6 +20,14 @@
     />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+    <!--
+      Runtime deployment configuration. A CLASSIC script, deliberately: it must run to completion
+      before the module bundle's first module-scope initialiser, which is exactly what a classic
+      (non-deferred) script does and what `type="module"` would not. public/env.js ships an empty
+      object so a dev server falls back to APP_CONFIG.api.origin; the container serves its own
+      with `Cache-Control: no-store`.
+    -->
+    <script src="env.js"></script>
   </head>
   <body>
     <foshol-root></foshol-root>

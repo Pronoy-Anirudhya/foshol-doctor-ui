@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { SessionStore } from '../auth/session-store';
-import { APP_CONFIG } from '../config/app-config';
+import { apiOrigin } from '../config/runtime-config';
 import { isApiOriginUrl } from '../http/auth.interceptor';
 import { AnalysisService } from '../../generated/services/analysis.service';
 
@@ -129,6 +129,6 @@ export class GradcamService {
       CASE_ID_TOKEN,
       encodeURIComponent(caseId),
     );
-    return new URL(path, APP_CONFIG.api.origin).toString();
+    return new URL(path, apiOrigin()).toString();
   }
 }

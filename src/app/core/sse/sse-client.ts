@@ -1,6 +1,7 @@
 import { DestroyRef, effect, inject, Injectable } from '@angular/core';
 import { SessionStore } from '../auth/session-store';
 import { APP_CONFIG } from '../config/app-config';
+import { apiBaseUrl } from '../config/runtime-config';
 import { nextDelayMs, type SseBackoffConfig } from './sse-backoff';
 import { SseDispatcher } from './sse-dispatcher';
 import { SseFrameDecoder, type SseFrame } from './sse-parser';
@@ -124,7 +125,7 @@ export class SseClient {
       // Only sent once the server has given us an id to resume from (handover §10).
       if (this.#lastEventId !== null) headers[HEADER_LAST_EVENT_ID] = this.#lastEventId;
 
-      const response = await this.fetchFn(APP_CONFIG.api.origin + APP_CONFIG.api.streamPath, {
+      const response = await this.fetchFn(apiBaseUrl() + APP_CONFIG.api.streamPath, {
         headers,
         signal: controller.signal,
         credentials: 'omit',
