@@ -1,6 +1,7 @@
 import { inject, Pipe, type PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import type { Locale } from '../../core/config/app-config';
+import { appendMarker } from './content-locale';
 
 /**
  * WEB-UX-015 — a content field whose sibling `<field>Fallback` flag is `true`
@@ -32,8 +33,7 @@ export class BnFallbackPipe implements PipeTransform {
   ): string {
     const text = value ?? '';
     // In Bangla the value is already the language of record, so the marker says nothing.
-    if (text.length === 0 || fallback !== true || locale === BANGLA) return text;
-    const marker: unknown = this.translate.instant(MARKER_KEY);
-    return typeof marker === 'string' && marker.length > 0 ? `${text} ${marker}` : text;
+    const marked = text.length > 0 && fallback === true && locale !== BANGLA;
+    return appendMarker(text, marked, this.translate.instant(MARKER_KEY));
   }
 }
