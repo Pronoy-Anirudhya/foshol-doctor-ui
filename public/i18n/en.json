@@ -206,6 +206,8 @@
   "auth.farmer.devFixedNotice": "This session is using a fixed verification code",
   "auth.farmer.expired": "That code has expired. Request a new one.",
   "auth.farmer.expiresIn": "Code expires in {{time}}",
+  "auth.farmer.notRegistered.detail": "No farmer is registered with this mobile number. Check the number, or ask the field officer you bought seed from to register you.",
+  "auth.farmer.notRegistered.title": "This number is not registered",
   "auth.farmer.officerLink": "Field officer or admin? Sign in here",
   "auth.farmer.phoneHint": "Bangladeshi mobile number, with the country code",
   "auth.farmer.phoneInvalid": "Enter a valid Bangladeshi mobile number",

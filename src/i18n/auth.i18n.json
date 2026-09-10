@@ -111,6 +111,14 @@
     "bn": "সঠিক বাংলাদেশি মোবাইল নম্বর দিন",
     "en": "Enter a valid Bangladeshi mobile number"
   },
+  "auth.farmer.notRegistered.title": {
+    "bn": "এই নম্বরটি নিবন্ধিত নয়",
+    "en": "This number is not registered"
+  },
+  "auth.farmer.notRegistered.detail": {
+    "bn": "এই মোবাইল নম্বরে কোনো কৃষক নিবন্ধিত নেই। নম্বরটি আবার দেখে নিন, অথবা যে মাঠ কর্মকর্তার কাছ থেকে বীজ নিয়েছেন তাঁকে নিবন্ধন করে দিতে বলুন।",
+    "en": "No farmer is registered with this mobile number. Check the number, or ask the field officer you bought seed from to register you."
+  },
   "auth.farmer.phoneLabel": {
     "bn": "মোবাইল নম্বর",
     "en": "Mobile number"
