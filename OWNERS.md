@@ -26,7 +26,7 @@ openapi/foshol-api.yaml   output of scripts/sync-openapi.mjs
 |---|---|---|
 | **A-http** | `core/http/**`, `core/errors/**` | `WEB-FR-005/006/013/401`, `WEB-SEC-002/003`, `WEB-API-002`, `WEB-TEST-006` |
 | **A-auth** | `core/auth/{auth.guard,role.guard,auth-facade}.ts`, `features/auth/**` | `WEB-FR-001/002/003/010`–`013`, `WEB-SEC-001/004/006` |
-| **A-kit** | `shared/ui/{app-shell,app-header,lang-toggle,sse-indicator,toast-host,live-region,offline-banner,error-panel,spinner,skeleton,empty-state,paginator,copy-button,page-heading,pictogram,bn-value}/**`, `shared/pipes/**`, `shared/directives/**`, `app.ts/html/css`, `index.html` | `WEB-FR-357/400/402`, `WEB-UX-012/015/041/042/046`, `WEB-API-003`, `WEB-DATA-006`, `WEB-SEC-006` |
+| **A-kit** | `shared/ui/{app-shell,app-header,lang-toggle,sse-indicator,toast-host,live-region,offline-banner,error-panel,spinner,skeleton,empty-state,paginator,copy-button,page-heading,pictogram,bn-value,hold-to-talk}/**`, `shared/pipes/**`, `shared/directives/**`, `app.ts/html/css`, `index.html` | `WEB-FR-357/400/402`, `WEB-UX-012/015/041/042/046`, `WEB-API-003`, `WEB-DATA-006`, `WEB-SEC-006` |
 | **B-primitives** | `shared/ui/{confidence-bar,decision-path-badge,analysis-mode-badge,severity-badge,matcher-chip,candidate-source-chip,status-stepper}/**` | `WEB-FR-152/214/215/216/220`–`224`, `WEB-NFR-011`, **`WEB-TEST-001`** |
 | **B-sse-stores** | `core/sse/**`, `core/stores/**`, `testing/harness/**` | `WEB-FR-200/204/350`–`359`, `WEB-DATA-002/004/005`, **`WEB-TEST-004/005`** |
 | **B-media** | `core/media/**`, `shared/ui/{secure-image,image-zoom,audio-player,gradcam-view}/**` | `WEB-FR-154/210`–`213`, `WEB-SEC-003` |
