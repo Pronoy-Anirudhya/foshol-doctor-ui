@@ -22,6 +22,7 @@ tags:
   - name: auth
   - name: farmers
   - name: knowledge
+  - name: faq
   - name: cases
   - name: analysis
   - name: review
@@ -328,6 +329,48 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/SymptomRef' }
+
+  # ── farmer FAQ (catalogue voice lookup; not a case advisory) ───────────
+  /api/v1/faq/voice-search:
+    post:
+      tags: [faq]
+      operationId: voiceSearchFaq
+      summary: Farmer voice lookup of registered KDB diseases (role FARMER)
+      description: >
+        Transcribes speech and returns ranked catalogue disease candidates only.
+        Does not create a diagnosis case, does not publish an advisory, and does
+        not return remedy text. After the farmer confirms a diseaseId, load remedies
+        from GET /api/v1/diseases/{diseaseId}/remedies.
+      parameters:
+        - name: preferred_language
+          in: query
+          required: false
+          schema: { type: string, default: bn, enum: [bn, en] }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [cropId, audio]
+              properties:
+                cropId: { type: string, format: uuid }
+                audio: { type: string, format: binary }
+      responses:
+        '200':
+          description: Catalogue candidates (possibly inconclusive)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VoiceSearchResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422':
+          description: Audio could not be decoded or embedding was the wrong width
+          content: { application/problem+json: { schema: { $ref: '#/components/schemas/Problem' } } }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
   # ── cases ─────────────────────────────────────────────────────────────────
   /api/v1/cases:
@@ -1157,6 +1200,27 @@ components:
           enum: [PER_DECIMAL, PER_SQ_M, PER_HECTARE, PER_ACRE, PER_SQ_FT, FIXED]
         fromArea:     { type: number, nullable: true }
         fromAreaUnit: { type: string, nullable: true, enum: [DECIMAL, SQ_M, SQ_FT, HECTARE, ACRE] }
+
+    VoiceSearchResult:
+      type: object
+      required: [transcription, asrConfidence, candidates, inconclusive]
+      properties:
+        transcription: { type: string }
+        asrConfidence: { type: number, format: float }
+        candidates:
+          type: array
+          items: { $ref: '#/components/schemas/VoiceSearchCandidate' }
+        inconclusive: { type: boolean }
+
+    VoiceSearchCandidate:
+      type: object
+      required: [diseaseId, code, nameBn, score, matcher]
+      properties:
+        diseaseId: { type: string, format: uuid }
+        code: { type: string }
+        nameBn: { type: string }
+        score: { type: number, format: float }
+        matcher: { type: string, enum: [NAME, VECTOR, FUZZY] }
 
     SymptomRef:
       type: object

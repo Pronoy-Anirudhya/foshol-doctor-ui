@@ -1,0 +1,103 @@
+.faq-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-teal-300);
+  border-radius: var(--radius-card);
+  background: var(--color-accent-soft);
+  font-size: 0.9375rem;
+  color: var(--color-teal-700);
+}
+
+.faq-disclaimer-link {
+  font-weight: 700;
+  color: var(--color-teal-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.faq-panel {
+  padding: 1.1rem;
+  border: 1px solid var(--color-surface-3);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface-0);
+  box-shadow: var(--shadow-card);
+}
+
+.faq-panel-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.faq-heard-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+/* The transcript is quoted, indented and italic-free: it reads as "this is what you said",
+   which is exactly what it is, and never as a finding about the field. */
+.faq-heard {
+  margin: 0.35rem 0 0;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 3px solid var(--color-surface-3);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+.faq-heard-meta {
+  margin: 0.45rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-ink-faint);
+}
+
+.faq-section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.faq-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.2rem;
+  border-radius: var(--radius-control);
+  background: var(--color-paddy-600);
+  font-weight: 700;
+  color: var(--color-ink-invert);
+  box-shadow: var(--shadow-stamp);
+}
+
+.faq-cta-quiet {
+  border: 1px solid var(--color-surface-3);
+  background: var(--color-surface-0);
+  color: var(--color-ink);
+  box-shadow: none;
+}
+
+.faq-link-button {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.25rem;
+  font-weight: 700;
+  color: var(--color-paddy-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.faq-footnote {
+  margin: 1.25rem 0 0;
+  padding-block-start: 0.9rem;
+  border-block-start: 1px dashed var(--color-surface-3);
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+}

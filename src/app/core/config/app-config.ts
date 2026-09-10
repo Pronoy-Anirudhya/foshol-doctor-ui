@@ -259,6 +259,24 @@ export const APP_CONFIG = {
     slaDueSoonMs: 3_600_000, //          PT1H
   },
 
+  /**
+   * The farmer's voice FAQ — a catalogue lookup, NOT a field diagnosis (ADR-0003 keeps every
+   * real diagnosis on `POST /cases` + officer review). No server property backs these: the
+   * timeout shapes one request and the other two shape a control.
+   */
+  faq: {
+    /**
+     * `POST /faq/voice-search` runs Whisper and then a KDB match on the Python sidecar. It is
+     * genuinely slow, so the ceiling is generous — but finite, because a farmer holding a phone
+     * in a field needs an answer or an error, never an indefinite spinner (`WEB-FR-404`).
+     */
+    requestTimeoutMs: 45_000,
+    /** `<foshol-skeleton [count]>` while the candidates are in flight. */
+    candidateSkeletonRows: 3,
+    /** Below this, a typed disease filter matches everything, so it does not filter yet. */
+    diseaseFilterMinChars: 1,
+  },
+
   ui: {
     spinnerDelayMs: 300, //              delay before a loading indicator appears
     toastMs: 6_000,

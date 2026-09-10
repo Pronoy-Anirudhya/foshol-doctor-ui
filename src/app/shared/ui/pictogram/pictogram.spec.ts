@@ -46,7 +46,7 @@ describe('Pictograms (WEB-UX-042, WEB-UX-044)', () => {
       return svg;
     }
 
-    for (const key of ['crop-rice', 'crop-tomato', 'crop-potato']) {
+    for (const key of ['crop-rice', 'crop-tomato', 'crop-potato', 'crop-corn', 'crop-wheat']) {
       it(`draws ${key} with meaningful alternative text`, async () => {
         const svg = await render(key);
         expect(svg.getAttribute('role')).toBe('img');
