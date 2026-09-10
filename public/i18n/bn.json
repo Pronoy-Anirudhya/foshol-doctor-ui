@@ -206,6 +206,8 @@
   "auth.farmer.devFixedNotice": "এখন একটি নির্ধারিত যাচাইকরণ কোড ব্যবহার হচ্ছে",
   "auth.farmer.expired": "কোডের মেয়াদ শেষ হয়ে গেছে। নতুন কোড নিন।",
   "auth.farmer.expiresIn": "কোডের মেয়াদ আছে আর {{time}}",
+  "auth.farmer.notRegistered.detail": "এই মোবাইল নম্বরে কোনো কৃষক নিবন্ধিত নেই। নম্বরটি আবার দেখে নিন, অথবা যে মাঠ কর্মকর্তার কাছ থেকে বীজ নিয়েছেন তাঁকে নিবন্ধন করে দিতে বলুন।",
+  "auth.farmer.notRegistered.title": "এই নম্বরটি নিবন্ধিত নয়",
   "auth.farmer.officerLink": "মাঠ কর্মকর্তা বা প্রশাসক? এখানে প্রবেশ করুন",
   "auth.farmer.phoneHint": "বাংলাদেশি মোবাইল নম্বর, দেশের কোডসহ",
   "auth.farmer.phoneInvalid": "সঠিক বাংলাদেশি মোবাইল নম্বর দিন",

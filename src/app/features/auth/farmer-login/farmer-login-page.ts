@@ -18,6 +18,7 @@ import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { Icon } from '../../../shared/ui/icon/icon';
+import { localiseAuthProblem } from '../shared/auth-error-keys';
 import { AuthShell } from '../shared/auth-shell';
 import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
 import { ProblemNotice } from '../shared/problem-notice';
@@ -410,11 +411,20 @@ export class FarmerLoginPage {
 
   private readonly phoneInputRef = viewChild<ElementRef<HTMLInputElement>>('phoneInput');
 
-  /** One notice at a time: the verification failure on step two, otherwise the send failure. */
+  /**
+   * One notice at a time: the verification failure on step two, otherwise the send failure.
+   *
+   * `localiseAuthProblem` swaps in our own Bangla copy for the codes we have something better to
+   * say about — today just `ERR_FARMER_NOT_FOUND`, the 404 that means this number is not a
+   * registered farmer. Everything else, a verify `401` included, passes through with the server's
+   * own `detail` intact.
+   */
   protected readonly activeProblem = computed(() =>
-    this.onCodeStep()
-      ? (this.facade.verifyState().problem ?? this.facade.requestState().problem)
-      : this.facade.requestState().problem,
+    localiseAuthProblem(
+      this.onCodeStep()
+        ? (this.facade.verifyState().problem ?? this.facade.requestState().problem)
+        : this.facade.requestState().problem,
+    ),
   );
 
   constructor() {
