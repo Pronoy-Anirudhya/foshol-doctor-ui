@@ -740,3 +740,64 @@ independently. The gate is guidance made firmer, not a new invariant.
 `noteBn` and the audio part are both optional on `submitCase`, and `canSubmit` does not consider
 them. It still ticks on the rail when answered; ticking and gating are now two separate inputs on
 `CaptureStep` (`complete`, `required`) precisely so this step can do one without the other.
+
+---
+
+## D-32 · The farmer FAQ voice lookup, and the two frozen files it amended
+
+**What.** A new farmer surface at `/farmer/faq` (`features/farmer/faq/**`), a first-class nav item
+beside "new case", wired to the contract operations `voiceSearchFaq`, `listCrops`,
+`listDiseasesByCrop` and `listRemedies`. Two frozen files were amended to carry it, and one new
+interceptor was registered.
+
+**Why it is not a second capture screen.** ADR-0003 keeps every field diagnosis on
+`POST /cases` → officer → advisory. This path never submits a case, never publishes an advisory,
+and never claims the farmer's own field has anything: it reads catalogue rows a farmer could
+already reach by tapping through a disease list, using speech as a faster index into the same
+public data. The disclaimer saying exactly that is persistent on the page rather than a toast, and
+`faq-store.spec.ts` asserts by URL that no case endpoint is ever touched from this flow.
+
+**The confirmation gate is the whole design.** `POST /faq/voice-search` returns ranked candidates
+and — by the backend's own design — no remedy text. The UI holds that line: `FaqStore.confirm` is
+the only method that calls `listRemedies`, and it runs only from a deliberate tap. Speech
+recognition mishears, and the top candidate of a mishearing is still a confident-looking disease
+name; auto-revealing its chemical dosage would be a safety defect, not a cosmetic one. Asserted
+twice — at the store, and at the page.
+
+**Amendment 1 — `core/config/app-config.ts`** gains a `faq` block: `requestTimeoutMs` (45 s),
+`candidateSkeletonRows`, `diseaseFilterMinChars`. Precedent D-13, D-17, D-25. No server property
+backs any of them; the timeout shapes one request and the other two shape a control.
+
+**Amendment 2 — `app.config.ts`** registers `requestAttemptInterceptor` **first**, ahead of
+`correlationIdInterceptor`. It reads two `HttpContextToken`s and does nothing otherwise, so every
+other request in the application is untouched — asserted as the first case in its spec.
+
+Two things forced that shape. `ng-openapi-gen` forwards exactly one caller-controlled value into a
+generated call, an `HttpContext`, so a per-call timeout or header has nowhere else to live without
+hand-building a request — which would mean hand-writing a URL (`WEB-API-001`). And ASR is slow
+enough that "still working" and "never coming" look identical to a farmer holding a phone in a
+field, so this one request needs a finite ceiling where the rest of the application deliberately
+has none.
+
+`correlationIdInterceptor` documents that the client never mints an id — it quotes back the last
+one the server gave us so a submit → analyse → review chain shares one. That is right for a chain
+and wrong for the start of one. A FAQ lookup is a new interaction on each attempt, and the id
+printed on its failure panel has to belong to that attempt, so `ATTEMPT_CORRELATION_ID` lets the
+caller supply one; the existing interceptor then sees the header already set and leaves it alone.
+
+**Deviation from the brief, recorded.** The request asked for organic-versus-chemical tabs.
+`Remedy['type']` has four values — `CULTURAL | ORGANIC | BIOLOGICAL | CHEMICAL` — so a two-way
+split would either hide two categories or invent a mapping, and inventing an agronomic grouping is
+`COMMON-CON-003`. The chemical rows get their own section because they are the ones carrying a
+pre-harvest interval and a handling obligation; the other three keep their own icon and label
+inside the non-chemical section. Server order is preserved within each.
+
+**Not done, deliberately.** The Web Speech API is not used as a fallback recogniser. It is a
+typing aid on the capture stepper (D-23); using it here would put a second transcriber in front of
+the farmer whose output the backend never sees. When the microphone cannot work — an insecure
+origin, a refused permission, no device, no supported container — or when the ASR sidecar answers
+`503`, or when the match is inconclusive, the page falls back to the typed catalogue over
+`GET /crops/{cropId}/diseases`, which none of those failures affect.
+
+**Unblock.** Nothing is outstanding: the operation is in the frozen contract and the generated
+client, so no hand-written URL exists anywhere in this feature.
