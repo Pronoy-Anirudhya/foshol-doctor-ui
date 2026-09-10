@@ -7,7 +7,7 @@ import {
 } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { BN_CATALOGUE } from '../../../core/i18n/bn-catalogue';
-import { ToastStore, TOAST_SUCCESS } from '../../../core/stores/toast-store';
+import { ToastStore, TOAST_INFO, TOAST_SUCCESS } from '../../../core/stores/toast-store';
 import { ToastHost } from './toast-host';
 
 class BanglaCatalogueLoader extends TranslateLoader {
@@ -60,6 +60,19 @@ describe('ToastHost (WEB-FR-354, WEB-UX-046)', () => {
     expect(toasts.length).toBe(2);
     expect(toasts[0]?.textContent).toContain(SERVER_TITLE);
     expect(toasts[1]?.textContent).toContain(BN_CATALOGUE['shared.empty.title']);
+  });
+
+  it('translates a chrome bodyKey but leaves a server body verbatim (WEB-UX-013, WEB-SEC-005)', async () => {
+    const { fixture, host, store } = await render();
+    store.show({ kind: TOAST_INFO, titleKey: 'shared.empty.title', bodyKey: 'badge.status.ANALYSED' });
+    store.show({ kind: TOAST_SUCCESS, title: SERVER_TITLE, body: '<b>বিস্তারিত</b>' });
+    await fixture.whenStable();
+
+    const toasts = host.querySelectorAll('.toast');
+    expect(toasts[0]?.textContent).toContain(BN_CATALOGUE['badge.status.ANALYSED']);
+    // Server text is interpolated as text: the markup is characters on screen, not an element.
+    expect(host.querySelector('.toast b')).toBeNull();
+    expect(toasts[1]?.textContent).toContain('<b>বিস্তারিত</b>');
   });
 
   it('is dismissible', async () => {
