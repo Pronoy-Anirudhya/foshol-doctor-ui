@@ -710,3 +710,33 @@ and both OTP paths are in `PUBLIC_AUTH_PATHS`, so this `404` clears no session a
 redirect. The 404 is displayed with the catalogue's Bangla copy rather than the server's `detail`,
 because the identity module hardcodes that detail in English and negotiates no language — see
 `features/auth/shared/auth-error-keys.ts`.
+
+---
+
+## D-22 update · Next is gated on the current step's required fields
+
+D-22 recorded the capture deck as a guide rather than a gate. Two of its properties have now been
+withdrawn on request, and this notes the second.
+
+**What changed.** The deck's **Next** button is disabled while the step in front of the farmer is
+missing something the submission actually needs. Three steps gate: crop, photographs, field area —
+exactly what `CaseDraftStore.canSubmit` demands. A disabled Next is accompanied by a stated reason
+(`farmer.capture.stepper.incomplete`) tied to the control with `aria-describedby`, because a dead
+control with no explanation is worse than a live one that fails.
+
+**What deliberately did NOT change: the rail stays free.** Every step remains reachable in one
+press from any other, including while Next is blocked. That is not an oversight — it is what
+`WEB-FR-140`/`141` require, and it is D-22's whole compliance argument: the free-text description
+must be available at all times, so a farmer who has not yet chosen a crop must still be able to
+reach the description box. Gating the rail would have satisfied "cannot progress" more literally
+and broken a requirement doing it.
+
+The practical consequence, stated plainly: a determined farmer can still reach a later step via the
+rail without completing an earlier one. Nothing is lost by that — `canSubmit` is unchanged, Send
+is still gated on both a valid draft and standing on the review step, and the server validates
+independently. The gate is guidance made firmer, not a new invariant.
+
+**Why "describe it" is not among the gated steps.** A description is optional on the wire —
+`noteBn` and the audio part are both optional on `submitCase`, and `canSubmit` does not consider
+them. It still ticks on the rail when answered; ticking and gating are now two separate inputs on
+`CaptureStep` (`complete`, `required`) precisely so this step can do one without the other.
