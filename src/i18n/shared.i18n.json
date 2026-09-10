@@ -231,6 +231,26 @@
     "bn": "এই কেসটি নিষ্পত্তির সময়সীমার কাছাকাছি চলে এসেছে",
     "en": "This case is nearing its resolution deadline"
   },
+  "shared.notifications.queue.analysed": {
+    "bn": "পর্যালোচনার জন্য নতুন কেস এসেছে",
+    "en": "New case ready for review"
+  },
+  "shared.notifications.queue.analysedBody": {
+    "bn": "কেসটি নিতে পর্যালোচনার সারি খুলুন",
+    "en": "Open the review queue to claim it"
+  },
+  "shared.notifications.kind.QUEUE_ARRIVAL": {
+    "bn": "নতুন কাজ",
+    "en": "New work"
+  },
+  "shared.notifications.openQueue": {
+    "bn": "সারিটি খুলুন",
+    "en": "Open the queue"
+  },
+  "shared.notifications.emptyHintOfficer": {
+    "bn": "নতুন কাজ ও সময়সীমার সতর্কতা এখানে জমা থাকবে।",
+    "en": "New review work and deadline warnings are kept here as they arrive."
+  },
   "shared.notifications.kpi.restored": {
     "bn": "{{count}}টি সময়সীমার সতর্কতা আবার তালিকায় আনা হয়েছে",
     "en": "Recovered {{count}} open deadline warnings"
