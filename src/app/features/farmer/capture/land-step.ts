@@ -12,6 +12,7 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import type { CropQuantityUnit, FieldAreaUnit } from '../../../core/stores/case-draft-store';
 import { isEmptyParse, parseBanglaQuantity, type ParsedLandSpeech } from './bangla-quantity';
+import { HoldToTalk } from '../../../shared/ui/hold-to-talk/hold-to-talk';
 import { FieldMetricsPanel } from './field-metrics-panel';
 import { LandSpeech } from './land-speech';
 
@@ -43,29 +44,18 @@ const NO_PULSE: readonly number[] = [];
 @Component({
   selector: 'foshol-land-step',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FieldMetricsPanel, TranslatePipe],
+  imports: [FieldMetricsPanel, HoldToTalk, TranslatePipe],
   host: { class: 'block' },
   template: `
     @if (speech.supported()) {
       <div class="mic-row">
-        <button
-          type="button"
-          class="mic touch-target-lg"
-          data-testid="land-mic"
-          [attr.data-listening]="speech.listening() ? true : null"
-          [attr.aria-pressed]="speech.listening()"
-          (click)="toggle()"
-        >
-          <svg class="mic-glyph" viewBox="0 0 24 24" aria-hidden="true" fill="none">
-            <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
-            <path
-              d="M6 11.5a6 6 0 0012 0M12 17.5V21M9 21h6"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
+        <foshol-hold-to-talk
+          testId="land-mic"
+          labelKey="farmer.capture.land.holdLabel"
+          [active]="speech.listening()"
+          (holdStart)="press()"
+          (holdEnd)="release()"
+        />
 
         <div class="min-w-0 flex-1">
           <!-- The held/idle state changes the WORD as well as the colour (WEB-UX-044). -->
@@ -81,6 +71,15 @@ const NO_PULSE: readonly number[] = [];
           <p class="mic-note">{{ 'farmer.capture.land.transient' | translate }}</p>
         </div>
       </div>
+
+      <!-- WEB-UX-046 — the same sr-only mirror the other two voice panels carry, so a screen
+           reader hears the listen start and stop rather than only seeing it. -->
+      <p class="sr-only" role="status">
+        {{
+          (speech.listening() ? 'farmer.capture.land.listening' : 'farmer.capture.land.speak')
+            | translate
+        }}
+      </p>
 
       @if (speech.transcript(); as heard) {
         <p class="heard" data-testid="land-heard">
@@ -127,34 +126,6 @@ const NO_PULSE: readonly number[] = [];
       border-radius: var(--radius-panel);
       background: var(--color-surface-0);
       box-shadow: var(--shadow-card);
-    }
-
-    .mic {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: none;
-      border-radius: 999px;
-      background: var(--color-paddy-600);
-      color: var(--color-ink-invert);
-      box-shadow: var(--shadow-card);
-      transition:
-        transform var(--duration-2) var(--ease-settle),
-        background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
-    }
-
-    .mic[data-listening] {
-      background: var(--color-clay-600);
-      transform: scale(1.06);
-      box-shadow:
-        0 0 0 8px var(--color-clay-100),
-        var(--shadow-lift);
-    }
-
-    .mic-glyph {
-      inline-size: 2rem;
-      block-size: 2rem;
     }
 
     .mic-state {
@@ -261,13 +232,18 @@ export class LandStep {
     });
   }
 
-  protected toggle(): void {
-    if (this.speech.listening()) {
-      this.speech.stop();
-      return;
-    }
+  /**
+   * Held. `listen()` runs synchronously inside the gesture because Safari gates both
+   * `start()` and the permission prompt on a user gesture — the same constraint `WEB-FR-142`
+   * records for the recorder's `AudioContext`.
+   */
+  protected press(): void {
     this._outcome.set(null);
     this.speech.listen();
+  }
+
+  protected release(): void {
+    this.speech.stop();
   }
 
   #apply(seq: number, text: string): void {

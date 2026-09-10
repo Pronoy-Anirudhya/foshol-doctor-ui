@@ -106,12 +106,20 @@ export const APP_CONFIG = {
    * step guidance, and the land step's dictation pre-fill (`DEVIATIONS.md` D-23). No server
    * property defines these — they are presentation, and both features degrade to silence
    * where the platform has no Bangla voice or no recogniser.
+   *
+   * The dictation is press-and-hold (`DEVIATIONS.md` D-33), so the gesture — not a timer —
+   * decides when the microphone closes.
    */
   speech: {
     recognitionLang: 'bn-BD',
     guideRate: 0.95, //                  a shade under natural pace; the guidance is instructional
     guidePitch: 1.0,
-    listenTimeoutMs: 12_000, //          give the microphone back rather than holding it open
+    /**
+     * A leak guard, NOT a UX rule. The hold bounds the listen and the release paths are
+     * exhaustive, so this only catches an engine that never reports its own end. Matched to
+     * `intake.maxAudioSeconds` so that one hold means the same maximum everywhere in the app.
+     */
+    listenTimeoutMs: 30_000,
     maxAlternatives: 1,
   },
 
