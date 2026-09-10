@@ -117,7 +117,7 @@
   },
   "farmer.capture.field.help": {
     "bn": "আপনার জমির পরিমাণ ভয়েসে বলুন অথবা নিচে লিখে দিন। সঠিক ওষুধের মাত্রা নির্ধারণে জমির নিখুঁত মাপ জরুরি।",
-    "en": "Press the microphone and say how much land you have, or type it in below. The field officer works out the remedy amount from this measurement."
+    "en": "Hold the microphone and say how much land you have, or type it in below. The field officer works out the remedy amount from this measurement."
   },
   "farmer.capture.field.quantityLabel": {
     "bn": "ফসলের পরিমাণ",
@@ -220,8 +220,12 @@
     "en": "No measurement was understood. Please type it in below."
   },
   "farmer.capture.land.speak": {
-    "bn": "মাইক চেপে বলুন",
-    "en": "Press the microphone and speak"
+    "bn": "মাইক চেপে ধরে বলুন",
+    "en": "Hold the microphone and speak"
+  },
+  "farmer.capture.land.holdLabel": {
+    "bn": "চেপে ধরে বলুন — জমি ও ফসলের পরিমাণ",
+    "en": "Hold to say your land and crop amounts"
   },
   "farmer.capture.land.transient": {
     "bn": "এই কথা কেসের সঙ্গে পাঠানো হয় না — শুধু নিচের ঘর ভরতে কাজে লাগে।",

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
-import { PointerHoldDirective } from '../../../shared/directives/pointer-hold.directive';
+import { HoldToTalk } from '../../../shared/ui/hold-to-talk/hold-to-talk';
 import { VoiceRecorder } from './voice-recorder';
 import { WaveformCanvas } from './waveform-canvas';
 
@@ -23,33 +23,20 @@ const PERCENT = 100;
 @Component({
   selector: 'foshol-voice-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PointerHoldDirective, TranslatePipe, WaveformCanvas],
+  imports: [HoldToTalk, TranslatePipe, WaveformCanvas],
   host: { class: 'block' },
   template: `
     @if (recorder.available()) {
       <div class="voice-card" data-testid="voice-panel">
         <div class="flex items-center gap-4">
-          <button
-            type="button"
-            class="record touch-target-lg"
-            data-testid="record-button"
-            fosholPointerHold
-            [attr.data-recording]="recorder.recording() ? true : null"
-            [attr.aria-pressed]="recorder.recording()"
-            [attr.aria-label]="'farmer.capture.voice.holdLabel' | translate"
+          <foshol-hold-to-talk
+            testId="record-button"
+            labelKey="farmer.capture.voice.holdLabel"
+            [active]="recorder.recording()"
+            [busy]="recorder.preparing()"
             (holdStart)="recorder.press()"
             (holdEnd)="recorder.release()"
-          >
-            <svg viewBox="0 0 24 24" class="record-glyph" aria-hidden="true" fill="none">
-              <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
-              <path
-                d="M6 11.5a6 6 0 0012 0M12 17.5V21M9 21h6"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
-          </button>
+          />
 
           <div class="min-w-0 flex-1">
             <p class="voice-state" data-testid="voice-state">{{ stateKey() | translate }}</p>
@@ -101,35 +88,6 @@ const PERCENT = 100;
       border-radius: 1.25rem;
       background: var(--color-surface-0);
       box-shadow: var(--shadow-card);
-    }
-
-    .record {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: none;
-      border-radius: 999px;
-      background: var(--color-paddy-600);
-      color: var(--color-ink-invert);
-      box-shadow: var(--shadow-card);
-      transition:
-        transform var(--duration-2) var(--ease-settle),
-        background-color var(--duration-1) var(--ease-settle),
-        box-shadow var(--duration-2) var(--ease-settle);
-    }
-
-    /* WEB-UX-021 — the held state is unambiguous: bigger, redder, ringed, and captioned. */
-    .record[data-recording] {
-      background: var(--color-clay-600);
-      transform: scale(1.08);
-      box-shadow:
-        0 0 0 8px var(--color-clay-100),
-        var(--shadow-lift);
-    }
-
-    .record-glyph {
-      inline-size: 2rem;
-      block-size: 2rem;
     }
 
     .voice-state {

@@ -46,11 +46,15 @@ blocker in `DEVIATIONS.md` and implement the nearest specified behaviour.
 7. **Never construct an API URL by string concatenation** (`WEB-API-001`). Call the generated
    services. The only exceptions are the SSE stream and the two out-of-contract media
    endpoints, both already built for you in `core/`.
-8. **Never re-implement a backend rule** (`WEB-NFR-001`). Decision path, severity, queue order,
+8. **Every microphone is press-and-hold** (`DEVIATIONS.md` D-33). A voice control is
+   `<foshol-hold-to-talk>` and nothing else — never a tap-to-toggle, never a bare `(click)` that
+   starts listening. The component brings the gesture, the 64 px target (`WEB-UX-021`), the held
+   state and a **required** `labelKey`, so a microphone with no accessible name will not compile.
+9. **Never re-implement a backend rule** (`WEB-NFR-001`). Decision path, severity, queue order,
    claim state and confidence thresholds are rendered as received, never recomputed.
-9. **Only touch files inside your assigned globs.** If you need a change elsewhere, STOP and
+10. **Only touch files inside your assigned globs.** If you need a change elsewhere, STOP and
    report it as an amendment request in your final message. Do not edit it yourself.
-10. **No barrel files.** No `index.ts` anywhere. Deep imports only.
+11. **No barrel files.** No `index.ts` anywhere. Deep imports only.
 
 ## Environment
 

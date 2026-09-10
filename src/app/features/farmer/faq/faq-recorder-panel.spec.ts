@@ -104,7 +104,9 @@ describe('FaqRecorderPanel — the three states, and the one that hides itself',
     const button = host.querySelector<HTMLButtonElement>('[data-testid="faq-record-button"]');
 
     expect(button?.getAttribute('aria-pressed')).toBe('true');
-    expect(button?.getAttribute('data-recording')).toBe('true');
+    // The shared control marks the held state as `data-active` — it is a microphone, not
+    // specifically a recorder, and the land step's dictation renders through the same button.
+    expect(button?.getAttribute('data-active')).toBe('true');
     expect(host.querySelector('[data-testid="faq-recorder-state"]')?.textContent?.trim()).toBe(
       BN_CATALOGUE['farmer.faq.mic.recording'],
     );
