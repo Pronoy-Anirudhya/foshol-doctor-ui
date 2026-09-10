@@ -71,6 +71,10 @@
     "bn": "আমার কেস",
     "en": "My cases"
   },
+  "shared.nav.FARMER.faq": {
+    "bn": "প্রশ্নোত্তর",
+    "en": "FAQ"
+  },
   "shared.nav.FARMER.newCase": {
     "bn": "নতুন কেস",
     "en": "New case"
@@ -322,6 +326,14 @@
   "shared.pictogram.crop.crop-potato": {
     "bn": "আলু",
     "en": "Potato"
+  },
+  "shared.pictogram.crop.crop-corn": {
+    "bn": "ভুট্টার মোচা",
+    "en": "Corn cob"
+  },
+  "shared.pictogram.crop.crop-wheat": {
+    "bn": "গমের শীষ",
+    "en": "Wheat ear"
   },
   "shared.pictogram.crop.generic": {
     "bn": "ফসল",

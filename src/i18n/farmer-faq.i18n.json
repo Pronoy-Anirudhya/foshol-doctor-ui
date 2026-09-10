@@ -1,0 +1,300 @@
+{
+  "farmer.faq.eyebrow": {
+    "bn": "প্রশ্নোত্তর",
+    "en": "FAQ"
+  },
+  "farmer.faq.title": {
+    "bn": "রোগের নাম বলুন, ব্যবস্থা জেনে নিন",
+    "en": "Say the disease name, read the measures"
+  },
+  "farmer.faq.subtitle": {
+    "bn": "রোগটি যদি আপনি আগে থেকেই চেনেন, নাম বলুন — নিবন্ধিত জ্ঞানভাণ্ডারে যা লেখা আছে তা দেখানো হবে।",
+    "en": "If you already know the disease, say its name and we will show what the registered knowledge base says."
+  },
+  "farmer.faq.disclaimer": {
+    "bn": "এটি জ্ঞানভাণ্ডারের তথ্য, আপনার জমির রোগ নির্ণয় নয়। নিশ্চিত না হলে ছবি দিয়ে কেস জমা দিন —",
+    "en": "This is a catalogue entry, not a diagnosis of your field. If you are unsure, submit a photo case —"
+  },
+  "farmer.faq.disclaimerCta": {
+    "bn": "নতুন কেস জমা দিন",
+    "en": "start a new case"
+  },
+
+  "farmer.faq.crop.title": {
+    "bn": "১ · ফসল বাছুন",
+    "en": "1 · Choose the crop"
+  },
+  "farmer.faq.crop.hint": {
+    "bn": "ফসল না বাছা পর্যন্ত প্রশ্ন করা যাবে না।",
+    "en": "You cannot ask a question until a crop is chosen."
+  },
+
+  "farmer.faq.ask.title": {
+    "bn": "২ · প্রশ্ন করুন",
+    "en": "2 · Ask your question"
+  },
+  "farmer.faq.ask.hint": {
+    "bn": "বোতামটি চেপে ধরে রোগের নাম বলুন, তারপর ছেড়ে দিন।",
+    "en": "Hold the button, say the disease name, then let go."
+  },
+
+  "farmer.faq.processing.title": {
+    "bn": "প্রশ্নটি নিয়ে কাজ চলছে…",
+    "en": "Working on your question…"
+  },
+  "farmer.faq.processing.hint": {
+    "bn": "কণ্ঠ থেকে লেখা তৈরি হচ্ছে, তারপর জ্ঞানভাণ্ডারে মিল খোঁজা হবে। একটু সময় লাগতে পারে।",
+    "en": "Turning speech into text, then matching it against the knowledge base. This can take a moment."
+  },
+
+  "farmer.faq.answer.heading": {
+    "bn": "উত্তর",
+    "en": "Answer"
+  },
+  "farmer.faq.answer.heardLabel": {
+    "bn": "আমরা যা শুনেছি",
+    "en": "What we heard"
+  },
+  "farmer.faq.answer.heardNothing": {
+    "bn": "কিছুই বোঝা যায়নি।",
+    "en": "Nothing could be made out."
+  },
+  "farmer.faq.answer.asrConfidence": {
+    "bn": "কণ্ঠ শনাক্তের নির্ভরযোগ্যতা {{score}}%",
+    "en": "Speech recognition confidence {{score}}%"
+  },
+  "farmer.faq.answer.candidatesTitle": {
+    "bn": "সম্ভাব্য রোগ",
+    "en": "Possible diseases"
+  },
+  "farmer.faq.answer.confirmHint": {
+    "bn": "আপনি যেটির কথা বলেছেন সেটিতে চাপ দিন। চাপ না দেওয়া পর্যন্ত কোনো ওষুধ বা মাত্রা দেখানো হবে না।",
+    "en": "Tap the one you meant. No remedy or dosage is shown until you do."
+  },
+
+  "farmer.faq.candidate.scoreLabel": {
+    "bn": "মিলের মাত্রা {{score}}%",
+    "en": "Match score {{score}}%"
+  },
+  "farmer.faq.matcher.NAME": {
+    "bn": "নামে মিলেছে",
+    "en": "Matched by name"
+  },
+  "farmer.faq.matcher.VECTOR": {
+    "bn": "অর্থে মিলেছে",
+    "en": "Matched by meaning"
+  },
+  "farmer.faq.matcher.FUZZY": {
+    "bn": "কাছাকাছি নামে মিলেছে",
+    "en": "Matched by a similar name"
+  },
+
+  "farmer.faq.mic.holdLabel": {
+    "bn": "চেপে ধরে প্রশ্ন বলুন",
+    "en": "Hold to ask your question"
+  },
+  "farmer.faq.mic.idle": {
+    "bn": "চেপে ধরে বলুন",
+    "en": "Hold to speak"
+  },
+  "farmer.faq.mic.preparing": {
+    "bn": "মাইক্রোফোন চালু হচ্ছে…",
+    "en": "Turning on the microphone…"
+  },
+  "farmer.faq.mic.recording": {
+    "bn": "রেকর্ড হচ্ছে…",
+    "en": "Recording…"
+  },
+  "farmer.faq.mic.captured": {
+    "bn": "রেকর্ড হয়েছে — শুনে নিন",
+    "en": "Recorded — listen back"
+  },
+  "farmer.faq.mic.sending": {
+    "bn": "পাঠানো হচ্ছে…",
+    "en": "Sending…"
+  },
+  "farmer.faq.mic.ask": {
+    "bn": "প্রশ্ন পাঠান",
+    "en": "Send question"
+  },
+  "farmer.faq.mic.discard": {
+    "bn": "মুছে আবার বলুন",
+    "en": "Discard and re-record"
+  },
+  "farmer.faq.mic.seconds": {
+    "bn": "সেকেন্ড",
+    "en": "seconds"
+  },
+  "farmer.faq.mic.pickCropFirst": {
+    "bn": "আগে ফসল বাছুন, তারপর বলতে পারবেন।",
+    "en": "Choose a crop first, then you can speak."
+  },
+  "farmer.faq.mic.diagnostic.INSECURE": {
+    "bn": "নিরাপদ সংযোগ (HTTPS) ছাড়া মাইক্রোফোন চালু করা যায় না। নিচের তালিকা থেকে রোগ বেছে নিন।",
+    "en": "The microphone needs a secure (HTTPS) connection. Choose a disease from the list below."
+  },
+  "farmer.faq.mic.diagnostic.UNSUPPORTED": {
+    "bn": "এই ব্রাউজারে রেকর্ড করা যায় না। নিচের তালিকা থেকে রোগ বেছে নিন।",
+    "en": "This browser cannot record. Choose a disease from the list below."
+  },
+  "farmer.faq.mic.diagnostic.NO_CONTAINER": {
+    "bn": "এই ব্রাউজারের অডিও ফরম্যাট সমর্থিত নয়। নিচের তালিকা থেকে রোগ বেছে নিন।",
+    "en": "This browser's audio format is not supported. Choose a disease from the list below."
+  },
+  "farmer.faq.mic.diagnostic.DENIED": {
+    "bn": "মাইক্রোফোন ব্যবহারের অনুমতি পাওয়া যায়নি। নিচের তালিকা থেকে রোগ বেছে নিন।",
+    "en": "Microphone access was not granted. Choose a disease from the list below."
+  },
+  "farmer.faq.mic.diagnostic.NO_DEVICE": {
+    "bn": "কোনো মাইক্রোফোন পাওয়া যায়নি। নিচের তালিকা থেকে রোগ বেছে নিন।",
+    "en": "No microphone was found. Choose a disease from the list below."
+  },
+  "farmer.faq.mic.diagnostic.READY": {
+    "bn": "মাইক্রোফোন প্রস্তুত।",
+    "en": "The microphone is ready."
+  },
+
+  "farmer.faq.noMatch.title": {
+    "bn": "মিল পাওয়া যায়নি",
+    "en": "No match was found"
+  },
+  "farmer.faq.noMatch.detail": {
+    "bn": "আবার বলে দেখুন, অথবা নিচের তালিকা থেকে রোগ বেছে নিন। নিশ্চিত না হলে ছবি দিয়ে কেস জমা দিন।",
+    "en": "Try saying it again, or choose from the list below. If you are unsure, submit a photo case."
+  },
+  "farmer.faq.noMatch.askAgain": {
+    "bn": "আবার বলুন",
+    "en": "Ask again"
+  },
+  "farmer.faq.noMatch.startCase": {
+    "bn": "ছবি দিয়ে কেস জমা দিন",
+    "en": "Submit a photo case"
+  },
+
+  "farmer.faq.browse.open": {
+    "bn": "অথবা তালিকা থেকে বেছে নিন",
+    "en": "Or choose from the list"
+  },
+  "farmer.faq.browse.title": {
+    "bn": "তালিকা থেকে রোগ বাছুন",
+    "en": "Choose a disease from the list"
+  },
+  "farmer.faq.browse.hint": {
+    "bn": "এই ফসলের জন্য নিবন্ধিত রোগগুলো।",
+    "en": "The diseases registered for this crop."
+  },
+  "farmer.faq.browse.label": {
+    "bn": "রোগ খুঁজুন",
+    "en": "Search diseases"
+  },
+  "farmer.faq.browse.placeholder": {
+    "bn": "নাম বা কোড লিখুন",
+    "en": "Type a name or code"
+  },
+  "farmer.faq.browse.loading": {
+    "bn": "তালিকা আসছে…",
+    "en": "Loading the list…"
+  },
+  "farmer.faq.browse.noneForCrop": {
+    "bn": "এই ফসলের জন্য কোনো রোগ নিবন্ধিত নেই।",
+    "en": "No diseases are registered for this crop."
+  },
+  "farmer.faq.browse.noMatch": {
+    "bn": "এই নামে কিছু পাওয়া যায়নি।",
+    "en": "Nothing matches that."
+  },
+
+  "farmer.faq.remedy.eyebrow": {
+    "bn": "নিবন্ধিত ব্যবস্থা",
+    "en": "Registered measures"
+  },
+  "farmer.faq.remedy.sourceNote": {
+    "bn": "নিবন্ধিত জ্ঞানভাণ্ডার থেকে",
+    "en": "From the registered knowledge base"
+  },
+  "farmer.faq.remedy.nonChemicalTitle": {
+    "bn": "রাসায়নিক ছাড়া ব্যবস্থা",
+    "en": "Non-chemical measures"
+  },
+  "farmer.faq.remedy.chemicalTitle": {
+    "bn": "রাসায়নিক ব্যবস্থা",
+    "en": "Chemical measures"
+  },
+  "farmer.faq.remedy.chemicalCaution": {
+    "bn": "রাসায়নিক প্রয়োগের সময় সুরক্ষা সরঞ্জাম ব্যবহার করুন এবং মোড়কের নির্দেশ মেনে চলুন।",
+    "en": "Wear protective equipment when applying chemicals, and follow the instructions on the label."
+  },
+  "farmer.faq.remedy.type.CULTURAL": {
+    "bn": "পরিচর্যাগত",
+    "en": "Cultural"
+  },
+  "farmer.faq.remedy.type.ORGANIC": {
+    "bn": "জৈব",
+    "en": "Organic"
+  },
+  "farmer.faq.remedy.type.BIOLOGICAL": {
+    "bn": "জীবাণুভিত্তিক",
+    "en": "Biological"
+  },
+  "farmer.faq.remedy.type.CHEMICAL": {
+    "bn": "রাসায়নিক",
+    "en": "Chemical"
+  },
+  "farmer.faq.remedy.dosage": {
+    "bn": "মাত্রা",
+    "en": "Dosage"
+  },
+  "farmer.faq.remedy.phiLabel": {
+    "bn": "সংগ্রহের আগে অপেক্ষা",
+    "en": "Pre-harvest interval"
+  },
+  "farmer.faq.remedy.phiValue": {
+    "bn": "{{days}} দিন",
+    "en": "{{days}} days"
+  },
+  "farmer.faq.remedy.source": {
+    "bn": "সূত্র",
+    "en": "Source"
+  },
+  "farmer.faq.remedy.noneTitle": {
+    "bn": "কোনো ব্যবস্থা নিবন্ধিত নেই",
+    "en": "No measures are registered"
+  },
+  "farmer.faq.remedy.noneDetail": {
+    "bn": "এই রোগের জন্য এখনো কোনো ব্যবস্থা যোগ করা হয়নি। ছবি দিয়ে কেস জমা দিলে কর্মকর্তা পরামর্শ দেবেন।",
+    "en": "No measures have been added for this disease yet. Submit a photo case and an officer will advise you."
+  },
+  "farmer.faq.remedy.footnote": {
+    "bn": "উপরের তথ্য নিবন্ধিত জ্ঞানভাণ্ডারের — আপনার জমি দেখে দেওয়া পরামর্শ নয়।",
+    "en": "The text above is from the registered knowledge base — it is not advice given after looking at your field."
+  },
+  "farmer.faq.remedy.askAnother": {
+    "bn": "আরেকটি প্রশ্ন করুন",
+    "en": "Ask another question"
+  },
+  "farmer.faq.remedy.startCase": {
+    "bn": "ছবি দিয়ে কেস জমা দিন",
+    "en": "Submit a photo case"
+  },
+
+  "farmer.faq.announce.searching": {
+    "bn": "প্রশ্ন পাঠানো হয়েছে, উত্তর খোঁজা হচ্ছে",
+    "en": "Question sent, searching for an answer"
+  },
+  "farmer.faq.announce.answered": {
+    "bn": "সম্ভাব্য রোগের তালিকা এসেছে",
+    "en": "Possible diseases are listed"
+  },
+  "farmer.faq.announce.noMatch": {
+    "bn": "কোনো মিল পাওয়া যায়নি",
+    "en": "No match was found"
+  },
+  "farmer.faq.announce.remedies": {
+    "bn": "নিবন্ধিত ব্যবস্থা দেখানো হয়েছে",
+    "en": "The registered measures are shown"
+  },
+  "farmer.faq.announce.failed": {
+    "bn": "প্রশ্নটি পাঠানো যায়নি",
+    "en": "The question could not be sent"
+  }
+}
