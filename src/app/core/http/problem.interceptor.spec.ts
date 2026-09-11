@@ -1,7 +1,7 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter, Router, type Navigation } from '@angular/router';
 import type { Principal } from '../../generated/models/principal';
 import { SessionStore } from '../auth/session-store';
 import { APP_CONFIG } from '../config/app-config';
@@ -126,6 +126,24 @@ describe('problemInterceptor', () => {
       .expectOne(`${API}/api/v1/admin/stats`)
       .flush({}, { status: 401, statusText: 'Unauthorized' });
     await failure;
+    expect(navigate).toHaveBeenCalledWith('/auth/officer');
+  });
+
+  it('on 401 before the first navigation lands, uses the URL being navigated to (D-37)', async () => {
+    // A session restored after a reload makes requests at bootstrap, while Router.url is still `/`.
+    atUrl('/');
+    vi.spyOn(router, 'getCurrentNavigation').mockReturnValue({
+      extractedUrl: router.parseUrl('/officer/queue?page=2'),
+    } as Navigation);
+    const failure = new Promise((resolve) =>
+      http.get(`${API}/api/v1/review/kpi-warnings`).subscribe({ error: resolve }),
+    );
+    backend
+      .expectOne(`${API}/api/v1/review/kpi-warnings`)
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
+    await failure;
+
+    expect(session.intendedUrl()).toBe('/officer/queue?page=2');
     expect(navigate).toHaveBeenCalledWith('/auth/officer');
   });
 

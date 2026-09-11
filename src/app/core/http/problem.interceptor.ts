@@ -33,6 +33,17 @@ function loginFor(currentUrl: string): string {
     : FARMER_LOGIN;
 }
 
+/**
+ * The URL the user is on — or, before the first navigation has ever completed, the one they are
+ * on their way to. A session restored after a reload (`DEVIATIONS.md` D-37) makes requests at
+ * bootstrap, so a `401` can land while `Router.url` is still `/`, which would send an officer to
+ * the farmer login and retain `/` as the route to restore.
+ */
+function attemptedUrl(router: Router): string {
+  const navigation = router.navigated ? null : router.getCurrentNavigation();
+  return navigation ? router.serializeUrl(navigation.extractedUrl) : router.url;
+}
+
 export const problemInterceptor: HttpInterceptorFn = (req, next) => {
   const bus = inject(ErrorBus);
   const session = inject(SessionStore);
@@ -46,7 +57,7 @@ export const problemInterceptor: HttpInterceptorFn = (req, next) => {
       // form shows it inline. Bouncing the user to the login they are already on would erase
       // what they typed and hide the reason.
       if (problem.status === HTTP_STATUS.unauthorised && !isPublicAuthUrl(req.url)) {
-        const attempted = router.url;
+        const attempted = attemptedUrl(router);
         session.rememberIntendedUrl(attempted);
         session.clear();
         void router.navigateByUrl(loginFor(attempted));
