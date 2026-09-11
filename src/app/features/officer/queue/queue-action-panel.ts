@@ -11,7 +11,9 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageStore } from '../../../core/i18n/language-store';
 import type { QueueRowView } from '../../../core/stores/queue-store';
+import { pickContent } from '../../../shared/pipes/content-locale';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { OfficerFacade, type QueueApproval, type RejectionReason } from '../officer-facade';
 import { QueueRejectFields, rejectReady } from './queue-reject-fields';
@@ -123,6 +125,7 @@ export class QueueActionPanel {
   readonly dismiss = output<void>();
 
   protected readonly facade = inject(OfficerFacade);
+  private readonly language = inject(LanguageStore);
 
   protected readonly approval = signal<QueueApproval | null>(null);
   protected readonly loading = signal(false);
@@ -135,7 +138,16 @@ export class QueueActionPanel {
   protected readonly panelId = computed(
     () => `queue-panel-${this.scope()}-${this.view().row.reviewTaskId}-${this.kind()}`,
   );
-  protected readonly diseaseName = computed(() => this.view().row.topDiseaseNameBn ?? '');
+  /** The row carries both locales, so the name the officer is asked to confirm follows the toggle. */
+  protected readonly diseaseName = computed(
+    () =>
+      pickContent(
+        this.view().row.topDiseaseNameBn,
+        this.view().row.topDiseaseNameEn,
+        this.view().row.topDiseaseNameEnFallback,
+        this.language.current(),
+      ).text,
+  );
   protected readonly pending = computed(
     () => this.facade.rowActionTaskId() === this.view().row.reviewTaskId,
   );

@@ -9,7 +9,9 @@ import {
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageStore } from '../../../core/i18n/language-store';
 import type { QueueRowView } from '../../../core/stores/queue-store';
+import { pickContent } from '../../../shared/pipes/content-locale';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Icon } from '../../../shared/ui/icon/icon';
 import { ColleaguePicker } from '../colleague-picker';
@@ -307,6 +309,7 @@ export class QueueBulkBar {
   readonly clearSelection = output<void>();
 
   private readonly facade = inject(OfficerFacade);
+  private readonly language = inject(LanguageStore);
 
   protected readonly bulk = this.facade.bulk;
   protected readonly approvals = signal<readonly QueueApproval[]>([]);
@@ -352,7 +355,12 @@ export class QueueBulkBar {
       return {
         taskId: approval.taskId,
         farmer: match?.row.farmerName ?? '',
-        disease: match?.row.topDiseaseNameBn ?? '',
+        disease: pickContent(
+          match?.row.topDiseaseNameBn,
+          match?.row.topDiseaseNameEn,
+          match?.row.topDiseaseNameEnFallback,
+          this.language.current(),
+        ).text,
         count: approval.remedyIds.length,
       };
     }),

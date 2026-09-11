@@ -131,7 +131,16 @@
                       [caseId]="entry.row.caseId"
                       [imageId]="thumbnailId"
                       [alt]="
-                        'farmer.history.thumbnailAlt' | translate: { crop: entry.row.cropNameBn }
+                        'farmer.history.thumbnailAlt'
+                          | translate
+                            : {
+                                crop:
+                                  entry.row.cropNameBn
+                                  | contentText
+                                    : entry.row.cropNameEn
+                                    : entry.row.cropNameEnFallback
+                                    : locale(),
+                              }
                       "
                     />
                   } @else {
@@ -163,8 +172,14 @@
                 </span>
 
                 <span class="min-w-0 flex-1">
-                  <!-- Server-supplied crop name, verbatim (WEB-UX-016). -->
-                  <span class="block truncate font-bold text-ink">{{ entry.row.cropNameBn }}</span>
+                  <!-- Server-supplied crop name, verbatim (WEB-UX-016), in the asked-for locale. -->
+                  <span class="block truncate font-bold text-ink">
+                    <foshol-bn-value
+                      [bn]="entry.row.cropNameBn"
+                      [en]="entry.row.cropNameEn"
+                      [fallback]="entry.row.cropNameEnFallback"
+                    />
+                  </span>
                   <span
                     class="mt-1 inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
                     [class]="statusPillClass(entry.status)"

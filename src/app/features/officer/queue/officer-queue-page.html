@@ -168,7 +168,11 @@
             </div>
 
             <p class="card-crop">
-              {{ view.row.cropNameBn }}
+              <foshol-bn-value
+                [bn]="view.row.cropNameBn"
+                [en]="view.row.cropNameEn"
+                [fallback]="view.row.cropNameEnFallback"
+              />
               @if (view.row.isResubmission) {
                 <span class="resub" [title]="'officer.queue.resubmissionHint' | translate">
                   <foshol-icon name="resubmit" size="xs" />
@@ -177,7 +181,13 @@
               }
             </p>
 
-            <p class="card-candidate">{{ view.row.topDiseaseNameBn }}</p>
+            <p class="card-candidate">
+              <foshol-bn-value
+                [bn]="view.row.topDiseaseNameBn"
+                [en]="view.row.topDiseaseNameEn"
+                [fallback]="view.row.topDiseaseNameEnFallback"
+              />
+            </p>
 
             <!-- WEB-NFR-011 — the queue row carries no `thresholds`, so it shows the number and
                  never a bar. The bar with its two threshold lines belongs on the case detail,
@@ -345,8 +355,20 @@
                     </span>
                   }
                 </td>
-                <td>{{ view.row.cropNameBn }}</td>
-                <td>{{ view.row.topDiseaseNameBn }}</td>
+                <td>
+                  <foshol-bn-value
+                    [bn]="view.row.cropNameBn"
+                    [en]="view.row.cropNameEn"
+                    [fallback]="view.row.cropNameEnFallback"
+                  />
+                </td>
+                <td>
+                  <foshol-bn-value
+                    [bn]="view.row.topDiseaseNameBn"
+                    [en]="view.row.topDiseaseNameEn"
+                    [fallback]="view.row.topDiseaseNameEnFallback"
+                  />
+                </td>
                 <td class="num tabular" data-testid="queue-confidence">
                   {{ view.row.topConfidence | percent1 }}%
                 </td>

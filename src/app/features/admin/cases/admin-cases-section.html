@@ -156,8 +156,19 @@
                     </span>
                   }
                 </td>
-                <td>{{ row.cropNameBn || row.cropCode || '—' }}</td>
-                <td>{{ row.topDiseaseNameBn || '—' }}</td>
+                <td>
+                  {{
+                    (row.cropNameBn | contentText: row.cropNameEn : row.cropNameEnFallback : locale()) ||
+                      row.cropCode ||
+                      '—'
+                  }}
+                </td>
+                <td>
+                  {{
+                    (row.topDiseaseNameBn
+                      | contentText: row.topDiseaseNameEn : row.topDiseaseNameEnFallback : locale()) || '—'
+                  }}
+                </td>
                 <td class="ac-num ac-time">
                   @if (row.topConfidence !== null && row.topConfidence !== undefined) {
                     {{ row.topConfidence | percent1 }}%

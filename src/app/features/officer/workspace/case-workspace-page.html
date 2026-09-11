@@ -44,9 +44,13 @@
         }
       </h2>
       <p class="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
-        <span class="font-semibold text-ink-muted [overflow-wrap:anywhere]">{{
-          detail.cropNameBn
-        }}</span>
+        <span class="font-semibold text-ink-muted [overflow-wrap:anywhere]">
+          <foshol-bn-value
+            [bn]="detail.cropNameBn"
+            [en]="detail.cropNameEn"
+            [fallback]="detail.cropNameEnFallback"
+          />
+        </span>
         <!-- Only when the heading is a name: where it is not, the heading already carries the
              case id and printing it twice in two lines reads as a mistake. -->
         @if (facade.farmerName()) {
@@ -363,7 +367,13 @@
               class="inline-flex items-center gap-1.5 rounded-full border border-surface-3 bg-surface-1 px-2.5 py-1"
               data-testid="symptom-chip"
             >
-              <span class="font-semibold text-ink">{{ symptom.nameBn }}</span>
+              <span class="font-semibold text-ink">
+                <foshol-bn-value
+                  [bn]="symptom.nameBn"
+                  [en]="symptom.nameEn"
+                  [fallback]="symptom.nameEnFallback"
+                />
+              </span>
               @if (symptom.matcher; as matcher) {
                 <foshol-matcher-chip [matcher]="matcher" [score]="symptom.score" />
               } @else {

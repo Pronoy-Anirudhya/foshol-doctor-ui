@@ -3,6 +3,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { toPercentString } from '../../../core/util/percent';
 import type { Candidate } from '../../../generated/models/candidate';
 import type { Thresholds } from '../../../generated/models/thresholds';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 import { CandidateSourceChip } from '../../../shared/ui/candidate-source-chip/candidate-source-chip';
 import { ConfidenceBar } from '../../../shared/ui/confidence-bar/confidence-bar';
 
@@ -25,6 +26,10 @@ import { ConfidenceBar } from '../../../shared/ui/confidence-bar/confidence-bar'
  *
  * `WEB-FR-224` — the rules are the thresholds and nothing more. No band is shaded, no fill is
  * keyed to a band, no path is named. The decision path comes from the badge (`WEB-FR-215`).
+ *
+ * `WEB-UX-012` — the disease name follows the language toggle through `<foshol-bn-value>`:
+ * `Candidate` now carries `diseaseNameEn` beside `diseaseNameBn`, so the switch is a re-read of
+ * a payload already in memory, never a refetch, and never a translation of our own.
  */
 /** Ranks are 1-based on the wire; rank 1 is the one the server built its suggestion from. */
 const TOP_RANK = 1;
@@ -32,7 +37,7 @@ const TOP_RANK = 1;
 @Component({
   selector: 'foshol-candidate-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CandidateSourceChip, ConfidenceBar, TranslatePipe],
+  imports: [BnValue, CandidateSourceChip, ConfidenceBar, TranslatePipe],
   templateUrl: './candidate-list.html',
   styleUrl: './candidate-list.css',
   host: {

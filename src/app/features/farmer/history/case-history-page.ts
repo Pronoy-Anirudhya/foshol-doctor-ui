@@ -11,13 +11,16 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { toProblemView } from '../../../core/errors/problem';
+import { LanguageStore } from '../../../core/i18n/language-store';
 import { SseStore } from '../../../core/sse/sse-store';
 import { CaseStatusStore } from '../../../core/stores/case-status-store';
 import type { CaseStatus } from '../../../generated/models/case-status';
 import type { FarmerCaseRow } from '../../../generated/models/farmer-case-row';
 import { CasesService } from '../../../generated/services/cases.service';
+import { ContentTextPipe } from '../../../shared/pipes/content-locale.pipe';
 import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
 import { BackLink } from '../../../shared/ui/back-link/back-link';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Paginator } from '../../../shared/ui/paginator/paginator';
@@ -68,6 +71,8 @@ const STATUS_FILTER_OPTIONS: readonly CaseStatus[] = [
     RouterOutlet,
     TranslatePipe,
     BackLink,
+    BnValue,
+    ContentTextPipe,
     DhakaDateTimePipe,
     EmptyState,
     ErrorPanel,
@@ -82,6 +87,10 @@ export class CaseHistoryPage {
   private readonly cases = inject(CasesService);
   private readonly caseStatus = inject(CaseStatusStore);
   private readonly sse = inject(SseStore);
+  private readonly language = inject(LanguageStore);
+
+  /** For the alt text, where a marker element cannot exist — `contentText` needs the locale. */
+  protected readonly locale = this.language.current;
 
   private readonly _page = signal(FIRST_PAGE);
   private readonly _loadedAt = signal(0);
@@ -156,8 +165,10 @@ export class CaseHistoryPage {
     return this.rows().filter((entry) => {
       if (status !== '' && entry.status !== status) return false;
       if (term === '') return true;
-      const crop = entry.row.cropNameBn.toLowerCase();
-      const disease = (entry.row.diseaseNameBn ?? '').toLowerCase();
+      // Both locales are on the row, so a search keeps working across the language toggle.
+      const crop = `${entry.row.cropNameBn} ${entry.row.cropNameEn ?? ''}`.toLowerCase();
+      const disease =
+        `${entry.row.diseaseNameBn ?? ''} ${entry.row.diseaseNameEn ?? ''}`.toLowerCase();
       return crop.includes(term) || disease.includes(term);
     });
   });

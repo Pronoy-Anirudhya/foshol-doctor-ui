@@ -19,6 +19,7 @@ import { VerifiedStamp } from './verified-stamp';
 import { LanguageStore } from '../../../core/i18n/language-store';
 import { pickRemedyContent, type RemedyContentView } from '../../../shared/pipes/content-locale';
 import { BnMarker } from '../../../shared/ui/bn-value/bn-marker';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 
 /**
  * Demo beat 5, and the screen the whole system exists to produce.
@@ -59,6 +60,7 @@ const FIRST_VERSION = 1;
     SeverityBadge,
     VerifiedStamp,
     BnMarker,
+    BnValue,
   ],
   host: { class: 'block' },
   templateUrl: './advisory-card.html',
@@ -79,8 +81,9 @@ export class AdvisoryCard {
 
   /**
    * `Advisory.remedies` is the generated `Remedy`, which carries both locales, so the toggle
-   * re-reads these. The advisory's OWN prose — `diseaseNameBn`, `officerNoteBn` — has no English
-   * sibling in the contract and stays Bangla (`WEB-UX-016`: never invent English).
+   * re-reads these. `diseaseNameBn` now has an English sibling too and is rendered through
+   * `<foshol-bn-value>`; `officerNoteBn` is the officer's own prose, has no English sibling, and
+   * stays Bangla (`WEB-UX-016`: never invent English).
    */
   protected readonly remedyRows = computed(() => {
     const locale = this.language.current();
