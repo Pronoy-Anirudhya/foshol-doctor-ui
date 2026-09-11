@@ -6,6 +6,12 @@ export interface Candidate {
   diseaseCode: string;
   diseaseId: string;
   diseaseNameBn: string;
+  diseaseNameEn?: string | null;
+
+  /**
+   * True when diseaseNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  diseaseNameEnFallback?: boolean;
   rank: number;
   source: 'MODEL' | 'KB' | 'MERGED';
 }

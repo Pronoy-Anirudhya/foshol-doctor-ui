@@ -9,6 +9,12 @@ export interface OfficerQueueRow {
   caseId: string;
   cropCode?: string;
   cropNameBn?: string;
+  cropNameEn?: string | null;
+
+  /**
+   * True when cropNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  cropNameEnFallback?: boolean;
   decisionPath?: DecisionPath;
   districtCode?: string;
   farmerName?: string;
@@ -23,4 +29,10 @@ export interface OfficerQueueRow {
   submittedAt: string;
   topConfidence?: number | null;
   topDiseaseNameBn?: string | null;
+  topDiseaseNameEn?: string | null;
+
+  /**
+   * True when topDiseaseNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  topDiseaseNameEnFallback?: boolean;
 }

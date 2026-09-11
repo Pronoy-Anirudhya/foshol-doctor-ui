@@ -13,6 +13,12 @@ export interface CaseDetail {
   caseId: string;
   cropId: string;
   cropNameBn?: string;
+  cropNameEn?: string | null;
+
+  /**
+   * True when cropNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  cropNameEnFallback?: boolean;
   cropQuantity?: number | null;
   cropQuantityUnit?: ('KG' | 'TON' | 'PLANTS' | 'BIGHAS_EQUIV') | null;
   decisionPath?: DecisionPath;

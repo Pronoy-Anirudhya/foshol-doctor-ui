@@ -8,6 +8,12 @@ export interface Advisory {
   caseId: string;
   diseaseId?: string | null;
   diseaseNameBn?: string | null;
+  diseaseNameEn?: string | null;
+
+  /**
+   * True when diseaseNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  diseaseNameEnFallback?: boolean;
   officerId: string;
   officerName: string;
   officerNoteBn?: string | null;

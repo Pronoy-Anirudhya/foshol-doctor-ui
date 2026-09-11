@@ -7,8 +7,20 @@ export interface FarmerCaseRow {
   advisoryVersion?: number | null;
   caseId: string;
   cropNameBn: string;
+  cropNameEn?: string | null;
+
+  /**
+   * True when cropNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  cropNameEnFallback?: boolean;
   decisionPath?: DecisionPath;
   diseaseNameBn?: string | null;
+  diseaseNameEn?: string | null;
+
+  /**
+   * True when diseaseNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  diseaseNameEnFallback?: boolean;
   officerName?: string | null;
   publishedAt?: string | null;
   rejectionMessageBn?: string | null;
