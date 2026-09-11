@@ -84,7 +84,18 @@
  * Blending it again (multiply) would darken the photograph twice; turning the overlay on is a
  * plain cross-fade from the bare photograph to the composited one.
  */
+/*
+ * `position` here is load-bearing, not decoration. `foshol-case-photo`'s host is itself
+ * positioned, and CSS paints a positioned element ABOVE a non-positioned sibling whatever the
+ * DOM order says — so a `static` overlay is painted UNDER the photograph, and the officer sees
+ * the bare leaf with the toggle stuck on. The blend mode used to lift it by creating a stacking
+ * context; the pre-composited PNG (D-38) took the blend away and took the lift with it. Worse,
+ * the symptom hid the cause: while the opacity transition runs the overlay is promoted to its
+ * own layer and shows, so it appeared for a split second and then dropped behind.
+ */
 .overlay {
+  position: relative;
+  z-index: 1;
   object-fit: fill;
   opacity: 0;
   pointer-events: none;

@@ -1074,11 +1074,17 @@ fetcher also does what the interceptors would have done on failure:
 - **Alignment.** The overlay is stretched over the photograph's own box (`object-fit: fill` in a
   box with the photograph's aspect ratio). Before, it was letterboxed, and the demo's 1×1 PNGs
   rendered as a centred square.
-- **No second blend.** The sidecar returns the photograph with the heat map already composited
-  over it (SIDECAR-FR-034), so the overlay is shown with no `mix-blend-mode`; turning it on
-  cross-fades from the bare photograph to the composited one. The earlier `multiply` would have
-  darkened the photograph twice. A replay fixture that is only a 1×1 placeholder therefore covers
-  the photograph with one flat colour until real overlays are re-recorded.
+- **No second blend, but the overlay must still be lifted.** The sidecar returns the photograph
+  with the heat map already composited over it (SIDECAR-FR-034), so the overlay is shown with no
+  `mix-blend-mode`; turning it on cross-fades from the bare photograph to the composited one. The
+  earlier `multiply` would have darkened the photograph twice. It was also, unintentionally, what
+  put the overlay on top: a blend mode creates a stacking context, and `foshol-case-photo`'s host
+  is positioned, so CSS paints it above a `static` sibling whatever the DOM order says. Removing
+  the blend therefore hid the overlay behind the photograph — visible only for the split second
+  the opacity transition promoted it to its own layer. The overlay now carries
+  `position: relative; z-index: 1` of its own, and a spec pins it. A replay fixture that is only a
+  1×1 placeholder still covers the photograph with one flat colour until real overlays are
+  re-recorded.
 
 **Requirement.** `WEB-FR-210`–`212`, `WEB-SEC-003` and `COMMON-SEC-016` are met. `WEB-API-001`
 holds, because both paths come from the generated `CasesService.GetCaseImagePath` and
