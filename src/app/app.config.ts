@@ -1,5 +1,6 @@
 import {
   inject,
+  provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
   type ApplicationConfig,
@@ -16,6 +17,7 @@ import { requestAttemptInterceptor } from './core/http/request-attempt.intercept
 import { provideI18n } from './core/i18n/i18n.providers';
 import { provideSse } from './core/sse/sse.providers';
 import { SESSION_TEARDOWN } from './core/auth/auth-facade';
+import { SessionStore } from './core/auth/session-store';
 import { StoreTeardown } from './core/stores/store-teardown';
 import { routes } from './app.routes';
 
@@ -45,6 +47,11 @@ export const appConfig: ApplicationConfig = {
     ),
 
     provideI18n(),
+
+    // D-37 — a reload keeps this tab's session until the JWT expires. Synchronous, and app
+    // initializers finish before the router's initial navigation, so the guards on the reloaded
+    // URL already see the restored session instead of bouncing to the login.
+    provideAppInitializer(() => inject(SessionStore).restore()),
 
     // SseClient is providedIn:'root' and therefore lazy, so without an eager initialiser the
     // effect that opens the stream on sign-in would never run and WEB-FR-351 would silently
