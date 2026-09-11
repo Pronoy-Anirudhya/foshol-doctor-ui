@@ -12,12 +12,17 @@
       </p>
 
       @if (advisory().diseaseNameBn) {
-        <!-- Human-supplied agronomic content: verbatim, never translated (COMMON-CON-003). -->
+        <!-- Human-supplied agronomic content: verbatim, never translated (COMMON-CON-003), and
+             in whichever locale the toggle asks for (WEB-UX-012). -->
         <h3
           class="mt-1.5 text-2xl font-extrabold text-ink md:text-3xl"
           data-testid="advisory-disease"
         >
-          {{ advisory().diseaseNameBn }}
+          <foshol-bn-value
+            [bn]="advisory().diseaseNameBn ?? ''"
+            [en]="advisory().diseaseNameEn"
+            [fallback]="advisory().diseaseNameEnFallback"
+          />
         </h3>
       }
 
@@ -206,7 +211,13 @@
                   {{ 'farmer.advisory.verifiedEyebrow' | translate }} {{ prior.officerName }}
                 </p>
                 @if (prior.diseaseNameBn) {
-                  <p class="mt-2 mb-0 font-bold">{{ prior.diseaseNameBn }}</p>
+                  <p class="mt-2 mb-0 font-bold">
+                    <foshol-bn-value
+                      [bn]="prior.diseaseNameBn ?? ''"
+                      [en]="prior.diseaseNameEn"
+                      [fallback]="prior.diseaseNameEnFallback"
+                    />
+                  </p>
                 }
                 @for (remedy of prior.remedies; track remedyKey(remedy, $index)) {
                   @let priorView = priorContent(remedy);

@@ -18,6 +18,7 @@ import type { OfficerQueueRow } from '../../../generated/models/officer-queue-ro
 import { DhakaTimePipe } from '../../../shared/pipes/dhaka-time.pipe';
 import { Percent1Pipe } from '../../../shared/pipes/percent1.pipe';
 import { AnalysisModeBadge } from '../../../shared/ui/analysis-mode-badge/analysis-mode-badge';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 import { DecisionPathBadge } from '../../../shared/ui/decision-path-badge/decision-path-badge';
 import { EmptyState } from '../../../shared/ui/empty-state/empty-state';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
@@ -96,6 +97,7 @@ interface OpenPanel {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AnalysisModeBadge,
+    BnValue,
     DecisionPathBadge,
     DhakaTimePipe,
     EmptyState,
@@ -178,9 +180,12 @@ export class OfficerQueuePage {
     const term = this.searchText().trim().toLowerCase();
     if (term === '') return this.rows();
     return this.rows().filter((view) => {
+      // Both locales sit on the row, so the search matches whichever one the officer typed —
+      // and keeps matching after the toggle moves.
       const farmer = (view.row.farmerName ?? '').toLowerCase();
-      const crop = (view.row.cropNameBn ?? '').toLowerCase();
-      const disease = (view.row.topDiseaseNameBn ?? '').toLowerCase();
+      const crop = `${view.row.cropNameBn ?? ''} ${view.row.cropNameEn ?? ''}`.toLowerCase();
+      const disease =
+        `${view.row.topDiseaseNameBn ?? ''} ${view.row.topDiseaseNameEn ?? ''}`.toLowerCase();
       return farmer.includes(term) || crop.includes(term) || disease.includes(term);
     });
   });

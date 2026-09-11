@@ -203,9 +203,15 @@ export class CaseWorkspacePage {
         this.language.current(),
       ).text;
     }
-    // `Candidate.diseaseNameBn` has no English sibling in the contract — Bangla, unmarked.
+    // `Candidate` carries both locales now, so this follows the toggle exactly as `Disease` does.
     const candidate = this.store.candidates().find((entry) => entry.diseaseId === diseaseId);
-    return candidate?.diseaseNameBn ?? '';
+    if (candidate === undefined) return '';
+    return pickContent(
+      candidate.diseaseNameBn,
+      candidate.diseaseNameEn,
+      candidate.diseaseNameEnFallback,
+      this.language.current(),
+    ).text;
   });
 
   protected readonly hasDisease = computed(() => this.draft().diseaseId !== null);

@@ -187,10 +187,34 @@ describe('GradcamView (WEB-FR-210…212)', () => {
     expect(toggle(fixture)).toBeNull();
     expect(overlay(fixture)).toBeNull();
 
+    // Back on the primary image the officer's own choice still stands: they turned it on, and
+    // only a different case starts over.
     fixture.componentInstance.imageId.set('i-1');
     fixture.componentInstance.isPrimary.set(true);
     await fixture.whenStable();
-    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('false');
+    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  /**
+   * The screen is alive underneath: the claim ring ticks the review store every second and an
+   * SSE nudge re-reads the case, each restating these inputs. An overlay the officer switched
+   * on must not switch itself off a moment later, and must not be refetched.
+   */
+  it('stays on while the case detail re-renders underneath it', async () => {
+    const fixture = await create();
+    await press(fixture);
+
+    for (let tick = 0; tick < 3; tick += 1) {
+      fixture.componentInstance.isPrimary.set(true);
+      fixture.componentInstance.overlayAvailable.set(true);
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+
+    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('true');
+    expect(overlay(fixture)?.classList.contains('visible')).toBe(true);
+    expect(gradcam.loadCalls).toBe(1);
+    expect(gradcam.revoked).toEqual([]);
   });
 
   it('fetches the overlay once for the whole case view, across thumbnails', async () => {

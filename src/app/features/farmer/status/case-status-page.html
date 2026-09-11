@@ -7,8 +7,12 @@
       <!-- An <h2>: this view is always rendered inside the history page's <h1> (WEB-UX-040). -->
       <h2 class="mt-1 text-2xl leading-tight font-bold text-ink md:text-3xl">
         @if (detail()?.cropNameBn; as cropName) {
-          <!-- Server-supplied crop name, verbatim (WEB-UX-016). -->
-          {{ cropName }}
+          <!-- Server-supplied crop name, verbatim (WEB-UX-016), in the asked-for locale. -->
+          <foshol-bn-value
+            [bn]="cropName"
+            [en]="detail()?.cropNameEn"
+            [fallback]="detail()?.cropNameEnFallback"
+          />
         } @else {
           {{ 'farmer.status.title' | translate }}
         }

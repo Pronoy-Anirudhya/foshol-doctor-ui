@@ -17,6 +17,7 @@ import type { CaseStatus } from '../../../generated/models/case-status';
 import { CasesService } from '../../../generated/services/cases.service';
 import { ReviewService } from '../../../generated/services/review.service';
 import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
+import { BnValue } from '../../../shared/ui/bn-value/bn-value';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { SecureImage } from '../../../shared/ui/secure-image/secure-image';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
@@ -56,6 +57,7 @@ const FIRST_PAGE = 0;
     TranslatePipe,
     DhakaDateTimePipe,
     AdvisoryCard,
+    BnValue,
     ErrorPanel,
     RejectionPanel,
     SecureImage,

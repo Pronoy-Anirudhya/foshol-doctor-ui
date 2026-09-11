@@ -32,8 +32,12 @@ import { BnMarker } from './bn-marker';
 export class BnValue {
   private readonly language = inject(LanguageStore);
 
-  /** The Bangla field — the language of record (`COMMON-NFR-037`). */
-  readonly bn = input('');
+  /**
+   * The Bangla field — the language of record (`COMMON-NFR-037`). Nullable, because plenty of
+   * catalogue fields are optional on the contract (`topDiseaseNameBn`, `diseaseNameBn`); an
+   * absent one renders as nothing rather than forcing every caller to spell `?? ''`.
+   */
+  readonly bn = input<string | null | undefined>('');
   /** The English field, or the Bangla copy the server made when it had no English. */
   readonly en = input<string | null | undefined>(null);
   /** The server's `*EnFallback` flag: true means `en` is Bangla text. */

@@ -31,8 +31,15 @@
       >
         <header class="cand-head">
           <span class="rank tabular" aria-hidden="true">{{ candidate.rank }}</span>
-          <!-- COMMON-CON-003 — a human-supplied disease name, rendered exactly as received. -->
-          <span class="cand-name">{{ candidate.diseaseNameBn }}</span>
+          <!-- COMMON-CON-003 — a human-supplied disease name, rendered exactly as received, in
+               whichever locale the toggle asks for (WEB-UX-012). -->
+          <span class="cand-name">
+            <foshol-bn-value
+              [bn]="candidate.diseaseNameBn"
+              [en]="candidate.diseaseNameEn"
+              [fallback]="candidate.diseaseNameEnFallback"
+            />
+          </span>
           <foshol-candidate-source-chip [source]="candidate.source" />
           <!-- The suggested remedies and any computed dose are built from rank 1 alone. The
                lower ranks are on screen so the officer can judge for themselves, not because

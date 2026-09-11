@@ -3,7 +3,9 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { toProblemView } from '../../../core/errors/problem';
+import { LanguageStore } from '../../../core/i18n/language-store';
 import type { KpiBreach } from '../../../generated/models/kpi-breach';
+import { pickContent } from '../../../shared/pipes/content-locale';
 import { AdminService } from '../../../generated/services/admin.service';
 import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
 import { BackLink } from '../../../shared/ui/back-link/back-link';
@@ -62,7 +64,10 @@ interface BreachRow {
   readonly id: string;
   readonly kind: BreachKind | null;
   readonly farmerName: string;
-  /** Server content, verbatim: `cropNameBn` when sent, else the code. Never translated. */
+  /**
+   * Server content, verbatim: the crop name in the asked-for locale when sent, else the code.
+   * Picked from the pair the server returned — never translated by us.
+   */
   readonly crop: string;
   readonly dueAt: string | null;
   readonly breachedAt: string | null;
@@ -96,6 +101,7 @@ export class KpiBreachesPage {
   private readonly admin = inject(AdminService);
   private readonly router = inject(Router);
   protected readonly store = inject(KpiBreachStore);
+  private readonly language = inject(LanguageStore);
 
   /** Query parameters, delivered as signal inputs by `withComponentInputBinding()`. */
   readonly kind = input<string | undefined>();
@@ -144,7 +150,9 @@ export class KpiBreachesPage {
   });
 
   protected readonly rows = computed<readonly BreachRow[]>(() =>
-    (this.store.page()?.content ?? []).map(toRow),
+    (this.store.page()?.content ?? []).map((breach, index) =>
+      toRow(breach, index, this.language.current()),
+    ),
   );
 
   protected readonly assignmentRows = computed(() =>
@@ -214,13 +222,24 @@ export class KpiBreachesPage {
   }
 }
 
-function toRow(breach: KpiBreach, index: number): BreachRow {
+/**
+ * `locale` is a parameter rather than an injected read: this is a module function, and the crop
+ * name still has to follow the language toggle (`WEB-UX-012`).
+ */
+function toRow(
+  breach: KpiBreach,
+  index: number,
+  locale: Parameters<typeof pickContent>[3],
+): BreachRow {
   const taskId = breach.reviewTaskId ?? null;
   return {
     id: breach.id ?? `${index}`,
     kind: breach.kind ?? null,
     farmerName: breach.farmerName ?? '',
-    crop: breach.cropNameBn ?? breach.cropCode ?? '',
+    crop:
+      pickContent(breach.cropNameBn, breach.cropNameEn, breach.cropNameEnFallback, locale).text ||
+      breach.cropCode ||
+      '',
     dueAt: breach.dueAt ?? null,
     breachedAt: breach.breachedAt ?? null,
     taskLink: taskId === null ? null : taskPath(taskId),
