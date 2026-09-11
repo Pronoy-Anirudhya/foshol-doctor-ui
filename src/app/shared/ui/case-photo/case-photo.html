@@ -1,0 +1,33 @@
+<!-- WEB-FR-400 — the skeleton fills the region from the first frame, so nothing is ever blank
+     and the photograph fades in over a box that is already the right size. -->
+<div class="skeleton" aria-hidden="true"></div>
+
+@if (state() !== 'failed') {
+  @if (src(); as url) {
+    <!-- A `blob:` URL minted from bytes fetched with the bearer. The API path is never an image
+         source, and no presigned URL ever reaches the template (WEB-SEC-003). -->
+    <img
+      class="frame"
+      [src]="url"
+      [alt]="alt()"
+      [style.object-fit]="fit()"
+      decoding="async"
+      (load)="onLoad($event)"
+      (error)="onError()"
+    />
+  }
+} @else {
+  <!-- Never the browser's broken-image glyph. A calm translated line, plus the alt text the
+       caller supplied, so the region still says what it was meant to show (WEB-UX-042). -->
+  <p class="fallback">
+    <foshol-icon name="image-broken" size="lg" />
+    <span>{{ 'media.image.unavailable' | translate }}</span>
+    <span class="sr-only">{{ alt() }}</span>
+  </p>
+}
+
+<span class="sr-only" role="status">
+  @if (state() === 'loading') {
+    {{ 'media.image.loading' | translate }}
+  }
+</span>
