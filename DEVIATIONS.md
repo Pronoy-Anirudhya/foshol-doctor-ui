@@ -973,3 +973,57 @@ is what this entry removes.
 
 **Requirement.** `WEB-FR-001` (chrome follows the JWT role) is preserved; `WEB-FR-354` /
 `WEB-FR-357` are unaffected for the two roles they address.
+
+---
+
+## D-37 · The session survives a reload, in this tab's sessionStorage
+
+**What.** `SessionStore` mirrors the session into `sessionStorage` under `foshol.session`: the JWT,
+the principal the login returned, and its expiry. `restore()` reads it back once, from an app
+initializer, before the router's first navigation, so a reload leaves the user where they were
+instead of on the login. An entry whose JWT `exp` has passed is discarded rather than restored, as
+is anything that fails a shape check. The JWT `role` claim still overrules the stored principal,
+exactly as it does at login. Every sign-out path already runs through `SessionStore.clear()`, which
+removes the entry: the account menu, a `401` from the API, and a `401` from the stream.
+
+**Why there is an entry.** It reverses `WEB-SEC-001`, which kept the token in memory only and
+accepted "a refresh is a new login" as the price. That price was paid on every reload on all three
+surfaces. Two frozen files changed. `app.config.ts` gains the `provideAppInitializer`.
+`scripts/check-architecture.mjs` replaces its single WEB-SEC-001 rule with two: the token pattern
+may still not meet `localStorage`, and `sessionStorage` may not be referenced anywhere except
+`session-store.ts` and its spec.
+
+**Why sessionStorage and not localStorage.** Tab scope. `sessionStorage` survives a reload and dies
+with the tab; `localStorage` is shared by every tab on the origin. Signing in as a farmer, an
+officer and an admin in three tabs, which is the normal way to exercise this application, works
+with the first and not with the second. With `localStorage` the last login would overwrite the
+other two, and every tab would reload as that user. Tab scope also limits how long a token sits at
+rest to the life of the tab rather than the browser profile. "Duplicate tab" copies
+`sessionStorage`, so the copy is the same user; a new tab is a new login.
+
+**The cost.** Before this change an XSS payload could act inside the page but could not read the
+bearer. Now it can read the bearer from `sessionStorage` and carry it away, for at most the tab's
+lifetime and the token's eight-hour `exp`. There is still no cookie, so there is still no CSRF
+surface. `WEB-SEC-005` (no server string rendered as HTML) is what keeps such a payload out in the
+first place, and it is unchanged.
+
+**Why restore is an explicit call, not constructor work.** Sixteen spec files sign in, some with an
+already-past expiry, and jsdom's `sessionStorage` outlives a single test. A constructor that
+rehydrated would carry one test's session into the next. Only bootstrap calls `restore()`.
+
+**The bug this surfaced.** A restored session makes requests at bootstrap: the SSE stream and the
+KPI seed. If the server rejects the token before its `exp`, for example after a backend restart with
+a new signing key, the `401` lands while the first navigation is still in flight and `Router.url` is
+still `/`. `problem.interceptor.ts` picked the login from `Router.url`, so it sent an officer to the
+farmer login and retained `/` as the route to restore. Until the first navigation completes, it now
+reads the in-flight navigation's URL instead, the same way `authGuard` already does.
+
+**What was deliberately NOT changed.** Mid-session expiry is still the server's to enforce. The
+first request after `exp` draws a `401`, which clears the session and returns the user to that
+surface's login with the attempted URL retained (`WEB-FR-013`). No client timer was added. The
+retained intended URL is not persisted. `APP_CONFIG.storageKeys` is untouched, because it lists the
+localStorage keys and this key belongs to `SessionStore`.
+
+**Requirement.** `WEB-SEC-001` is amended as above. `WEB-SEC-002` (the token is sent only as a
+header), `WEB-SEC-003` (and only to the API origin) and `WEB-SEC-004` (sign-out clears everything)
+hold unchanged.

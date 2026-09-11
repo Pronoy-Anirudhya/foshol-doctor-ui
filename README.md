@@ -89,8 +89,9 @@ src/app/
   confidence, positioned from `analysis.thresholds` — never from local config.
 - **Queue order is the server's.** `QueueStore` exposes no comparator at all, so the server's
   order cannot be destroyed by a later edit.
-- **The JWT lives in memory only** — a refresh is a new login, by design (`WEB-SEC-001`).
-  `localStorage` holds the language preference and a draft crop id and note, nothing else.
+- **A reload keeps you signed in, in that tab only.** The JWT is held in memory and mirrored to
+  the tab's `sessionStorage` until it expires or you sign out, so three tabs can hold three
+  different users (`DEVIATIONS.md` D-37). `localStorage` holds the language preference and a draft crop id and note, nothing else.
 - **The capture stepper never speaks before you touch it.** Browsers refuse speech synthesis
   until a user gesture, so a silent first step is deliberate, not a broken demo: press
   **শুনুন** once and every later step speaks on arrival (`DEVIATIONS.md` D-23). The spoken
