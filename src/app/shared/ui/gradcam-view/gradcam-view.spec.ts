@@ -252,6 +252,19 @@ describe('GradcamView (WEB-FR-210…212)', () => {
     expect(fixture.componentInstance.unavailable).toBe(1);
   });
 
+  /**
+   * Paint order, not decoration. `foshol-case-photo`'s host is positioned, and CSS paints a
+   * positioned element above a non-positioned sibling whatever the DOM order says — so a
+   * `static` overlay is painted UNDER the photograph and the officer sees the bare leaf with the
+   * toggle stuck on, which is exactly what shipped once the blend mode was removed.
+   */
+  it('lifts the overlay above the photograph instead of painting it underneath', async () => {
+    const fixture = await create();
+    await press(fixture);
+
+    expect(getComputedStyle(overlay(fixture)!).position).not.toBe('static');
+  });
+
   /** WEB-UX-042 — the overlay says what it is, and says nothing while it is not shown. */
   it('gives the overlay meaningful alternative text and hides it from AT while off', async () => {
     const fixture = await create();
