@@ -23,8 +23,15 @@ const RULES = [
   },
   {
     id: 'WEB-SEC-001',
-    why: 'the JWT lives in memory only — never in web storage',
-    test: /(localStorage|sessionStorage)\s*[.[]\s*['"`]?\w*[Tt]oken/,
+    why: 'the JWT never goes into localStorage',
+    test: /localStorage\s*[.[]\s*['"`]?\w*[Tt]oken/,
+  },
+  {
+    // D-37 — the session is mirrored to sessionStorage, and only SessionStore may touch it.
+    id: 'WEB-SEC-001',
+    why: 'sessionStorage holds the session and is reached only through core/auth/session-store.ts',
+    test: /\bsessionStorage\b/,
+    exempt: (f) => /^app\/core\/auth\/session-store(\.spec)?\.ts$/.test(f),
   },
   {
     id: 'WEB-NFR-002',
