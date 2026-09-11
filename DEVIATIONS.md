@@ -56,6 +56,10 @@ outside `core/http`, `core/media`, `core/sse` and `core/i18n`.
 **Unblock.** Add these three operations to `docs/openapi/foshol-api.yaml` (owner: A1), then
 delete this service and regenerate.
 
+**Update: D-38.** The officer case detail no longer calls `…/images/{imageId}/url`; its
+photographs load through the contract's `…/content` operation. The farmer screens and the audio
+player still use this service.
+
 ---
 
 ## D-03 · `hasGradcam` rather than `gradcamObjectKey`
@@ -1027,3 +1031,55 @@ localStorage keys and this key belongs to `SessionStore`.
 **Requirement.** `WEB-SEC-001` is amended as above. `WEB-SEC-002` (the token is sent only as a
 header), `WEB-SEC-003` (and only to the API origin) and `WEB-SEC-004` (sign-out clears everything)
 hold unchanged.
+
+---
+
+## D-38 · Officer case photographs and the Grad-CAM come through the contract's 302 operations
+
+**What.** On the officer case detail, every photograph now loads from
+`GET /api/v1/cases/{caseId}/images/{imageId}/content?variant=ORIGINAL|DERIVATIVE` and the overlay
+from `GET /api/v1/cases/{caseId}/gradcam`. Both answer `302` into the object store. A single
+fetcher, `core/media/redirected-blob.ts`, sends the bearer to the API origin only, follows the
+redirect, and returns the bytes. `foshol-case-photo` and `foshol-gradcam-view` turn those bytes into
+`blob:` object URLs and revoke them when the view is left. The out-of-contract
+`…/images/{imageId}/url` (D-02) is no longer used here; the farmer screens still use it.
+
+**Why raw `fetch` and not `HttpClient`.** The interceptors add `X-Correlation-Id` and
+`Accept-Language`. Unlike `Authorization`, a browser carries those headers across a cross-origin
+redirect, and that would turn the object-store GET into a preflighted request MinIO was never
+configured for. The fetcher sends one header, so the redirected GET stays a simple one. The
+fetcher also does what the interceptors would have done on failure:
+- A `401` from the API ends the session through `expireSession`, the same function the problem
+  interceptor now calls.
+- A problem document is reduced by the same `toProblemView`.
+- A redirected `403` gets exactly one fresh redirect. That covers a presigned URL that expired
+  between the `302` and the GET (COMMON-SEC-016).
+
+**The overlay (WEB-FR-211 / WEB-FR-212).**
+- **Presence.** An overlay exists when `analysis.hasGradcam` says so, or else top-level
+  `hasGradcam`, or else a non-null `gradcamObjectKey`; the first true one wins. This amends D-03:
+  the key is read as a flag and nothing else, and is never stored, logged or used as a URL. When
+  none is true, `/gradcam` is not called.
+- **Primary image only.** The toggle appears only on the primary image (`primary`, otherwise the
+  lowest `position`), because that is the photograph the Grad-CAM was computed for. It defaults to
+  off, and moving to another image turns it off again.
+- **Offered only once fetched.** The toggle appears only after the PNG has been fetched, so a `404`
+  means there is no control at all. A `503` also hides the toggle, and shows the problem's title,
+  detail and correlation id with a retry. The photograph stays, and claim, approve and reject are
+  unaffected.
+- **Placement.** The toggle sits in `image-zoom`'s `zoomBarEnd` slot, not inside the pannable
+  viewport. Inside the viewport, a zoomed view captured the pointer that should have pressed it.
+- **Interaction.** It is a plain toggle: a native `button` with `aria-pressed`. Hold-to-compare
+  was removed.
+- **Alignment.** The overlay is stretched over the photograph's own box (`object-fit: fill` in a
+  box with the photograph's aspect ratio). Before, it was letterboxed, and the demo's 1×1 PNGs
+  rendered as a centred square.
+- **No second blend.** The sidecar returns the photograph with the heat map already composited
+  over it (SIDECAR-FR-034), so the overlay is shown with no `mix-blend-mode`; turning it on
+  cross-fades from the bare photograph to the composited one. The earlier `multiply` would have
+  darkened the photograph twice. A replay fixture that is only a 1×1 placeholder therefore covers
+  the photograph with one flat colour until real overlays are re-recorded.
+
+**Requirement.** `WEB-FR-210`–`212`, `WEB-SEC-003` and `COMMON-SEC-016` are met. `WEB-API-001`
+holds, because both paths come from the generated `CasesService.GetCaseImagePath` and
+`AnalysisService.GetCaseGradcamPath` constants.
