@@ -270,18 +270,17 @@
     <details class="panel" open>
       <summary class="panel-head">{{ 'officer.case.section.images' | translate }}</summary>
       @if (activeImage(); as image) {
-        <!-- WEB-FR-210 — zoom by pointer AND keyboard, from the shared control.
-             WEB-FR-211/212 — the Grad-CAM toggle lives inside `foshol-gradcam-view` and exists
-             only where the analysis says an overlay exists. Where it does not, there is no
-             control at all — never a disabled or broken one. -->
-        <foshol-image-zoom>
-          <foshol-gradcam-view
-            [caseId]="detail.caseId"
-            [imageId]="image.imageId"
-            [imageAlt]="'officer.case.imageAlt' | translate: { position: image.position }"
-            [hasGradcam]="analysis()?.hasGradcam === true"
-          />
-        </foshol-image-zoom>
+        <!-- WEB-FR-210 — zoom by pointer AND keyboard; the viewer owns the shared zoom control.
+             WEB-FR-211/212 — the Grad-CAM toggle sits in the zoom bar, exists only on the primary
+             image, and only once an overlay has actually been fetched. Where there is none there
+             is no control at all — never a disabled or broken one (D-38). -->
+        <foshol-gradcam-view
+          [caseId]="detail.caseId"
+          [imageId]="image.imageId"
+          [imageAlt]="'officer.case.imageAlt' | translate: { position: image.position }"
+          [isPrimary]="activeIsPrimary()"
+          [overlayAvailable]="facade.gradcamPresent()"
+        />
 
         @if (images().length > 1) {
           <ul class="m-0 mt-3 flex list-none flex-wrap gap-2 p-0">
@@ -294,7 +293,7 @@
                   [attr.aria-pressed]="thumb.imageId === image.imageId"
                   (click)="pickImage(thumb.imageId)"
                 >
-                  <foshol-secure-image
+                  <foshol-case-photo
                     [caseId]="detail.caseId"
                     [imageId]="thumb.imageId"
                     [alt]="'officer.case.imagePick' | translate: { position: thumb.position }"

@@ -24,11 +24,11 @@ import { AnalysisModeBadge } from '../../../shared/ui/analysis-mode-badge/analys
 import { AudioPlayer } from '../../../shared/ui/audio-player/audio-player';
 import { DecisionPathBadge } from '../../../shared/ui/decision-path-badge/decision-path-badge';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
+import { CasePhoto } from '../../../shared/ui/case-photo/case-photo';
 import { GradcamView } from '../../../shared/ui/gradcam-view/gradcam-view';
 import { Icon } from '../../../shared/ui/icon/icon';
-import { ImageZoom } from '../../../shared/ui/image-zoom/image-zoom';
 import { MatcherChip } from '../../../shared/ui/matcher-chip/matcher-chip';
-import { SecureImage } from '../../../shared/ui/secure-image/secure-image';
+import { primaryImageOf } from './primary-image';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
 import { DhakaDateTimePipe } from '../../../shared/pipes/dhaka-date-time.pipe';
 import { Percent1Pipe } from '../../../shared/pipes/percent1.pipe';
@@ -94,19 +94,18 @@ const BUTTON_BASE =
     BnValue,
     AudioPlayer,
     CandidateList,
+    CasePhoto,
     ClaimTimerRing,
     DecisionPathBadge,
     DhakaDateTimePipe,
     ErrorPanel,
     GradcamView,
     Icon,
-    ImageZoom,
     KpiClock,
     MatcherChip,
     Percent1Pipe,
     RemedyEditor,
     RouterLink,
-    SecureImage,
     Spinner,
     TransferPanel,
     TranslatePipe,
@@ -171,11 +170,18 @@ export class CaseWorkspacePage {
 
   protected readonly images = computed<readonly CaseImage[]>(() => this.caseDetail()?.images ?? []);
 
+  /** WEB-FR-211 — the image the Grad-CAM belongs to: `primary`, else the lowest `position`. */
+  protected readonly primaryImage = computed(() => primaryImageOf(this.images()));
+
+  /** The officer's pick, or the primary image until they make one. */
   protected readonly activeImage = computed<CaseImage | null>(() => {
-    const images = this.images();
-    if (images.length === 0) return null;
-    const chosen = images.find((image) => image.imageId === this.activeImageId());
-    return chosen ?? images.find((image) => image.primary) ?? images[0];
+    const chosen = this.images().find((image) => image.imageId === this.activeImageId());
+    return chosen ?? this.primaryImage();
+  });
+
+  protected readonly activeIsPrimary = computed(() => {
+    const active = this.activeImage();
+    return active !== null && active.imageId === this.primaryImage()?.imageId;
   });
 
   /** `WEB-FR-217` — the count, so an unmapped model output is never silently dropped. */

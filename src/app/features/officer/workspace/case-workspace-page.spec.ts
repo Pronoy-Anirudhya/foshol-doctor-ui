@@ -17,7 +17,39 @@ import diseasesRice from '../../../../testing/fixtures/diseases-rice.json';
 import principalOfficer from '../../../../testing/fixtures/principal-officer.json';
 import remediesBlast from '../../../../testing/fixtures/remedies-blast.json';
 import reviewTaskLive from '../../../../testing/fixtures/review-task-live-shape.json';
+import { CaseImageContentService } from '../../../core/media/case-image-content.service';
+import { GradcamService, GradcamUnavailableError } from '../../../core/media/gradcam.service';
 import { CaseWorkspacePage } from './case-workspace-page';
+
+/**
+ * The photographs and the overlay are fetched with `fetch`, not `HttpClient` (D-38), so they are
+ * faked at the service boundary. `gradcam-view.spec.ts` and `case-photo.spec.ts` own the detail.
+ */
+class FakeGradcam {
+  mode: 'ok' | 'missing' = 'ok';
+  loadCalls = 0;
+
+  load(): Promise<string> {
+    this.loadCalls += 1;
+    return this.mode === 'ok'
+      ? Promise.resolve('blob:http://localhost:4200/overlay')
+      : Promise.reject(new GradcamUnavailableError(404));
+  }
+
+  revoke(): void {
+    /* Nothing was minted. */
+  }
+}
+
+class FakeContent {
+  load(): Promise<string> {
+    return Promise.resolve('blob:http://localhost:4200/photo');
+  }
+
+  revoke(): void {
+    /* Nothing was minted. */
+  }
+}
 
 /**
  * The three promises this console makes, asserted against the DOM:
@@ -86,9 +118,17 @@ describe('CaseWorkspacePage (WEB-FR-210…244)', () => {
     return `${ORIGIN}${path}`;
   }
 
-  /** Answers the five contract-shaped calls the facade composes the workspace from (D-05). */
-  async function openCase(analysis: object = analysisPrimary): Promise<void> {
-    http.expectOne(url(`/api/v1/review/tasks/${TASK_ID}`)).flush(reviewTaskLive);
+  let gradcam: FakeGradcam;
+
+  /**
+   * Answers the five contract-shaped calls the facade composes the workspace from (D-05). The
+   * task body is the flat live shape unless a test needs different Grad-CAM flags (D-38).
+   */
+  async function openCase(
+    analysis: object = analysisPrimary,
+    task: object = reviewTaskLive,
+  ): Promise<void> {
+    http.expectOne(url(`/api/v1/review/tasks/${TASK_ID}`)).flush(task);
     await settle();
 
     http.expectOne(url(`/api/v1/cases/${CASE_ID}`)).flush(caseDetail);
@@ -115,12 +155,15 @@ describe('CaseWorkspacePage (WEB-FR-210…244)', () => {
   }
 
   beforeEach(async () => {
+    gradcam = new FakeGradcam();
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
         provideI18n(),
+        { provide: GradcamService, useValue: gradcam },
+        { provide: CaseImageContentService, useValue: new FakeContent() },
         { provide: ApiConfiguration, useValue: { rootUrl: ORIGIN } },
       ],
     });
@@ -325,10 +368,29 @@ describe('CaseWorkspacePage (WEB-FR-210…244)', () => {
     expect(byId<HTMLButtonElement>('action-replace')!.disabled).toBe(false);
   });
 
-  it('hides the Grad-CAM toggle entirely where there is no overlay (WEB-FR-212)', async () => {
-    await openCase(analysisUndetermined);
+  it('offers the Grad-CAM toggle, off, on the primary photograph (WEB-FR-211)', async () => {
+    await openCase();
+    await settle();
+
+    const toggle = el().querySelector('foshol-gradcam-view .toggle');
+    expect(toggle?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('hides the Grad-CAM toggle, and never asks, where there is no overlay (WEB-FR-212)', async () => {
+    await openCase(analysisUndetermined, { ...reviewTaskLive, gradcamObjectKey: null });
+    await settle();
 
     expect(el().querySelector('foshol-gradcam-view .toggle')).toBeNull();
+    expect(gradcam.loadCalls).toBe(0);
+  });
+
+  /** D-38 — the task detail's object key alone says an overlay exists; it is never a URL. */
+  it('takes the overlay flag from the task detail when the analysis says none', async () => {
+    await openCase(analysisUndetermined);
+    await settle();
+
+    expect(gradcam.loadCalls).toBe(1);
+    expect(el().querySelector('foshol-gradcam-view .toggle')).not.toBeNull();
   });
 
   // The farmer-reported metrics the server reckons a dose from, and where they came from.

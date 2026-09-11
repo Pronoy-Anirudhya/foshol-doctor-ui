@@ -6,6 +6,12 @@ export interface KpiBreach {
   caseId?: string;
   cropCode?: string;
   cropNameBn?: string;
+  cropNameEn?: string | null;
+
+  /**
+   * True when cropNameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  cropNameEnFallback?: boolean;
   dueAt?: string;
   farmerName?: string;
   id?: string;

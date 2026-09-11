@@ -1285,6 +1285,8 @@ components:
         caseId:       { type: string, format: uuid }
         cropId:       { type: string, format: uuid }
         cropNameBn:   { type: string }
+        cropNameEn:   { type: string, nullable: true }
+        cropNameEnFallback: { type: boolean, description: True when cropNameEn fell back to Bangla (COMMON-NFR-038) }
         status:       { $ref: '#/components/schemas/CaseStatus' }
         decisionPath: { $ref: '#/components/schemas/DecisionPath' }
         noteBn:       { type: string, nullable: true }
@@ -1340,9 +1342,13 @@ components:
       properties:
         caseId:              { type: string, format: uuid }
         cropNameBn:          { type: string }
+        cropNameEn:          { type: string, nullable: true }
+        cropNameEnFallback:  { type: boolean, description: True when cropNameEn fell back to Bangla (COMMON-NFR-038) }
         status:              { $ref: '#/components/schemas/CaseStatus' }
         decisionPath:        { $ref: '#/components/schemas/DecisionPath' }
         diseaseNameBn:       { type: string, nullable: true }
+        diseaseNameEn:       { type: string, nullable: true }
+        diseaseNameEnFallback: { type: boolean, description: True when diseaseNameEn fell back to Bangla (COMMON-NFR-038) }
         officerName:         { type: string, nullable: true }
         advisoryVersion:     { type: integer, nullable: true }
         rejectionMessageBn:  { type: string, nullable: true }
@@ -1357,6 +1363,8 @@ components:
         diseaseId:     { type: string, format: uuid }
         diseaseCode:   { type: string }
         diseaseNameBn: { type: string }
+        diseaseNameEn: { type: string, nullable: true }
+        diseaseNameEnFallback: { type: boolean, description: True when diseaseNameEn fell back to Bangla (COMMON-NFR-038) }
         confidence:    { type: number, format: float }
         rank:          { type: integer }
         source:        { type: string, enum: [MODEL, KB, MERGED] }
@@ -1368,6 +1376,8 @@ components:
         symptomId:   { type: string, format: uuid }
         symptomCode: { type: string }
         nameBn:      { type: string }
+        nameEn:      { type: string, nullable: true }
+        nameEnFallback: { type: boolean, description: True when nameEn fell back to Bangla (COMMON-NFR-038) }
         score:       { type: number, format: float }
         source:      { type: string, enum: [SPEECH, VISION, OFFICER] }
         matcher:     { type: string, enum: [VECTOR, FUZZY, MANUAL], nullable: true }
@@ -1411,9 +1421,13 @@ components:
         farmerName:        { type: string }
         cropCode:          { type: string }
         cropNameBn:        { type: string }
+        cropNameEn:        { type: string, nullable: true }
+        cropNameEnFallback: { type: boolean, description: True when cropNameEn fell back to Bangla (COMMON-NFR-038) }
         districtCode:      { type: string }
         decisionPath:      { $ref: '#/components/schemas/DecisionPath' }
         topDiseaseNameBn:  { type: string, nullable: true }
+        topDiseaseNameEn:  { type: string, nullable: true }
+        topDiseaseNameEnFallback: { type: boolean, description: True when topDiseaseNameEn fell back to Bangla (COMMON-NFR-038) }
         topConfidence:     { type: number, format: float, nullable: true }
         imageCount:        { type: integer }
         hasAudio:          { type: boolean }
@@ -1483,6 +1497,8 @@ components:
         caseId:        { type: string, format: uuid }
         diseaseId:     { type: string, format: uuid, nullable: true }
         diseaseNameBn: { type: string, nullable: true }
+        diseaseNameEn: { type: string, nullable: true }
+        diseaseNameEnFallback: { type: boolean, description: True when diseaseNameEn fell back to Bangla (COMMON-NFR-038) }
         officerId:     { type: string, format: uuid }
         officerName:   { type: string }
         action:        { type: string, enum: [APPROVED, EDITED, REPLACED] }
@@ -1612,6 +1628,8 @@ components:
         farmerName:    { type: string }
         cropCode:      { type: string }
         cropNameBn:   { type: string }
+        cropNameEn:   { type: string, nullable: true }
+        cropNameEnFallback: { type: boolean, description: True when cropNameEn fell back to Bangla (COMMON-NFR-038) }
         dueAt:         { type: string, format: date-time }
         breachedAt:    { type: string, format: date-time }
 

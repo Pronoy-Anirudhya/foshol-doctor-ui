@@ -4,6 +4,12 @@
 export interface ExtractedSymptom {
   matcher?: ('VECTOR' | 'FUZZY' | 'MANUAL') | null;
   nameBn: string;
+  nameEn?: string | null;
+
+  /**
+   * True when nameEn fell back to Bangla (COMMON-NFR-038)
+   */
+  nameEnFallback?: boolean;
   score: number;
   source: 'SPEECH' | 'VISION' | 'OFFICER';
   symptomCode: string;
