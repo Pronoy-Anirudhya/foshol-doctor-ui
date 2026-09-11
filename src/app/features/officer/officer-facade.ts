@@ -175,6 +175,17 @@ export class OfficerFacade {
   /** `WEB-FR-235` — the last failed action, kept on screen beside the editor it did not clear. */
   readonly actionProblem = this._actionProblem.asReadonly();
   readonly summary = this._summary.asReadonly();
+
+  /**
+   * WEB-FR-211 / WEB-FR-212 — whether the open case has a Grad-CAM overlay, first true wins: the
+   * task detail's `analysis.hasGradcam`, its top-level `hasGradcam`, a non-null
+   * `gradcamObjectKey` (all read by `review-task.adapter.ts`), then the composed
+   * `AnalysisDetail`. When false, the case detail offers no toggle and never calls `/gradcam`.
+   */
+  readonly gradcamPresent = computed(
+    () =>
+      this._summary()?.gradcamPresent === true || this.workspace.analysis()?.hasGradcam === true,
+  );
   readonly diseases = this._diseases.asReadonly();
   readonly diseasesLoading = this._diseasesLoading.asReadonly();
   /** The active remedies of the selected disease, exactly as the API returned them. */
@@ -754,7 +765,8 @@ export class OfficerFacade {
 
     return {
       task: summary.task,
-      case: caseDetail,
+      // The task detail's own `case.images` when it sent them (D-38), else the composed case's.
+      case: summary.images === null ? caseDetail : { ...caseDetail, images: [...summary.images] },
       analysis,
       farmerName: summary.farmerName ?? undefined,
       suggestedDiseaseId: summary.topDiseaseId,

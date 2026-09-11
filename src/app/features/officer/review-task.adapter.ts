@@ -1,4 +1,5 @@
 import type { Advisory } from '../../generated/models/advisory';
+import type { CaseImage } from '../../generated/models/case-image';
 import type { Remedy } from '../../generated/models/remedy';
 import type { ReviewCaseDetail } from '../../generated/models/review-case-detail';
 import type { ReviewTask } from '../../generated/models/review-task';
@@ -10,15 +11,16 @@ import type { ReviewTask } from '../../generated/models/review-task';
  *
  * `GET /review/tasks/{taskId}` is typed by the frozen contract as the nested
  * `{task, case, analysis, farmerName, suggestedDiseaseId, suggestedRemedies, priorAdvisory}`.
- * The running server returns **one flat object** instead (full field list in
- * `LIVE-API-NOTES.md`). The generated client therefore hands us a `ReviewCaseDetail` whose
- * fields are all `undefined` at runtime, and TypeScript cannot see that it is lying.
+ * The running server first returned **one flat object** instead (full field list in
+ * `LIVE-API-NOTES.md`), and now sends the nested shape WITH the flat fields alongside it. The
+ * generated client cannot tell which fields are really there, so this file — and only this
+ * file — casts the generated response through `unknown` and reads what the server actually sent.
  *
- * So this file — and only this file — casts the generated response through `unknown` and reads
- * the body the server actually sends. Everything else in the officer console is composed from
- * endpoints that DO match the contract (`GET /cases/{caseId}`, `GET /cases/{caseId}/analysis`,
- * and the `ReviewTask` returned by `claim`), which is why this adapter is small: it exists for
- * `suggestedRemedies`, `topDiseaseId` and `publishedAdvisory`, which live nowhere else.
+ * Everything else in the officer console is still composed from endpoints that match the
+ * contract (`GET /cases/{caseId}`, `GET /cases/{caseId}/analysis`, and the `ReviewTask` returned
+ * by `claim`), which is why this adapter is small. It exists for `suggestedRemedies`,
+ * `topDiseaseId` and `publishedAdvisory`, which live nowhere else, and for the two things the
+ * Grad-CAM needs from the task detail (D-38): whether an overlay exists, and `case.images`.
  *
  * The call itself still goes through the **generated** client, so no URL is hand-written and
  * `WEB-API-001` holds.
@@ -52,6 +54,14 @@ interface FlatReviewTaskBody {
   suggestedRemedies?: unknown;
   publishedAdvisory?: unknown;
   version?: unknown;
+  /** Nested `ReviewCaseDetail.analysis` — its `hasGradcam` is the preferred overlay flag. */
+  analysis?: unknown;
+  /** Nested `ReviewCaseDetail.case` — its `images` are the preferred image list. */
+  case?: unknown;
+  /** Flat aliases of the same facts. */
+  hasGradcam?: unknown;
+  gradcamObjectKey?: unknown;
+  images?: unknown;
 }
 
 const TASK_STATES: readonly string[] = ['PENDING', 'CLAIMED', 'DONE', 'REJECTED'];
@@ -81,6 +91,13 @@ export interface ReviewTaskSummary {
   readonly suggestedRemedies: readonly Remedy[];
   /** Set on a re-submission whose parent already produced an advisory. */
   readonly publishedAdvisory: Advisory | null;
+  /**
+   * WEB-FR-211 — the task detail says the case has a Grad-CAM overlay (`gradcamPresent`).
+   * Deliberately a boolean: the object key behind it is a storage path, and nothing keeps it.
+   */
+  readonly gradcamPresent: boolean;
+  /** `case.images` (or the flat alias) when well-formed; `null` sends the caller elsewhere. */
+  readonly images: readonly CaseImage[] | null;
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -93,6 +110,47 @@ const readBoolean = (value: unknown): boolean => value === true;
 
 const readNumber = (value: unknown): number | null =>
   typeof value === 'number' && Number.isFinite(value) ? value : null;
+
+/**
+ * WEB-FR-211 / WEB-FR-212 (D-38) — first true wins: the nested `analysis.hasGradcam`, then the
+ * top-level `hasGradcam`, then a non-empty `gradcamObjectKey`. The key is read as a flag and
+ * nothing more; it is a storage path, never a URL, and it is not returned.
+ */
+export function gradcamPresent(response: ReviewCaseDetail): boolean {
+  const body = response as unknown as FlatReviewTaskBody;
+  const analysis = isRecord(body.analysis) ? body.analysis : null;
+  return (
+    readBoolean(analysis?.['hasGradcam']) ||
+    readBoolean(body.hasGradcam) ||
+    readString(body.gradcamObjectKey) !== null
+  );
+}
+
+function readImage(value: unknown): CaseImage | null {
+  if (!isRecord(value)) return null;
+  const imageId = readString(value['imageId']);
+  const position = readNumber(value['position']);
+  if (imageId === null || position === null || typeof value['primary'] !== 'boolean') return null;
+  return {
+    imageId,
+    position,
+    primary: value['primary'],
+    qualityScore: readNumber(value['qualityScore']),
+    width: readNumber(value['width']),
+    height: readNumber(value['height']),
+  };
+}
+
+/** The nested `case.images` first, then the flat alias; all-or-nothing, never a partial list. */
+function readImages(body: FlatReviewTaskBody): readonly CaseImage[] | null {
+  const nested = isRecord(body.case) ? body.case['images'] : undefined;
+  for (const candidate of [nested, body.images]) {
+    if (!Array.isArray(candidate) || candidate.length === 0) continue;
+    const images = candidate.map(readImage);
+    if (images.every((image): image is CaseImage => image !== null)) return images;
+  }
+  return null;
+}
 
 /**
  * D-07 — the same remedy object arrives keyed `id` from `GET /diseases/{id}/remedies` and
@@ -156,5 +214,7 @@ export function adaptReviewTask(response: ReviewCaseDetail, taskId: string): Rev
     publishedAdvisory: isRecord(body.publishedAdvisory)
       ? (body.publishedAdvisory as unknown as Advisory)
       : null,
+    gradcamPresent: gradcamPresent(response),
+    images: readImages(body),
   };
 }
