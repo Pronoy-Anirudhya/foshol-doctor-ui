@@ -10,7 +10,7 @@ interface JwtClaims {
   readonly iat?: number;
 }
 
-const ROLES: readonly string[] = ['FARMER', 'OFFICER', 'ADMIN'];
+export const ROLES: readonly string[] = ['FARMER', 'OFFICER', 'ADMIN'];
 
 /**
  * A ~20-line base64url claim decode instead of a JWT library (WEB-NFR-007).
