@@ -506,6 +506,7 @@ paths:
         '302': { description: Redirect to the presigned overlay PNG }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { description: No overlay exists for this case }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
   /api/v1/cases/{caseId}/advisory:
     get:
