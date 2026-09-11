@@ -4,13 +4,6 @@
   gap: 0.5rem;
 }
 
-.bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
 .toggle {
   display: inline-flex;
   align-items: center;
@@ -51,7 +44,8 @@
   color: var(--color-ink-muted);
 }
 
-.hint {
+.note {
+  margin: 0;
   font-size: 0.75rem;
   color: var(--color-ink-faint);
 }
@@ -64,23 +58,34 @@
   background-color: var(--color-surface-2);
 }
 
-.primary {
-  grid-area: 1 / 1;
-  border-radius: 0;
+/* Until the photograph has said what its proportions are there is nothing to size the box by. */
+.stack:not([data-sized='true']) {
+  min-block-size: 12rem;
 }
 
-/*
- * multiply is the honest blend for a Grad-CAM: it darkens where the heat map is saturated and
- * leaves the leaf untouched where it is pale, so the photograph stays readable underneath
- * instead of being replaced by a colour wash. screen and normal both hide the very texture the
- * officer is judging.
- */
+.photo,
 .overlay {
   grid-area: 1 / 1;
   inline-size: 100%;
   block-size: 100%;
-  object-fit: contain;
-  mix-blend-mode: multiply;
+}
+
+.photo {
+  border-radius: 0;
+}
+
+/*
+ * `fill`, not `contain`: the box already has the photograph's proportions, so stretching the PNG
+ * to it lays every heat-map pixel over the part of the leaf it was computed from, whatever the
+ * PNG's own resolution.
+ *
+ * No blend mode. The sidecar returns the photograph with the heat map already composited over it
+ * at `FOSHOL_SIDECAR_EXPLAIN_ALPHA` (SIDECAR-FR-034), so the leaf is still visible inside the PNG.
+ * Blending it again (multiply) would darken the photograph twice; turning the overlay on is a
+ * plain cross-fade from the bare photograph to the composited one.
+ */
+.overlay {
+  object-fit: fill;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--duration-2) var(--ease-settle);

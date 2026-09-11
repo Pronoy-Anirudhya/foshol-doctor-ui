@@ -6,46 +6,46 @@ import {
   effect,
   inject,
   input,
+  linkedSignal,
   output,
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { GradcamService } from '../../../core/media/gradcam.service';
-import { IMAGE_VARIANT_ORIGINAL } from '../../../core/media/out-of-contract/media-url.service';
-import { PointerHoldDirective } from '../../directives/pointer-hold.directive';
-import { SecureImage } from '../secure-image/secure-image';
+import type { ProblemView } from '../../../core/errors/problem';
+import { CASE_IMAGE_ORIGINAL } from '../../../core/media/case-image-content.service';
+import { GradcamFailedError, GradcamService } from '../../../core/media/gradcam.service';
+import { CasePhoto, type PhotoSize } from '../case-photo/case-photo';
+import { ErrorPanel } from '../error-panel/error-panel';
+import { ImageZoom } from '../image-zoom/image-zoom';
 
 /**
- * WEB-FR-211 — the Grad-CAM overlay over the primary case image, DEFAULTING TO OFF. The officer
- * sees the photograph first and the model's opinion second; a heat map that is already burned
- * over the leaf when the page opens is the model telling the officer what to think.
+ * The officer's view of a case photograph, and the Grad-CAM overlay on the primary one.
  *
- * WEB-FR-212 — if there is no overlay, the toggle is HIDDEN. Not disabled, not greyed, not
- * present-but-broken. The same applies when the fetch fails for any reason: a control that does
- * nothing is worse than no control, because the officer spends the demo pressing it.
+ * WEB-FR-210 — the photograph sits inside the shared zoom control, pointer and keyboard.
  *
- * D-03 — the requirement text says `gradcamObjectKey`, the frozen schema says
- * `hasGradcam: boolean`. WEB-API-005 makes the generated client the winner, so `hasGradcam` is
- * what this component binds to, and the caller passes `AnalysisDetail.hasGradcam` straight in.
+ * WEB-FR-211 — an overlay toggle over the PRIMARY image, DEFAULTING TO OFF. The officer sees the
+ * photograph first and the model's opinion second: a heat map already burned over the leaf when
+ * the page opens is the model telling the officer what to think. It shows where the vision model
+ * looked for its top-1 class — explainability for the reviewer, not a finding — and the note
+ * under the toggle says so.
  *
- * The interaction has two halves, and both matter:
- *   - a quick press LATCHES the overlay on, so it can be studied hands-free;
- *   - a press held down shows it only WHILE HELD, so the officer can flick between the heat map
- *     and the bare leaf and see what actually changed. Comparison is the whole reason to look
- *     at a Grad-CAM at all, and a latched toggle makes it a two-click round trip.
+ * WEB-FR-212 — no overlay, no control. Not disabled, not greyed, not present-but-broken. The
+ * toggle appears only once the overlay has actually been fetched, so a `404` or a blocked fetch
+ * is discovered before the officer is offered a control that would do nothing.
  *
- * WEB-UX-040 — both halves work from the keyboard, because `PointerHoldDirective` treats a held
- * Space or Enter as a hold. A short keypress therefore latches exactly as a short click does.
+ * The toggle lives in the zoom bar (`zoomBarEnd`), never inside the pannable viewport: there it
+ * would be dragged about with the picture, and a zoomed viewport captures the very pointer that
+ * should have pressed it.
+ *
+ * The component stays mounted while the officer flips through thumbnails, so the overlay is
+ * fetched once per case view and its object URL is revoked when the view is left. On any image
+ * but the primary, the toggle and the overlay do not exist: the Grad-CAM was computed for the
+ * primary photograph and says nothing about the others (`DEVIATIONS.md` D-38).
  */
-
-/** Below this, a press is a click; above it, it was a deliberate hold-to-compare. */
-const QUICK_PRESS_MAX_MS = 300;
-const NO_TIMESTAMP = 0;
-
 @Component({
   selector: 'foshol-gradcam-view',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, SecureImage, PointerHoldDirective],
+  imports: [CasePhoto, ErrorPanel, ImageZoom, TranslatePipe],
   templateUrl: './gradcam-view.html',
   styleUrl: './gradcam-view.css',
 })
@@ -53,22 +53,26 @@ export class GradcamView {
   private readonly gradcam = inject(GradcamService);
 
   readonly caseId = input.required<string>();
+
+  /** The image on screen: the primary one, or whichever thumbnail the officer picked. */
   readonly imageId = input.required<string>();
 
-  /** WEB-UX-042 — the primary photograph's alternative text, supplied by the caller. */
+  /** WEB-UX-042 — the photograph's alternative text, supplied by the caller. */
   readonly imageAlt = input.required<string>();
 
-  /** `AnalysisDetail.hasGradcam` (D-03), never a locally derived guess. */
-  readonly hasGradcam = input.required<boolean>();
+  /** Whether `imageId` is the primary image — the only one a Grad-CAM belongs to. */
+  readonly isPrimary = input.required<boolean>();
 
   /**
-   * Raised once when an overlay was promised but could not be fetched. The toggle has already
-   * hidden itself by then; this exists so the case detail can note the gap rather than leaving
-   * the officer wondering where the heat map went.
+   * The server says an overlay exists: `analysis.hasGradcam`, then `hasGradcam`, then a non-null
+   * `gradcamObjectKey` (D-38). When false, `/gradcam` is never called at all.
    */
+  readonly overlayAvailable = input.required<boolean>();
+
+  /** Raised once when an overlay was promised but could not be fetched. */
   readonly overlayUnavailable = output<void>();
 
-  protected readonly originalVariant = IMAGE_VARIANT_ORIGINAL;
+  protected readonly originalVariant = CASE_IMAGE_ORIGINAL;
 
   /**
    * Held as a plain field as well as a signal. Revocation bookkeeping must not be a
@@ -77,59 +81,70 @@ export class GradcamView {
    */
   private objectUrl: string | null = null;
   private readonly _objectUrl = signal<string | null>(null);
+  private readonly _problem = signal<ProblemView | null>(null);
+  /** Bumped by the problem panel's retry. */
+  private readonly _attempt = signal(0);
 
-  private readonly _latched = signal(false);
-  private readonly _held = signal(false);
-  private readonly _unavailable = signal(false);
-  private holdStartedAt = NO_TIMESTAMP;
+  /** Off by default, and off again whenever the officer moves onto or away from the primary. */
+  private readonly _on = linkedSignal<boolean, boolean>({
+    source: this.isPrimary,
+    computation: () => false,
+  });
+
+  /** The photograph's `aspect-ratio`, once it has loaded and said what it is. */
+  private readonly _aspect = linkedSignal<string, string | null>({
+    source: this.imageId,
+    computation: () => null,
+  });
 
   protected readonly overlayUrl = this._objectUrl.asReadonly();
-  protected readonly latched = this._latched.asReadonly();
+  protected readonly problem = this._problem.asReadonly();
+  protected readonly aspect = this._aspect.asReadonly();
+  protected readonly overlayOn = this._on.asReadonly();
 
   /** WEB-FR-212 — the single gate on whether the control exists at all. */
-  protected readonly toggleVisible = computed(() => this.hasGradcam() && !this._unavailable());
-
-  protected readonly overlayVisible = computed(
-    () => (this._latched() || this._held()) && this._objectUrl() !== null,
+  protected readonly toggleVisible = computed(
+    () => this.isPrimary() && this._objectUrl() !== null,
   );
+
+  protected readonly overlayVisible = computed(() => this.toggleVisible() && this._on());
 
   constructor() {
     /**
-     * Loaded eagerly rather than on first press, for two reasons. Hold-to-compare has to be
-     * instant to be worth having, and a failure has to be known BEFORE the toggle is offered —
-     * discovering it on the officer's first press is exactly the broken control WEB-FR-212
-     * forbids.
+     * Fetched as soon as the server says there is an overlay, not on first press, so that a
+     * failure is known BEFORE the toggle is offered — discovering it on the officer's first
+     * press is exactly the broken control WEB-FR-212 forbids.
      */
     effect((onCleanup) => {
       const caseId = this.caseId();
-      const wanted = this.hasGradcam();
+      const wanted = this.overlayAvailable();
+      this._attempt();
 
       let cancelled = false;
       onCleanup(() => {
         cancelled = true;
       });
 
-      if (!wanted) {
-        this.adopt(null);
-        return;
-      }
+      this.adopt(null);
+      this._problem.set(null);
+      if (!wanted) return;
 
-      this.gradcam
-        .load(caseId)
-        .then((url) => {
+      this.gradcam.load(caseId).then(
+        (url) => {
           // A component destroyed, or a case switched, mid-flight still owns this object URL.
           if (cancelled) {
             this.gradcam.revoke(url);
             return;
           }
           this.adopt(url);
-        })
-        .catch(() => {
+        },
+        (error: unknown) => {
           if (cancelled) return;
-          this._unavailable.set(true);
-          this._latched.set(false);
+          // A storage outage is worth telling the officer about; a 404 is simply "no overlay".
+          if (error instanceof GradcamFailedError) this._problem.set(error.problem);
           this.overlayUnavailable.emit();
-        });
+        },
+      );
     });
 
     // A blob object URL is a document-lifetime root: a leaked one pins the PNG in memory until
@@ -137,17 +152,16 @@ export class GradcamView {
     inject(DestroyRef).onDestroy(() => this.adopt(null));
   }
 
-  protected onHoldStart(): void {
-    this.holdStartedAt = Date.now();
-    this._held.set(true);
+  protected toggle(): void {
+    this._on.update((on) => !on);
   }
 
-  protected onHoldEnd(): void {
-    const quick = Date.now() - this.holdStartedAt < QUICK_PRESS_MAX_MS;
-    this._held.set(false);
-    // A quick press is a click, and a click latches. A long press was a comparison, and
-    // releasing it should leave the overlay exactly as it was found.
-    if (quick) this._latched.update((on) => !on);
+  protected retry(): void {
+    this._attempt.update((attempt) => attempt + 1);
+  }
+
+  protected onPhotoSize(size: PhotoSize): void {
+    this._aspect.set(`${size.width} / ${size.height}`);
   }
 
   private adopt(next: string | null): void {

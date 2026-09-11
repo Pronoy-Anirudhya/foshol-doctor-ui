@@ -1,24 +1,48 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
-import { GradcamService, GradcamUnavailableError } from '../../../core/media/gradcam.service';
-import { SecureMediaService } from '../../../core/media/secure-media.service';
+import { toProblemView } from '../../../core/errors/problem';
+import {
+  CaseImageContentService,
+  type CaseImageVariant,
+} from '../../../core/media/case-image-content.service';
+import {
+  GradcamFailedError,
+  GradcamService,
+  GradcamUnavailableError,
+} from '../../../core/media/gradcam.service';
 import { GradcamView } from './gradcam-view';
 
 const OVERLAY_URL = 'blob:http://localhost:4200/overlay';
+const PHOTO_URL = 'blob:http://localhost:4200/photo';
+const CORRELATION_ID = '01a07caa-d705-7ad0-a51b-f334668c9f99';
+
+const STORAGE_DOWN = toProblemView(
+  new HttpErrorResponse({
+    status: 503,
+    error: {
+      status: 503,
+      code: 'ERR_STORAGE_UNAVAILABLE',
+      title: 'Service Unavailable',
+      detail: 'Object store is unavailable.',
+      correlationId: CORRELATION_ID,
+    },
+  }),
+);
 
 class FakeGradcamService {
   loadCalls = 0;
   revoked: string[] = [];
-  /** A flag rather than a stored rejected promise: an eagerly rejected one that nothing has
+  /** A mode rather than a stored rejected promise: an eagerly rejected one that nothing has
    *  awaited yet is reported as an unhandled rejection and poisons the whole run. */
-  failing = false;
+  mode: 'ok' | 'missing' | 'failed' = 'ok';
 
   load(): Promise<string> {
     this.loadCalls += 1;
-    return this.failing
-      ? Promise.reject(new GradcamUnavailableError(404))
-      : Promise.resolve(OVERLAY_URL);
+    if (this.mode === 'missing') return Promise.reject(new GradcamUnavailableError(404));
+    if (this.mode === 'failed') return Promise.reject(new GradcamFailedError(STORAGE_DOWN));
+    return Promise.resolve(OVERLAY_URL);
   }
 
   revoke(url: string | null): void {
@@ -26,13 +50,16 @@ class FakeGradcamService {
   }
 }
 
-class FakeSecureMediaService {
-  resolve(): Promise<string> {
-    return Promise.resolve('https://store.example/primary.jpg');
+class FakeContent {
+  readonly variants: CaseImageVariant[] = [];
+
+  load(_caseId: string, _imageId: string, variant: CaseImageVariant): Promise<string> {
+    this.variants.push(variant);
+    return Promise.resolve(PHOTO_URL);
   }
 
-  refresh(): Promise<string> {
-    return Promise.resolve('https://store.example/primary.jpg');
+  revoke(): void {
+    /* The photograph's own lifetime is `case-photo.spec.ts`'s business. */
   }
 }
 
@@ -41,48 +68,53 @@ class FakeSecureMediaService {
   template: `
     <foshol-gradcam-view
       caseId="c-1"
-      imageId="i-1"
       imageAlt="ধানের পাতা"
-      [hasGradcam]="hasGradcam()"
+      [imageId]="imageId()"
+      [isPrimary]="isPrimary()"
+      [overlayAvailable]="overlayAvailable()"
       (overlayUnavailable)="unavailable = unavailable + 1"
     />
   `,
 })
 class Host {
-  readonly hasGradcam = signal(true);
+  readonly imageId = signal('i-1');
+  readonly isPrimary = signal(true);
+  readonly overlayAvailable = signal(true);
   unavailable = 0;
 }
 
-describe('GradcamView', () => {
+describe('GradcamView (WEB-FR-210…212)', () => {
   let gradcam: FakeGradcamService;
+  let content: FakeContent;
 
-  const create = async () => {
+  const create = async (): Promise<ComponentFixture<Host>> => {
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
     return fixture;
   };
 
-  const toggle = (fixture: { nativeElement: HTMLElement }): HTMLButtonElement | null =>
-    fixture.nativeElement.querySelector<HTMLButtonElement>('.toggle');
+  const root = (fixture: ComponentFixture<Host>): HTMLElement =>
+    fixture.nativeElement as HTMLElement;
 
-  const overlay = (fixture: { nativeElement: HTMLElement }): HTMLImageElement | null =>
-    fixture.nativeElement.querySelector<HTMLImageElement>('.overlay');
+  const toggle = (fixture: ComponentFixture<Host>): HTMLButtonElement | null =>
+    root(fixture).querySelector<HTMLButtonElement>('.toggle');
 
-  /** The directive treats a held Space as a hold; a quick one is therefore a click. */
-  const quickPress = async (fixture: Awaited<ReturnType<typeof create>>): Promise<void> => {
-    const button = toggle(fixture);
-    button?.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-    button?.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', bubbles: true }));
+  const overlay = (fixture: ComponentFixture<Host>): HTMLImageElement | null =>
+    root(fixture).querySelector<HTMLImageElement>('.overlay');
+
+  const press = async (fixture: ComponentFixture<Host>): Promise<void> => {
+    toggle(fixture)?.click();
     await fixture.whenStable();
   };
 
   beforeEach(() => {
     gradcam = new FakeGradcamService();
+    content = new FakeContent();
     TestBed.configureTestingModule({
       providers: [
         provideTranslateService(),
         { provide: GradcamService, useValue: gradcam },
-        { provide: SecureMediaService, useValue: new FakeSecureMediaService() },
+        { provide: CaseImageContentService, useValue: content },
       ],
     });
   });
@@ -92,63 +124,108 @@ describe('GradcamView', () => {
     const fixture = await create();
 
     expect(toggle(fixture)).not.toBeNull();
-    expect(overlay(fixture)?.classList.contains('visible')).toBe(false);
     expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('false');
+    expect(overlay(fixture)?.classList.contains('visible')).toBe(false);
   });
 
-  /** WEB-FR-212 — hidden, not disabled. D-03: gated on `hasGradcam`, per the frozen schema. */
-  it('hides the toggle entirely when the case has no overlay', async () => {
+  /** WEB-FR-210 — the officer's view is the photograph as the farmer took it. */
+  it('shows the original photograph, not the derivative', async () => {
+    await create();
+
+    expect(content.variants).toEqual(['ORIGINAL']);
+  });
+
+  /** WEB-FR-212 — hidden, not disabled, and `/gradcam` is not even asked. */
+  it('offers no toggle and never fetches when the case has no overlay', async () => {
     const fixture = TestBed.createComponent(Host);
-    fixture.componentInstance.hasGradcam.set(false);
+    fixture.componentInstance.overlayAvailable.set(false);
     await fixture.whenStable();
 
     expect(toggle(fixture)).toBeNull();
-    expect(fixture.nativeElement.querySelector('button[disabled]')).toBeNull();
+    // Not a disabled toggle either. (The zoom-out button is disabled at fit, and is not ours.)
+    expect(root(fixture).querySelector('button[aria-pressed]')).toBeNull();
     expect(gradcam.loadCalls).toBe(0);
   });
 
-  /**
-   * The known cross-origin risk. If the blob fetch is refused, the control must vanish before
-   * the officer ever presses it — a control that does nothing is worse than no control.
-   */
-  it('hides the toggle and reports when the overlay cannot be fetched', async () => {
-    gradcam.failing = true;
+  it('turns the overlay on with a press, and off again with the next', async () => {
+    const fixture = await create();
 
+    await press(fixture);
+    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('true');
+    expect(overlay(fixture)?.classList.contains('visible')).toBe(true);
+
+    await press(fixture);
+    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('false');
+    expect(overlay(fixture)?.classList.contains('visible')).toBe(false);
+  });
+
+  /** WEB-UX-040 — a native button, so Enter and Space press it with no extra wiring. */
+  it('is a native button, and so keyboard operable', async () => {
+    const fixture = await create();
+
+    expect(toggle(fixture)?.tagName).toBe('BUTTON');
+    expect(toggle(fixture)?.getAttribute('type')).toBe('button');
+  });
+
+  /** A zoomed viewport captures the pointer; a toggle inside it could not be pressed. */
+  it('sits in the zoom bar, not inside the pannable viewport', async () => {
+    const fixture = await create();
+
+    expect(root(fixture).querySelector('foshol-image-zoom .bar .toggle')).not.toBeNull();
+    expect(root(fixture).querySelector('.viewport .toggle')).toBeNull();
+    expect(root(fixture).querySelector('.viewport .overlay')).not.toBeNull();
+  });
+
+  /** The Grad-CAM was computed for the primary photograph and says nothing about the others. */
+  it('offers neither toggle nor overlay on any image but the primary', async () => {
+    const fixture = await create();
+    await press(fixture);
+
+    fixture.componentInstance.imageId.set('i-2');
+    fixture.componentInstance.isPrimary.set(false);
+    await fixture.whenStable();
+    expect(toggle(fixture)).toBeNull();
+    expect(overlay(fixture)).toBeNull();
+
+    fixture.componentInstance.imageId.set('i-1');
+    fixture.componentInstance.isPrimary.set(true);
+    await fixture.whenStable();
+    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('fetches the overlay once for the whole case view, across thumbnails', async () => {
+    const fixture = await create();
+
+    fixture.componentInstance.imageId.set('i-2');
+    fixture.componentInstance.isPrimary.set(false);
+    await fixture.whenStable();
+    fixture.componentInstance.imageId.set('i-1');
+    fixture.componentInstance.isPrimary.set(true);
+    await fixture.whenStable();
+
+    expect(gradcam.loadCalls).toBe(1);
+  });
+
+  /** A 404 is "no overlay": no control, and nothing to apologise for. */
+  it('hides the toggle and reports when the case turns out to have no overlay', async () => {
+    gradcam.mode = 'missing';
     const fixture = await create();
 
     expect(toggle(fixture)).toBeNull();
     expect(overlay(fixture)).toBeNull();
+    expect(root(fixture).querySelector('foshol-error-panel')).toBeNull();
     expect(fixture.componentInstance.unavailable).toBe(1);
   });
 
-  it('latches the overlay on a quick press and off again on the next', async () => {
+  /** WEB-FR-005 — a storage outage says so, and the photograph stays. */
+  it('shows the problem and keeps the photograph when the overlay cannot be served', async () => {
+    gradcam.mode = 'failed';
     const fixture = await create();
 
-    await quickPress(fixture);
-    expect(overlay(fixture)?.classList.contains('visible')).toBe(true);
-    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('true');
-
-    await quickPress(fixture);
-    expect(overlay(fixture)?.classList.contains('visible')).toBe(false);
-  });
-
-  /** Hold-to-compare: visible while held, and back to whatever it was on release. */
-  it('shows the overlay only while a long press is held', async () => {
-    const fixture = await create();
-    const button = toggle(fixture);
-
-    button?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
-    await fixture.whenStable();
-    expect(overlay(fixture)?.classList.contains('visible')).toBe(true);
-
-    // Push the release past the quick-press window so it reads as a hold, not a click.
-    vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 5_000);
-    button?.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
-    await fixture.whenStable();
-    vi.restoreAllMocks();
-
-    expect(overlay(fixture)?.classList.contains('visible')).toBe(false);
-    expect(toggle(fixture)?.getAttribute('aria-pressed')).toBe('false');
+    expect(toggle(fixture)).toBeNull();
+    expect(root(fixture).querySelector('foshol-error-panel')).not.toBeNull();
+    expect(root(fixture).querySelector('foshol-case-photo')).not.toBeNull();
+    expect(fixture.componentInstance.unavailable).toBe(1);
   });
 
   /** WEB-UX-042 — the overlay says what it is, and says nothing while it is not shown. */
@@ -158,20 +235,22 @@ describe('GradcamView', () => {
     expect(overlay(fixture)?.getAttribute('alt')).toBe('media.gradcam.alt');
     expect(overlay(fixture)?.getAttribute('aria-hidden')).toBe('true');
 
-    await quickPress(fixture);
+    await press(fixture);
     expect(overlay(fixture)?.getAttribute('aria-hidden')).toBeNull();
   });
 
   /** WEB-UX-044 — the state is readable as text, not only as a colour. */
-  it('states the overlay state in words', async () => {
+  it('states the overlay state in words, and that it is not a diagnosis', async () => {
     const fixture = await create();
-    expect(fixture.nativeElement.querySelector('.state')?.textContent?.trim()).toBe(
+
+    expect(root(fixture).querySelector('.state')?.textContent?.trim()).toBe(
       'media.gradcam.state.off',
     );
+    expect(root(fixture).querySelector('.note')?.textContent?.trim()).toBe('media.gradcam.note');
   });
 
   /** A leaked blob object URL pins the PNG until the tab closes. */
-  it('revokes the object URL when destroyed', async () => {
+  it('revokes the overlay object URL when destroyed', async () => {
     const fixture = await create();
     fixture.destroy();
 

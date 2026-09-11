@@ -1,50 +1,64 @@
-<!-- WEB-FR-212 — @if, not [disabled]. When there is no overlay the control does not exist. -->
-@if (toggleVisible()) {
-  <div class="bar">
-    <button
-      type="button"
-      class="toggle touch-target"
-      fosholPointerHold
-      [attr.aria-pressed]="latched()"
-      [attr.data-on]="overlayVisible()"
-      (holdStart)="onHoldStart()"
-      (holdEnd)="onHoldEnd()"
-    >
-      <span class="dot" aria-hidden="true"></span>
-      <span>{{ (latched() ? 'media.gradcam.hide' : 'media.gradcam.show') | translate }}</span>
-    </button>
+<foshol-image-zoom>
+  <!-- The toggle belongs to the zoom bar, not to the pannable viewport: a zoomed viewport
+       captures the pointer, and a control inside it would pan and scale with the picture. -->
+  <ng-container ngProjectAs="[zoomBarEnd]">
+    <!-- WEB-FR-212 — @if, not [disabled]. When there is no overlay the control does not exist. -->
+    @if (toggleVisible()) {
+      <button
+        type="button"
+        class="toggle touch-target"
+        [attr.aria-pressed]="overlayOn()"
+        [attr.data-on]="overlayOn()"
+        (click)="toggle()"
+      >
+        <span class="dot" aria-hidden="true"></span>
+        <span>{{ (overlayOn() ? 'media.gradcam.hide' : 'media.gradcam.show') | translate }}</span>
+      </button>
 
-    <!-- WEB-UX-044 — the state is text, never only the colour of the dot or of the picture. -->
-    <span class="state">
-      {{ (overlayVisible() ? 'media.gradcam.state.on' : 'media.gradcam.state.off') | translate }}
-    </span>
+      <!-- WEB-UX-044 — the state is text, never only the colour of the dot or of the picture. -->
+      <span class="state">
+        {{ (overlayOn() ? 'media.gradcam.state.on' : 'media.gradcam.state.off') | translate }}
+      </span>
+    }
+  </ng-container>
 
-    <span class="hint">{{ 'media.gradcam.hint' | translate }}</span>
+  <!-- The photograph and the overlay share one box with the photograph's own proportions, so a
+       heat map of any resolution lies over exactly the leaf it was computed from. -->
+  <div class="stack" [attr.data-sized]="aspect() !== null" [style.aspect-ratio]="aspect()">
+    <foshol-case-photo
+      class="photo"
+      [caseId]="caseId()"
+      [imageId]="imageId()"
+      [variant]="originalVariant"
+      [alt]="imageAlt()"
+      [fit]="aspect() === null ? 'contain' : 'fill'"
+      (naturalSize)="onPhotoSize($event)"
+    />
+
+    @if (toggleVisible()) {
+      @if (overlayUrl(); as url) {
+        <!-- WEB-UX-042 — the overlay is an image in its own right and says what it is, not
+             "gradcam.png". It is aria-hidden while invisible so a screen reader is not told about
+             a layer that is not currently shown. -->
+        <img
+          class="overlay"
+          [src]="url"
+          [alt]="'media.gradcam.alt' | translate"
+          [attr.aria-hidden]="overlayVisible() ? null : 'true'"
+          [class.visible]="overlayVisible()"
+          decoding="async"
+        />
+      }
+    }
   </div>
+</foshol-image-zoom>
+
+@if (toggleVisible()) {
+  <p class="note">{{ 'media.gradcam.note' | translate }}</p>
 }
 
-<div class="stack">
-  <!-- The zoom view wants the full-resolution object, not the queue thumbnail. -->
-  <foshol-secure-image
-    class="primary"
-    [caseId]="caseId()"
-    [imageId]="imageId()"
-    [variant]="originalVariant"
-    [alt]="imageAlt()"
-    fit="contain"
-  />
-
-  @if (overlayUrl(); as url) {
-    <!-- WEB-UX-042 — the overlay is an image in its own right and says what it is, not
-         "gradcam.png". It is aria-hidden while invisible so a screen reader is not told about
-         a layer that is not currently shown. -->
-    <img
-      class="overlay"
-      [src]="url"
-      [alt]="'media.gradcam.alt' | translate"
-      [attr.aria-hidden]="overlayVisible() ? null : 'true'"
-      [class.visible]="overlayVisible()"
-      decoding="async"
-    />
-  }
-</div>
+<!-- WEB-FR-005 — a storage outage shows its title, detail and correlation id. The photograph
+     stays, and nothing here stands between the officer and claim, approve or reject. -->
+@if (problem(); as failure) {
+  <foshol-error-panel [problem]="failure" (retry)="retry()" />
+}

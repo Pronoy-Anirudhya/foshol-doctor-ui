@@ -32,12 +32,12 @@
     "en": "Keyboard + − 0 and arrow keys; double-click with a mouse"
   },
   "media.gradcam.show": {
-    "bn": "তাপচিত্র দেখুন",
-    "en": "Show heat map"
+    "bn": "মডেল কোথায় দেখেছে দেখুন",
+    "en": "Show where the model looked"
   },
   "media.gradcam.hide": {
-    "bn": "তাপচিত্র সরান",
-    "en": "Hide heat map"
+    "bn": "মডেল কোথায় দেখেছে তা সরান",
+    "en": "Hide where the model looked"
   },
   "media.gradcam.state.on": {
     "bn": "তাপচিত্র চালু",
@@ -47,9 +47,9 @@
     "bn": "তাপচিত্র বন্ধ",
     "en": "Heat map off"
   },
-  "media.gradcam.hint": {
-    "bn": "চেপে ধরে রাখলে মিলিয়ে দেখা যায়",
-    "en": "Press and hold to compare"
+  "media.gradcam.note": {
+    "bn": "মডেল ছবির কোন অংশে নজর দিয়েছে, তা আপনার যাচাইয়ের জন্য — এটি রোগনির্ণয় নয়।",
+    "en": "Where the model looked, for your review — it is not a diagnosis."
   },
   "media.gradcam.alt": {
     "bn": "গ্র্যাড-ক্যাম তাপচিত্র: ছবির যে অংশগুলোতে মডেল সবচেয়ে বেশি নজর দিয়েছে, মূল ছবির উপরে স্তর হিসেবে বসানো।",
