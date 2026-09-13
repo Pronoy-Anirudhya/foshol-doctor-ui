@@ -7,7 +7,11 @@
 #
 # Debian slim rather than alpine: @angular/build (esbuild), tailwindcss 4 (lightningcss) and
 # rollup all ship per-libc native binaries, and glibc is the path they are exercised on daily.
-FROM node:24-bookworm-slim AS build
+#
+# --platform=$BUILDPLATFORM: this stage emits static JS/CSS/HTML, identical on every CPU, so it
+# always runs natively on the build machine. A multi-arch build (--platform linux/amd64,linux/arm64)
+# then compiles Angular ONCE, and only the tiny nginx stage below is per-architecture — no QEMU.
+FROM --platform=$BUILDPLATFORM node:24-bookworm-slim AS build
 WORKDIR /app
 
 ENV CI=true \
