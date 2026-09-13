@@ -5,6 +5,7 @@ import { toProblemView } from '../../core/errors/problem';
 import { LiveAnnouncer } from '../../core/stores/live-announcer';
 import { FarmersService } from '../../generated/services/farmers.service';
 import { ErrorPanel } from '../../shared/ui/error-panel/error-panel';
+import { LoadingOverlay } from '../../shared/ui/loading-overlay/loading-overlay';
 import { ModalDialog } from '../../shared/ui/modal-dialog/modal-dialog';
 import { checkCsv, templateBlob, type CsvRejection } from './farmer-csv';
 import { farmerErrorKey } from './farmer-error-keys';
@@ -35,7 +36,7 @@ const BYTES_PER_KIB = 1024;
 @Component({
   selector: 'foshol-farmer-import-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ModalDialog, ErrorPanel],
+  imports: [TranslatePipe, ModalDialog, ErrorPanel, LoadingOverlay],
   host: { class: 'contents' },
   templateUrl: './farmer-import-dialog.html',
 })

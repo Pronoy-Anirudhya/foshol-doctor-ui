@@ -18,6 +18,7 @@ import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import { Icon } from '../../../shared/ui/icon/icon';
+import { LoadingOverlay } from '../../../shared/ui/loading-overlay/loading-overlay';
 import { localiseAuthProblem } from '../shared/auth-error-keys';
 import { AuthShell } from '../shared/auth-shell';
 import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
@@ -53,12 +54,19 @@ const DEV_FIXED = 'DEV_FIXED';
     AuthShell,
     DemoHint,
     Icon,
+    LoadingOverlay,
     ProblemNotice,
     ReactiveFormsModule,
     RouterLink,
     TranslatePipe,
   ],
   template: `
+    <foshol-loading-overlay
+      [active]="facade.requestPending() || facade.verifyPending()"
+      [titleKey]="pendingTitleKey()"
+      testId="farmer-login-overlay"
+    />
+
     <foshol-auth-shell variant="farmer">
       <div class="card p-6 sm:p-8">
         <h2 class="text-2xl font-bold">{{ 'auth.farmer.title' | translate }}</h2>
@@ -425,6 +433,11 @@ export class FarmerLoginPage {
         ? (this.facade.verifyState().problem ?? this.facade.requestState().problem)
         : this.facade.requestState().problem,
     ),
+  );
+
+  /** Verifying only ever follows requesting, so a verify in flight is named first. */
+  protected readonly pendingTitleKey = computed(() =>
+    this.facade.verifyPending() ? 'auth.farmer.verifying' : 'auth.farmer.requesting',
   );
 
   constructor() {

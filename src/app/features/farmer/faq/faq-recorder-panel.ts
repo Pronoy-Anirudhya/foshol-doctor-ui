@@ -3,6 +3,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { APP_CONFIG } from '../../../core/config/app-config';
 import type { DraftAudio } from '../../../core/stores/case-draft-store';
 import { HoldToTalk } from '../../../shared/ui/hold-to-talk/hold-to-talk';
+import { LoadingOverlay } from '../../../shared/ui/loading-overlay/loading-overlay';
 import { VoiceRecorder } from '../capture/voice-recorder';
 import { WaveformCanvas } from '../capture/waveform-canvas';
 
@@ -34,7 +35,7 @@ const PERCENT = 100;
 @Component({
   selector: 'foshol-faq-recorder-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [HoldToTalk, TranslatePipe, WaveformCanvas],
+  imports: [HoldToTalk, LoadingOverlay, TranslatePipe, WaveformCanvas],
   host: { class: 'block' },
   template: `
     @if (recorder.available()) {
@@ -113,6 +114,16 @@ const PERCENT = 100;
         {{ diagnosticKey() | translate }}
       </p>
     }
+
+    <!-- A second, harder-to-miss echo of state C: the button already says "sending" and is
+         disabled, but this overlay makes the wait unmistakable on a small screen. It disappears
+         the instant busy() drops, so nothing here has to notice the request finishing. -->
+    <foshol-loading-overlay
+      [active]="busy()"
+      titleKey="farmer.faq.mic.sending"
+      hintKey="farmer.faq.processing.hint"
+      testId="faq-sending-modal"
+    />
   `,
   styles: `
     .faq-rec {

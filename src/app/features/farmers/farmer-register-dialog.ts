@@ -10,6 +10,7 @@ import type { RegisterFarmerRequest } from '../../generated/models/register-farm
 import { AuthService } from '../../generated/services/auth.service';
 import { FarmersService } from '../../generated/services/farmers.service';
 import { ErrorPanel } from '../../shared/ui/error-panel/error-panel';
+import { LoadingOverlay } from '../../shared/ui/loading-overlay/loading-overlay';
 import { ModalDialog } from '../../shared/ui/modal-dialog/modal-dialog';
 import { farmerErrorKey } from './farmer-error-keys';
 import { FarmerDirectoryStore } from './farmer-directory-store';
@@ -40,7 +41,7 @@ type Locale = RegisterFarmerRequest['preferredLanguage'];
 @Component({
   selector: 'foshol-farmer-register-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ModalDialog, ErrorPanel],
+  imports: [ReactiveFormsModule, TranslatePipe, ModalDialog, ErrorPanel, LoadingOverlay],
   host: { class: 'contents' },
   templateUrl: './farmer-register-dialog.html',
 })

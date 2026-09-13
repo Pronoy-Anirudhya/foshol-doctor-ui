@@ -435,6 +435,7 @@
   "farmer.capture.submit.retry": "Send again",
   "farmer.capture.submit.send": "Send",
   "farmer.capture.submit.sending": "Sending…",
+  "farmer.capture.submit.sendingHint": "Uploading your photos and details. This can take a moment on a slow connection.",
   "farmer.capture.subtitle": "Take photos, then describe the problem by voice or in writing. A field officer checks every case before any advice is sent.",
   "farmer.capture.title": "Photos and description",
   "farmer.capture.voice.captured": "Recording captured",

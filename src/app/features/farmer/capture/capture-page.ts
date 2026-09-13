@@ -19,6 +19,7 @@ import { KnowledgeService } from '../../../generated/services/knowledge.service'
 import { BackLink } from '../../../shared/ui/back-link/back-link';
 import { ErrorPanel } from '../../../shared/ui/error-panel/error-panel';
 import { Icon } from '../../../shared/ui/icon/icon';
+import { LoadingOverlay } from '../../../shared/ui/loading-overlay/loading-overlay';
 import { PageHeading } from '../../../shared/ui/page-heading/page-heading';
 import { Skeleton } from '../../../shared/ui/skeleton/skeleton';
 import { Spinner } from '../../../shared/ui/spinner/spinner';
@@ -102,6 +103,7 @@ const STEP_REVIEW = 'review';
     Icon,
     ImageStrip,
     LandStep,
+    LoadingOverlay,
     NoteBox,
     PageHeading,
     QualityReject,
@@ -112,6 +114,17 @@ const STEP_REVIEW = 'review';
     VoicePanel,
   ],
   template: `
+    <!-- The persistent submit bar lets Send fire from ANY step (WEB-FR-140/141), so this overlay
+         lives at the page root rather than inside foshol-review-summary: that component is only
+         mounted while the review card is in the stepper's deck (CaptureStepper.inDeck), and a
+         submit from an earlier step would otherwise leave the wait with nothing to show for it. -->
+    <foshol-loading-overlay
+      [active]="draft.isSubmitting()"
+      titleKey="farmer.capture.submit.sending"
+      hintKey="farmer.capture.submit.sendingHint"
+      testId="capture-submit-overlay"
+    />
+
     <div class="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 md:pt-10 xl:max-w-4xl">
       <foshol-back-link
         class="mb-4 block"

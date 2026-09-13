@@ -13,6 +13,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AUTH_SURFACES } from '../../../core/auth/auth.guard';
 import { AuthFacade } from '../../../core/auth/auth-facade';
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { LoadingOverlay } from '../../../shared/ui/loading-overlay/loading-overlay';
 import { AuthShell } from '../shared/auth-shell';
 import { DEMO_ACCOUNTS, DemoHint, type DemoAccount } from '../shared/demo-hint';
 import { ProblemNotice } from '../shared/problem-notice';
@@ -29,8 +30,22 @@ import { ProblemNotice } from '../shared/problem-notice';
 @Component({
   selector: 'foshol-officer-login-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AuthShell, DemoHint, ProblemNotice, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [
+    AuthShell,
+    DemoHint,
+    LoadingOverlay,
+    ProblemNotice,
+    ReactiveFormsModule,
+    RouterLink,
+    TranslatePipe,
+  ],
   template: `
+    <foshol-loading-overlay
+      [active]="facade.loginPending()"
+      titleKey="auth.officer.submitting"
+      testId="officer-login-overlay"
+    />
+
     <foshol-auth-shell variant="console">
       <div class="card p-6 sm:p-8">
         <h2 class="text-2xl font-bold">{{ 'auth.officer.title' | translate }}</h2>

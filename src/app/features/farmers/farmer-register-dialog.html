@@ -4,6 +4,12 @@
   headingId="farmer-register-title"
   (closed)="close()"
 >
+  <foshol-loading-overlay
+    [active]="store.submitting()"
+    titleKey="farmers.register.submitting"
+    testId="register-overlay"
+  />
+
   @if (succeeded()) {
     <!-- WEB-FR-311 — the confirmation names the farmer and the district they were written into.
          It never echoes the phone: the control was cleared the moment the request succeeded, and
