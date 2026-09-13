@@ -435,6 +435,7 @@
   "farmer.capture.submit.retry": "আবার পাঠান",
   "farmer.capture.submit.send": "পাঠান",
   "farmer.capture.submit.sending": "পাঠানো হচ্ছে…",
+  "farmer.capture.submit.sendingHint": "ছবি ও তথ্য আপলোড হচ্ছে। সংযোগ ধীর হলে একটু সময় লাগতে পারে।",
   "farmer.capture.subtitle": "ছবি তুলুন এবং প্রয়োজনে ভয়েস বা টেক্সটের মাধ্যমে সমস্যাটি বিস্তারিত জানান। আমাদের কৃষি কর্মকর্তা আপনার তথ্য যাচাই করে সঠিক পরামর্শ পাঠাবেন।",
   "farmer.capture.title": "ছবি ও বর্ণনা দিন",
   "farmer.capture.voice.captured": "রেকর্ডিং নেওয়া হয়েছে",

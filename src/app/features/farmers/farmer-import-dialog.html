@@ -4,6 +4,12 @@
   headingId="farmer-import-title"
   (closed)="close()"
 >
+  <foshol-loading-overlay
+    [active]="store.importing()"
+    titleKey="farmers.import.uploading"
+    testId="import-overlay"
+  />
+
   <div class="flex flex-col gap-5">
     <!-- 1 — The template. Downloading it first is what stops a home-made header reaching the
          server, so it leads rather than sitting at the bottom as a footnote. -->
